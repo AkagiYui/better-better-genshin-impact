@@ -1,9 +1,24 @@
 import axios from 'axios'
 import router from '../router'
 
+// 获取当前baseURL的函数
+export const getBaseURL = () => {
+  // 优先使用动态设置的基础URL
+  return localStorage.getItem('dynamicBaseURL') || ''
+}
+
+// 设置baseURL的函数
+export const setBaseURL = (url) => {
+  if (url) {
+    localStorage.setItem('dynamicBaseURL', url)
+  } else {
+    localStorage.removeItem('dynamicBaseURL')
+  }
+}
+
 // 创建axios实例
 const api = axios.create({
-  baseURL: '', // 使用相对路径，让Vite代理处理
+  baseURL: undefined, // 使用相对路径，让Vite代理处理
   timeout: 35000,
   headers: {
     'Content-Type': 'application/json'
@@ -13,8 +28,15 @@ const api = axios.create({
 // 请求拦截器
 api.interceptors.request.use(
   config => {
+    // 动态获取baseURL
+    const dynamicBaseURL = getBaseURL()
+    if (dynamicBaseURL) {
+      config.baseURL = dynamicBaseURL
+    }
+
     if (process.env.NODE_ENV !== 'production') {
       console.log('API请求:', config.method?.toUpperCase(), config.url)
+      console.log('BaseURL:', config.baseURL || 'Vite代理')
     }
     
     // 从 localStorage 获取 token 并添加到 Authorization 头

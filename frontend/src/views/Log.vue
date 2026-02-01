@@ -58,6 +58,7 @@ import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { Swiper } from 'swiper/bundle'
 import 'swiper/css/bundle'
+import { getBaseURL } from '@/utils/api' 
 
 const router = useRouter()
 
@@ -207,7 +208,7 @@ const connectWebSocket = name => {
 
   try {
     const protocol = location.protocol === 'https:' ? 'wss' : 'ws'
-    const wsUrl = `${protocol}://${location.host}/ws/${encodeURIComponent(name)}`
+    const wsUrl = `${getBaseURL()}/ws/${encodeURIComponent(name)}`
     ws = new WebSocket(wsUrl)
 
     ws.onmessage = e => {
@@ -236,7 +237,7 @@ const loadLogFiles = async () => {
   try {
     const token = localStorage.getItem('aBgiToken')
     const headers = token ? { 'Authorization': token } : {}
-    const res = await fetch('/api/logFiles', { headers })
+    const res = await fetch(getBaseURL()+'/api/logFiles', { headers })
     
     if (!res.ok) throw new Error(`Status ${res.status}`)
     const data = await res.json()

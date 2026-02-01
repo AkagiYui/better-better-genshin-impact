@@ -235,7 +235,7 @@ import { ref, reactive, onMounted, onUnmounted, computed, watch, h } from 'vue'
 import { message, Modal, Select } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 // 假设这里有您的API工具，如果报错请保留您原来的引入方式
-import { apiMethods } from '@/utils/api' 
+import { apiMethods,getBaseURL } from '@/utils/api' 
 
 const router = useRouter()
 
@@ -269,7 +269,7 @@ const imageRef = ref(null)
 
 const refreshScreenshot = () => {
   const ts = Date.now()
-  screenshotModal.url = `/api/aBgiJt?t=${ts}&tk=${token}`
+  screenshotModal.url = getBaseURL()+`/api/aBgiJt?t=${ts}&tk=${token}`
 }
 
 const openScreenshot = () => {
