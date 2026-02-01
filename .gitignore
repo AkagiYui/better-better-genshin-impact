@@ -1,0 +1,7 @@
+.vscode/
+.idea/
+
+auto-bgi/
+
+node_modules/
+dist/
