@@ -137,14 +137,14 @@ export default {
     }
 
     const loadImages = async () => {
-      try {
-        const data = await apiMethods.getImages()
-        images.value = data.data || []
-      } catch (err) {
-        console.error('Failed to load images:', err)
-        // fallback
-        images.value = ['bd.jpg', 'ff.png', 'ng.jpg', 'sh.jpg']
-      }
+      // try {
+      //   const data = await apiMethods.getImages()
+      //   images.value = data.data || []
+      // } catch (err) {
+      //   console.error('Failed to load images:', err)
+      //   // fallback
+      //   images.value = ['bd.jpg', 'ff.png', 'ng.jpg', 'sh.jpg']
+      // }
     }
 
     const initializeSwipers = async () => {

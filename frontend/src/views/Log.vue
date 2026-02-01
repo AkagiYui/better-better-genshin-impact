@@ -78,7 +78,7 @@ const CONSTANTS = {
     delay: 8000,
     speed: 1200
   },
-  STATIC_IMAGES: ['bd.jpg', 'ff.png', 'ng.jpg', 'sh.jpg'], // 确保这些图片在 public/img/ 下
+  STATIC_IMAGES: [], //['bd.jpg', 'ff.png', 'ng.jpg', 'sh.jpg'], // 确保这些图片在 public/img/ 下
   IMG_CACHE_KEY: 'sys_bg_cache_v1',
   IMG_CACHE_TTL: 604800000 // 7天
 }

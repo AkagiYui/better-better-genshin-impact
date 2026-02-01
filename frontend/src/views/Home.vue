@@ -718,15 +718,15 @@ const refreshStatus = async () => {
 }
 
 const getImages = async () => {
-    try {
-        const res = await fetch('/api/images')
-        const data = await res.json()
-        carouselImages.value = data.images || []
-        if(carouselImages.value.length) startCarousel()
-    } catch(e) {
-        carouselImages.value = ['/img/bd.jpg', '/img/ff.png'] // Fallback
-        startCarousel()
-    }
+    // try {
+    //     const res = await fetch('/api/images')
+    //     const data = await res.json()
+    //     carouselImages.value = data.images || []
+    //     if(carouselImages.value.length) startCarousel()
+    // } catch(e) {
+    //     carouselImages.value = ['/img/bd.jpg', '/img/ff.png'] // Fallback
+    //     startCarousel()
+    // }
 }
 const startCarousel = () => {
     setInterval(() => {
@@ -735,15 +735,15 @@ const startCarousel = () => {
 }
 
 const getHeaderImages = async () => {
-    try {
-        const res = await fetch('/api/images') // Or separate API
-        const data = await res.json()
-        headerCarouselImages.value = data.images || []
-        if(headerCarouselImages.value.length) startHeaderCarousel()
-    } catch(e) {
-        headerCarouselImages.value = ['/img/bd.jpg'] 
-        startHeaderCarousel()
-    }
+    // try {
+    //     const res = await fetch('/api/images') // Or separate API
+    //     const data = await res.json()
+    //     headerCarouselImages.value = data.images || []
+    //     if(headerCarouselImages.value.length) startHeaderCarousel()
+    // } catch(e) {
+    //     headerCarouselImages.value = ['/img/bd.jpg'] 
+    //     startHeaderCarousel()
+    // }
 }
 const startHeaderCarousel = () => {
     headerCarouselInterval = setInterval(() => {

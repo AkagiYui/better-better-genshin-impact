@@ -206,17 +206,18 @@ export default {
     let headerCarouselInterval = null
 
     const getHeaderImages = async () => {
-      try {
-        const response = await fetch('/api/images')
-        if (!response.ok) throw new Error('Failed')
-        const data = await response.json()
-        headerCarouselImages.value = data.images || []
-        if (headerCarouselImages.value.length > 0) startHeaderCarousel()
-      } catch (error) {
-        // 默认图片回退
-        headerCarouselImages.value = ['/img/bd.jpg', '/img/ff.png']
-        startHeaderCarousel()
-      }
+      headerCarouselImages.value = []
+      // try {
+      //   const response = await fetch('/api/images')
+      //   if (!response.ok) throw new Error('Failed')
+      //   const data = await response.json()
+      //   headerCarouselImages.value = data.images || []
+      //   if (headerCarouselImages.value.length > 0) startHeaderCarousel()
+      // } catch (error) {
+      //   // 默认图片回退
+      //   headerCarouselImages.value = ['/img/bd.jpg', '/img/ff.png']
+      //   startHeaderCarousel()
+      // }
     }
 
     const startHeaderCarousel = () => {

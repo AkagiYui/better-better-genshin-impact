@@ -228,17 +228,17 @@ const selectionPreview = computed(() => {
 
 // 获取轮播图图片
 const getImages = async () => {
-  try {
-    const response = await fetch('/api/images')
-    if (!response.ok) throw new Error('Failed')
-    const data = await response.json()
-    carouselImages.value = data.images || []
-    if (carouselImages.value.length > 0) startCarousel()
-  } catch (error) {
-    // 默认图片
-    carouselImages.value = ['/img/bd.jpg', '/img/ff.png']
-    startCarousel()
-  }
+  // try {
+  //   const response = await fetch('/api/images')
+  //   if (!response.ok) throw new Error('Failed')
+  //   const data = await response.json()
+  //   carouselImages.value = data.images || []
+  //   if (carouselImages.value.length > 0) startCarousel()
+  // } catch (error) {
+  //   // 默认图片
+  //   carouselImages.value = ['/img/bd.jpg', '/img/ff.png']
+  //   startCarousel()
+  // }
 }
 
 const startCarousel = () => {
