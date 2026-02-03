@@ -1,7 +1,7 @@
 <template>
   <div class="task-cron-page">
-    <div class="bg-circle circle-1"></div>
-    <div class="bg-circle circle-2"></div>
+    <div class="bg-circle circle-1" />
+    <div class="bg-circle circle-2" />
 
     <div class="main-container">
       <a-typography-title :level="2" class="page-title">
@@ -14,19 +14,18 @@
             <a-card :bordered="false" class="pink-card form-card hover-effect">
               <template #title>
                 <div class="card-header-title">
-                  <plus-circle-outlined />
+                  <PlusCircleOutlined />
                   <span>{{ isEditing ? '编辑任务' : '新增任务' }}</span>
                 </div>
               </template>
-              
+
               <a-alert
                 type="info"
                 show-icon
-                class="cron-tip"
-              >
+                class="cron-tip">
                 <template #message>
                   <span style="font-size: 12px; color: #666;">
-                    Cron: 秒 分 时 日 月 周 (年)<br/>
+                    Cron: 秒 分 时 日 月 周 (年)<br />
                     示例: */5 * * * * (每5分)
                   </span>
                 </template>
@@ -40,13 +39,11 @@
                     :loading="dropdownLoading"
                     allow-clear
                     class="pink-input"
-                    :disabled="isEditing"
-                  >
+                    :disabled="isEditing">
                     <a-select-option
                       v-for="taskName in availableTaskNames"
                       :key="taskName"
-                      :value="taskName"
-                    >
+                      :value="taskName">
                       {{ taskName }}
                     </a-select-option>
                   </a-select>
@@ -57,21 +54,19 @@
                     v-model:value="formState.spec"
                     placeholder="例如：0 0 12 * * ?"
                     allow-clear
-                    class="pink-input"
-                  >
+                    class="pink-input">
                     <template #suffix>
                       <a-tooltip title="点击查看在线生成器">
-                        <question-circle-outlined style="color: #ff85c0; cursor: pointer" @click="openCronTool"/>
+                        <QuestionCircleOutlined style="color: #ff85c0; cursor: pointer" @click="openCronTool" />
                       </a-tooltip>
                     </template>
                   </a-input>
                   <div class="preset-tags">
-                    <a-tag 
-                      v-for="item in presetSpecs" 
-                      :key="item.label" 
-                      color="pink" 
-                      @click="applyPreset(item.spec)"
-                    >
+                    <a-tag
+                      v-for="item in presetSpecs"
+                      :key="item.label"
+                      color="pink"
+                      @click="applyPreset(item.spec)">
                       {{ item.label }}
                     </a-tag>
                   </div>
@@ -83,8 +78,7 @@
                     :auto-size="{ minRows: 3, maxRows: 5 }"
                     placeholder="配置组名称等..."
                     allow-clear
-                    class="pink-input"
-                  />
+                    class="pink-input" />
                 </a-form-item>
 
                 <a-form-item label="备注 (可选)">
@@ -93,26 +87,23 @@
                     :auto-size="{ minRows: 2, maxRows: 4 }"
                     placeholder="任务备注信息..."
                     allow-clear
-                    class="pink-input"
-                  />
+                    class="pink-input" />
                 </a-form-item>
 
                 <div class="form-actions">
-                  <a-button 
-                    type="primary" 
-                    class="pink-btn submit-btn" 
+                  <a-button
+                    type="primary"
+                    class="pink-btn submit-btn"
                     :loading="formLoading"
-                    @click="handleSubmitTask"
                     :disabled="submitDisabled"
-                  >
+                    @click="handleSubmitTask">
                     {{ isEditing ? '保存修改' : '立即添加' }}
                   </a-button>
-                  
-                  <a-button 
-                    v-if="isEditing" 
-                    class="pink-btn ghost-btn" 
-                    @click="resetForm"
-                  >
+
+                  <a-button
+                    v-if="isEditing"
+                    class="pink-btn ghost-btn"
+                    @click="resetForm">
                     取消
                   </a-button>
 
@@ -130,12 +121,10 @@
             <template v-if="taskCronList.length > 0">
               <a-list
                 :grid="{ gutter: 16, xs: 1, sm: 1, md: 2, lg: 3, xl: 3, xxl: 3 }"
-                :data-source="taskCronList"
-              >
+                :data-source="taskCronList">
                 <template #renderItem="{ item }">
                   <a-list-item class="full-height-item">
                     <a-card :bordered="false" class="task-item-card hover-effect">
-                      
                       <div class="task-header">
                         <div class="task-name-wrapper">
                           <span class="task-name" :title="item.name">{{ item.name }}</span>
@@ -148,7 +137,7 @@
                       <div class="task-body">
                         <div class="info-block">
                           <div class="info-label">
-                            <clock-circle-outlined /> Cron 表达式
+                            <ClockCircleOutlined /> Cron 表达式
                           </div>
                           <div class="cron-box" :title="item.spec">
                             {{ item.spec }}
@@ -156,67 +145,65 @@
                         </div>
 
                         <div class="info-row">
-                          <field-time-outlined class="icon" />
+                          <FieldTimeOutlined class="icon" />
                           <span class="sub-text">下次: {{ item.paused ? '-' : (item.next || '计算中...') }}</span>
                         </div>
 
-                        <div class="info-row data-row" v-if="item.data">
-                          <code-outlined class="icon" />
+                        <div v-if="item.data" class="info-row data-row">
+                          <CodeOutlined class="icon" />
                           <span class="sub-text text-truncate" :title="item.data">{{ item.data }}</span>
                         </div>
 
-                        <div class="info-row mark-row" v-if="item.mark">
-                          <edit-outlined class="icon" />
+                        <div v-if="item.mark" class="info-row mark-row">
+                          <EditOutlined class="icon" />
                           <span class="sub-text" :title="item.mark">备注: {{ item.mark }}</span>
                         </div>
                       </div>
 
                       <div class="task-actions">
                         <a-tooltip title="立即运行一次">
-                          <a-button 
-                            shape="circle" size="small" 
+                          <a-button
+                            shape="circle"
+                            size="small"
                             class="action-btn run-btn"
-                            @click="AtOnceRunTask(item.name, item.data)"
-                          >
-                            <caret-right-outlined />
+                            @click="AtOnceRunTask(item.name, item.data)">
+                            <CaretRightOutlined />
                           </a-button>
                         </a-tooltip>
 
                         <a-tooltip title="编辑配置">
-                          <a-button 
-                            shape="circle" size="small" 
+                          <a-button
+                            shape="circle"
+                            size="small"
                             class="action-btn edit-btn"
-                            @click="startEdit(item)"
-                          >
-                            <edit-outlined />
+                            @click="startEdit(item)">
+                            <EditOutlined />
                           </a-button>
                         </a-tooltip>
 
-                         <a-popconfirm
-                                    :title="item.paused ? '恢复这个任务？' : '暂停这个任务？'"
-                                    ok-text="确定"
-                                    cancel-text="取消"
-                                    @confirm="togglePause(item)"
-                                  >
-                                    <a-tooltip :title="item.paused ? '恢复' : '暂停'">
-                                      <a-button 
-                                        shape="circle" 
-                                        size="small" 
-                                        class="action-btn"
-                                        :class="item.paused ? 'resume-btn' : 'pause-btn'"
-                                      >
-                                        <play-circle-outlined v-if="item.paused" />
-                                        <pause-circle-outlined v-else />
-                                        </a-button>
-                                    </a-tooltip>
-                                  </a-popconfirm>
+                        <a-popconfirm
+                          :title="item.paused ? '恢复这个任务？' : '暂停这个任务？'"
+                          ok-text="确定"
+                          cancel-text="取消"
+                          @confirm="togglePause(item)">
+                          <a-tooltip :title="item.paused ? '恢复' : '暂停'">
+                            <a-button
+                              shape="circle"
+                              size="small"
+                              class="action-btn"
+                              :class="item.paused ? 'resume-btn' : 'pause-btn'">
+                              <PlayCircleOutlined v-if="item.paused" />
+                              <PauseCircleOutlined v-else />
+                            </a-button>
+                          </a-tooltip>
+                        </a-popconfirm>
 
-                        <a-button 
-                          shape="circle" size="small" 
+                        <a-button
+                          shape="circle"
+                          size="small"
                           class="action-btn delete-btn"
-                          @click="confirmRemove(item)"
-                        >
-                          <delete-outlined />
+                          @click="confirmRemove(item)">
+                          <DeleteOutlined />
                         </a-button>
                       </div>
                     </a-card>
@@ -224,8 +211,6 @@
                 </template>
               </a-list>
             </template>
-            
-       
           </a-spin>
         </a-col>
       </a-row>
@@ -234,39 +219,39 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, computed } from 'vue'
-import { message, Modal } from 'ant-design-vue'
-import { 
-  PlusCircleOutlined, 
-  QuestionCircleOutlined, 
-  ClockCircleOutlined, 
+import { onMounted, reactive, ref, computed } from "vue"
+import { message, Modal } from "ant-design-vue"
+import {
+  PlusCircleOutlined,
+  QuestionCircleOutlined,
+  ClockCircleOutlined,
   FieldTimeOutlined,
   CodeOutlined,
   CaretRightOutlined,
   EditOutlined,
   DeleteOutlined,
   PlayCircleOutlined,
-  PauseCircleOutlined
-} from '@ant-design/icons-vue'
-import { apiMethods } from '@/utils/api'
+  PauseCircleOutlined,
+} from "@ant-design/icons-vue"
+import { apiMethods } from "@/utils/api"
 
 // --- 逻辑部分保持原样 ---
 
 const formState = reactive({
   id: 0,
   entry_id: 0,
-  name: '',
-  spec: '',
-  data: '',
-  mark: '',
-  status: 1
+  name: "",
+  spec: "",
+  data: "",
+  mark: "",
+  status: 1,
 })
 
 const presetSpecs = [
-  { label: '每天 4:05', spec: '0 5 4 * * *' },
-  { label: '每周一 4:00', spec: '0 0 4 ? * MON' },
-  { label: '每天 23:30', spec: '0 30 23 * * *' },
-  { label: '每5分钟', spec: '0 */5 * * * ?' }
+  { label: "每天 4:05", spec: "0 5 4 * * *" },
+  { label: "每周一 4:00", spec: "0 0 4 ? * MON" },
+  { label: "每天 23:30", spec: "0 30 23 * * *" },
+  { label: "每5分钟", spec: "0 */5 * * * ?" },
 ]
 
 const taskCronList = ref([])
@@ -290,7 +275,7 @@ const fetchTaskList = async () => {
       ? list.map(normalizeTaskCron)
       : []
   } catch (error) {
-    message.error('获取任务列表失败')
+    message.error("获取任务列表失败")
   } finally {
     tableLoading.value = false
   }
@@ -302,23 +287,23 @@ const fetchTaskNameOptions = async () => {
     const names = await apiMethods.getAvailableTaskCronNames()
     availableTaskNames.value = Array.isArray(names) ? names : []
   } catch (error) {
-    message.error('获取可用任务名称失败')
+    message.error("获取可用任务名称失败")
   } finally {
     dropdownLoading.value = false
   }
 }
 
 const comeBack = () => {
-  window.location.href = '/'
+  window.location.href = "/"
 }
 
 const openCronTool = () => {
-    window.open('https://cron.ciding.cc/', '_blank')
+  window.open("https://cron.ciding.cc/", "_blank")
 }
 
 const handleSubmitTask = async () => {
   if (submitDisabled.value) {
-    message.warning('请选择任务并填写 Cron 表达式')
+    message.warning("请选择任务并填写 Cron 表达式")
     return
   }
 
@@ -330,29 +315,29 @@ const handleSubmitTask = async () => {
       entry_id: formState.entry_id,
       name: formState.name,
       spec: formState.spec.trim(),
-      data: formState.data?.trim() || '',
-      mark: formState.mark?.trim() || '',
-      status: formState.status
+      data: formState.data?.trim() || "",
+      mark: formState.mark?.trim() || "",
+      status: formState.status,
     }
     let res
     if (editing) {
       res = await apiMethods.updateTaskCron({
         id: editingTaskId.value,
-        ...payload
+        ...payload,
       })
     } else {
       res = await apiMethods.addTaskCron(payload)
     }
-    const msg = typeof res === 'string'
+    const msg = typeof res === "string"
       ? res
       : editing
-        ? '任务已更新'
-        : '任务已添加'
+        ? "任务已更新"
+        : "任务已添加"
     message.success(msg)
     resetForm()
     fetchTaskList()
   } catch (error) {
-    message.error(editing ? '修改任务失败' : '添加任务失败')
+    message.error(editing ? "修改任务失败" : "添加任务失败")
   } finally {
     formLoading.value = false
   }
@@ -362,10 +347,10 @@ const resetForm = () => {
   editingTaskId.value = null
   formState.id = 0
   formState.entry_id = 0
-  formState.name = ''
-  formState.spec = ''
-  formState.data = ''
-  formState.mark = ''
+  formState.name = ""
+  formState.spec = ""
+  formState.data = ""
+  formState.mark = ""
   formState.status = 0
 }
 
@@ -375,10 +360,10 @@ const startEdit = (record) => {
   formState.entry_id = record.entry_id
   formState.name = record.name
   formState.spec = record.spec
-  formState.data = record.data || ''
-  formState.mark = record.mark || ''
+  formState.data = record.data || ""
+  formState.mark = record.mark || ""
   formState.status = record.status || 0
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+  window.scrollTo({ top: 0, behavior: "smooth" })
 }
 
 const applyPreset = (spec) => {
@@ -388,34 +373,34 @@ const applyPreset = (spec) => {
 const confirmRemove = (record) => {
   Modal.confirm({
     title: `确认删除任务「${record.name}」？`,
-    content: '删除后需要重新创建才能恢复。',
-    okText: '狠狠删除',
-    cancelText: '再想想',
+    content: "删除后需要重新创建才能恢复。",
+    okText: "狠狠删除",
+    cancelText: "再想想",
     okButtonProps: { danger: true },
     centered: true,
-    onOk: () => removeTask(record.id, record.entry_id)
+    onOk: () => removeTask(record.id, record.entry_id),
   })
 }
 
 
 const AtOnceRunTask = (type, data) => {
-    Modal.confirm({
-        title: '确认立即运行？',
-        content: '是否确认立即运行当前的任务？',
-        okText: '确定',
-        cancelText: '取消',
-        centered: true, // 居中显示
-        onOk: async () => {
-            try { 
-                  const res = await apiMethods.AtOnceRunTaskCron(type, data)
-                  const msg = typeof res === 'string' ? res : '任务指令已发送'
-                  message.success(msg)
-                  fetchTaskList()
-            } catch(e) { 
-                message.error('执行任务失败',JSON.stringify(e)) 
-            }
-        }
-    })
+  Modal.confirm({
+    title: "确认立即运行？",
+    content: "是否确认立即运行当前的任务？",
+    okText: "确定",
+    cancelText: "取消",
+    centered: true, // 居中显示
+    onOk: async () => {
+      try {
+        const res = await apiMethods.AtOnceRunTaskCron(type, data)
+        const msg = typeof res === "string" ? res : "任务指令已发送"
+        message.success(msg)
+        fetchTaskList()
+      } catch(e) {
+        message.error("执行任务失败", JSON.stringify(e))
+      }
+    },
+  })
 }
 
 // const AtOnceRunTask = async (type, data) => {
@@ -432,11 +417,11 @@ const AtOnceRunTask = (type, data) => {
 const removeTask = async (id, entry_id) => {
   try {
     const res = await apiMethods.removeTaskCron(id, entry_id)
-    const msg = typeof res === 'string' ? res : '任务已删除'
+    const msg = typeof res === "string" ? res : "任务已删除"
     message.success(msg)
     fetchTaskList()
   } catch (error) {
-    message.error('删除任务失败')
+    message.error("删除任务失败")
   }
 }
 
@@ -444,7 +429,7 @@ const togglePause = async (record) => {
   const paused = Boolean(record?.paused)
   const id = record?.id
   if (!id) {
-    message.error('未找到任务 id，无法执行操作')
+    message.error("未找到任务 id，无法执行操作")
     return
   }
   try {
@@ -454,10 +439,10 @@ const togglePause = async (record) => {
     } else {
       res = await apiMethods.pauseTaskCron(id)
     }
-    const defaultMsg = paused ? '任务已恢复' : '任务已暂停'
-    const msg = typeof res === 'object' && res !== null && res.msg
+    const defaultMsg = paused ? "任务已恢复" : "任务已暂停"
+    const msg = typeof res === "object" && res !== null && res.msg
       ? res.msg
-      : typeof res === 'string'
+      : typeof res === "string"
         ? res
         : defaultMsg
     message.success(msg)
@@ -468,7 +453,7 @@ const togglePause = async (record) => {
     }
     await fetchTaskList()
   } catch (error) {
-    message.error(paused ? '恢复任务失败' : '暂停任务失败')
+    message.error(paused ? "恢复任务失败" : "暂停任务失败")
   }
 }
 
@@ -482,7 +467,7 @@ const normalizeTaskCron = (item) => {
     id,
     entry_id,
     status: statusNum,
-    paused
+    paused,
   }
 }
 
@@ -656,7 +641,7 @@ onMounted(() => {
   /* 关键：使用 Flex 布局让卡片内容垂直分布，实现底部对齐 */
   display: flex;
   flex-direction: column;
-  height: 100%; 
+  height: 100%;
 }
 
 /* 覆盖 Ant Design Card body 默认 padding，并设为 flex */
@@ -730,7 +715,7 @@ onMounted(() => {
   font-weight: 600;
   font-size: 14px;
   /* 关键：允许在任意字符间换行 */
-  word-break: break-all; 
+  word-break: break-all;
   white-space: pre-wrap;
   line-height: 1.5;
 }

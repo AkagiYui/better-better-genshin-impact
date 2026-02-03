@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import { fileURLToPath, URL } from 'node:url'
+import { fileURLToPath, URL } from "node:url"
+import { defineConfig } from "vite"
+import vue from "@vitejs/plugin-vue"
 
 export default defineConfig({
   plugins: [
@@ -8,23 +8,23 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    }
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+    },
   },
   server: {
-    host: '0.0.0.0', // 新增此行，允许外部访问
+    host: "0.0.0.0", // 新增此行，允许外部访问
     port: 3000,
     proxy: {
-    }
+    },
   },
   build: {
     chunkSizeWarningLimit: 2000,
-    minify: 'terser',
+    minify: "terser",
     terserOptions: {
       compress: {
         drop_console: true, // 移除所有 console
-        drop_debugger: true
-      }
+        drop_debugger: true,
+      },
     },
     rollupOptions: {
       output: {
@@ -42,10 +42,10 @@ export default defineConfig({
             if (["vue", "vue+devtools-api"].includes(chunkName)) {
               chunkName = "vue+runtime-core"
             }
-            return "vendor-" + chunkName
+            return `vendor-${chunkName}`
           }
         },
-      
+
         entryFileNames: "js/[name]-[hash].js",
         chunkFileNames: "js/[name]-[hash].js",
         assetFileNames: (chunkInfo) => {
@@ -62,7 +62,7 @@ export default defineConfig({
           }
           return "assets/[name]-[hash][extname]"
         },
-      }
+      },
     },
   },
 })

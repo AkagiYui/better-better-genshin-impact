@@ -1,12 +1,12 @@
 <template>
   <div class="obs-container anime-theme">
-    <div class="sky-bg" v-if="$mq !== 'mobile'">
-      <div class="cloud cloud-1"></div>
-      <div class="cloud cloud-2"></div>
-      <div class="sakura sakura-1"></div>
-      <div class="sakura sakura-2"></div>
-      <div class="sakura sakura-3"></div>
-      <div class="sparkle sparkle-1"></div>
+    <div v-if="$mq !== 'mobile'" class="sky-bg">
+      <div class="cloud cloud-1" />
+      <div class="cloud cloud-2" />
+      <div class="sakura sakura-1" />
+      <div class="sakura sakura-2" />
+      <div class="sakura sakura-3" />
+      <div class="sparkle sparkle-1" />
     </div>
 
     <main class="main-layout">
@@ -15,15 +15,15 @@
           <div class="card-header">
             <span class="card-title">📹 控制台</span>
             <div class="connection-status" :class="{ 'online': isObsConnected, 'offline': !isObsConnected }">
-              <span class="status-dot"></span>
+              <span class="status-dot" />
               {{ isObsConnected ? 'OBS已连接' : 'OBS未连接' }}
             </div>
           </div>
-          
+
           <div class="status-section">
             <div class="status-badge" :class="{ 'recording': isRecording, 'disabled': !isObsConnected }">
               <div class="status-icon">
-                <div class="dot" :class="{ 'loading': loadingStatus.gettingStatus }"></div>
+                <div class="dot" :class="{ 'loading': loadingStatus.gettingStatus }" />
               </div>
               <div class="status-content">
                 <div class="status-main">{{ !isObsConnected ? '💔 断开' : (isRecording ? '🔴 录制中' : '⭕ 待机') }}</div>
@@ -33,7 +33,7 @@
 
             <div class="status-badge replay-status" :class="{ 'recording': isReplayBufferActive, 'disabled': !isObsConnected }">
               <div class="status-icon">
-                <div class="dot" :class="{ 'loading': loadingStatus.gettingReplayStatus }"></div>
+                <div class="dot" :class="{ 'loading': loadingStatus.gettingReplayStatus }" />
               </div>
               <div class="status-content">
                 <div class="status-main">{{ !isObsConnected ? '💔 断开' : (isReplayBufferActive ? '🟢 回放激活' : '⚪ 回放待机') }}</div>
@@ -50,22 +50,20 @@
 
             <div class="section-title">📹 录制操作</div>
             <div class="btn-row">
-              <button 
-                class="btn primary large" 
-                @click="startRecording" 
+              <button
+                class="btn primary large"
                 :disabled="!isObsConnected || isRecording || loadingStatus.starting"
-              >
-                <span class="btn-icon" v-if="!loadingStatus.starting">🎬</span>
+                @click="startRecording">
+                <span v-if="!loadingStatus.starting" class="btn-icon">🎬</span>
                 <MobileSpinner v-else />
                 <span class="btn-text">{{ loadingStatus.starting ? '启动中' : '开始录制' }}</span>
               </button>
-              
-              <button 
-                class="btn secondary large" 
-                @click="stopRecording" 
+
+              <button
+                class="btn secondary large"
                 :disabled="!isObsConnected || !isRecording || loadingStatus.stopping"
-              >
-                <span class="btn-icon" v-if="!loadingStatus.stopping">⏹️</span>
+                @click="stopRecording">
+                <span v-if="!loadingStatus.stopping" class="btn-icon">⏹️</span>
                 <MobileSpinner v-else />
                 <span class="btn-text">{{ loadingStatus.stopping ? '停止中' : '停止录制' }}</span>
               </button>
@@ -73,46 +71,42 @@
 
             <div class="section-title">🔄 回放缓冲操作</div>
             <div class="btn-row">
-              <button 
-                class="btn accent" 
-                @click="startReplayBuffer" 
+              <button
+                class="btn accent"
                 :disabled="!isObsConnected || isReplayBufferActive || loadingStatus.startingReplay"
-              >
+                @click="startReplayBuffer">
                 <span class="btn-icon">▶️</span>
                 <span class="btn-text">{{ loadingStatus.startingReplay ? '启动中' : '启动回放' }}</span>
               </button>
-              
-              <button 
-                class="btn secondary" 
-                @click="stopReplayBuffer" 
+
+              <button
+                class="btn secondary"
                 :disabled="!isObsConnected || !isReplayBufferActive || loadingStatus.stoppingReplay"
-              >
+                @click="stopReplayBuffer">
                 <span class="btn-icon">⏸️</span>
                 <span class="btn-text">{{ loadingStatus.stoppingReplay ? '停止中' : '停止回放' }}</span>
               </button>
             </div>
 
-            <button 
-              class="btn save-btn" 
-              @click="saveReplayBuffer" 
+            <button
+              class="btn save-btn"
               :disabled="!isObsConnected || !isReplayBufferActive || loadingStatus.savingReplay"
-            >
+              @click="saveReplayBuffer">
               <MobileSpinner v-if="loadingStatus.savingReplay" />
-              <span class="btn-icon" v-else>💾</span>
+              <span v-else class="btn-icon">💾</span>
               <span class="btn-text">{{ loadingStatus.savingReplay ? '保存中...' : '保存回放片段' }}</span>
             </button>
-            
-            <div class="divider"></div>
-            
+
+            <div class="divider" />
+
             <div class="section-title">📂 系统</div>
             <div class="btn-row">
-              <button 
-                class="btn ghost" 
-                @click="fetchVideos" 
+              <button
+                class="btn ghost"
                 :disabled="loadingStatus.fetchingVideos"
-              >
+                @click="fetchVideos">
                 <MobileSpinner v-if="loadingStatus.fetchingVideos" />
-                <span class="btn-icon" v-else>🔄</span>
+                <span v-else class="btn-icon">🔄</span>
                 <span class="btn-text">{{ loadingStatus.fetchingVideos ? '加载中' : '刷新列表' }}</span>
               </button>
 
@@ -128,7 +122,7 @@
       <section class="player-section" :class="{'active': currentVideo}">
         <div class="card player-card glassy">
           <transition name="fade" mode="out-in">
-            <div v-if="currentVideo" class="player-container" key="player">
+            <div v-if="currentVideo" key="player" class="player-container">
               <div class="player-header">
                 <div class="player-title">
                   <span class="icon">▶️</span>
@@ -136,16 +130,15 @@
                 </div>
                 <button class="btn small close-btn" @click="closePlayer">✕</button>
               </div>
-              
+
               <div class="video-wrapper">
-                <video 
+                <video
                   ref="videoRef"
-                  controls 
+                  controls
                   autoplay
                   class="main-video"
                   :src="getVideoStreamUrl(currentVideo)"
-                  @ratechange="handleRateChange"
-                >
+                  @ratechange="handleRateChange">
                   您的浏览器不支持视频播放
                 </video>
 
@@ -158,11 +151,10 @@
                     <button class="speed-btn high-speed" :class="{ active: currentPlaybackRate === 8.0 }" @click="setPlaybackRate(8.0)">8.0x</button>
                   </div>
                 </div>
-
               </div>
             </div>
 
-            <div v-else class="empty-player" key="empty">
+            <div v-else key="empty" class="empty-player">
               <div class="empty-content">
                 <div class="empty-icon">🎞️</div>
                 <h3>选择视频播放</h3>
@@ -179,52 +171,49 @@
           <div class="card-header">
             <div class="header-left">
               <span class="card-title">📂 文件列表</span>
-              <span class="badge" v-if="videos.length">{{ videos.length }}</span>
+              <span v-if="videos.length" class="badge">{{ videos.length }}</span>
             </div>
-                <div class="header-actions">
-                    <button
-                      class="btn small danger"
-                      @click="confirmDeleteAll"
-                      :disabled="loadingStatus.deletingAll"
-                    >
-                      <span v-if="!loadingStatus.deletingAll">🧹</span>
-                      <span v-else class="mobile-spinner"></span>
-                      <span class="btn-text">清空所有视频</span>
-                    </button>
+            <div class="header-actions">
+              <button
+                class="btn small danger"
+                :disabled="loadingStatus.deletingAll"
+                @click="confirmDeleteAll">
+                <span v-if="!loadingStatus.deletingAll">🧹</span>
+                <span v-else class="mobile-spinner" />
+                <span class="btn-text">清空所有视频</span>
+              </button>
 
-                    <!-- Sort by modified time (toggle) -->
-                    <button
-                      class="btn small"
-                      :class="{ active: sortDesc }"
-                      @click="toggleSortByModified"
-                      :disabled="loadingStatus.fetchingVideos || videos.length===0"
-                      title="按修改时间倒序排列（切换）"
-                    >
-                      <span v-if="!sortDesc">🕒</span>
-                      <span v-else>🔽</span>
-                      <span class="btn-text">排序</span>
-                    </button>
+              <!-- Sort by modified time (toggle) -->
+              <button
+                class="btn small"
+                :class="{ active: sortDesc }"
+                :disabled="loadingStatus.fetchingVideos || videos.length===0"
+                title="按修改时间倒序排列（切换）"
+                @click="toggleSortByModified">
+                <span v-if="!sortDesc">🕒</span>
+                <span v-else>🔽</span>
+                <span class="btn-text">排序</span>
+              </button>
 
-                    <button class="btn small refresh-icon" @click="fetchVideos" :disabled="loadingStatus.fetchingVideos">
-                      <span :class="{'spin': loadingStatus.fetchingVideos}">🔄 刷新</span>
-                    </button>
-                  </div>
+              <button class="btn small refresh-icon" :disabled="loadingStatus.fetchingVideos" @click="fetchVideos">
+                <span :class="{'spin': loadingStatus.fetchingVideos}">🔄 刷新</span>
+              </button>
+            </div>
           </div>
 
           <div class="video-list custom-scroll">
             <div v-if="loadingStatus.fetchingVideos" class="mobile-loading">
-               <div class="list-spinner"></div>
-               <p class="loading-text">加载文件中...</p>
+              <div class="list-spinner" />
+              <p class="loading-text">加载文件中...</p>
             </div>
 
-            <transition-group name="list" tag="div" v-if="!loadingStatus.fetchingVideos && videos.length > 0">
-              <div 
-                v-for="video in videos" 
-                :key="video.name" 
+            <transition-group v-if="!loadingStatus.fetchingVideos && videos.length > 0" name="list" tag="div">
+              <div
+                v-for="video in videos"
+                :key="video.name"
                 class="video-item"
                 :class="{ 'active': currentVideo === video.name }"
-                @click="playVideo(video.name)"
-              >
+                @click="playVideo(video.name)">
                 <div class="video-thumbnail">
                   <span class="thumb-icon">🎬</span>
                 </div>
@@ -236,11 +225,10 @@
                   </div>
                 </div>
                 <div class="video-actions">
-                  <button 
-                    class="btn small delete-btn" 
-                    @click.stop="DeleteVideo(video.name)"
+                  <button
+                    class="btn small delete-btn"
                     :disabled="loadingStatus.deletingVideo && deletingVideoName === video.name"
-                  >
+                    @click.stop="DeleteVideo(video.name)">
                     🗑️
                   </button>
                 </div>
@@ -259,25 +247,25 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive, computed } from 'vue'
-import dayjs from 'dayjs'
-import { apiMethods } from '@/utils/api'
-import { Modal, notification } from 'ant-design-vue'
+import { ref, onMounted, reactive, computed } from "vue"
+import dayjs from "dayjs"
+import { Modal, notification } from "ant-design-vue"
+import { apiMethods } from "@/utils/api"
 
 function getToken() {
-  return localStorage.getItem('bbgi-token') || ''
+  return localStorage.getItem("bbgi-token") || ""
 }
 
 function getVideoStreamUrl(path) {
   const token = getToken()
-  const url = `/api/abgiObs/PlayVideoStream?path=${encodeURIComponent(path)}${token ? `&tk=${encodeURIComponent(token)}` : ''}`
+  const url = `/api/abgiObs/PlayVideoStream?path=${encodeURIComponent(path)}${token ? `&tk=${encodeURIComponent(token)}` : ""}`
   return url
 }
 
 // 简单的响应式判断
 const windowWidth = ref(window.innerWidth)
-const $mq = computed(() => windowWidth.value > 768 ? 'desktop' : 'mobile')
-window.addEventListener('resize', () => { windowWidth.value = window.innerWidth })
+const $mq = computed(() => windowWidth.value > 768 ? "desktop" : "mobile")
+window.addEventListener("resize", () => { windowWidth.value = window.innerWidth })
 
 // --- 状态变量 ---
 const isObsConnected = ref(false) // 新增：连接状态
@@ -285,10 +273,10 @@ const isRecording = ref(false)
 const isReplayBufferActive = ref(false)
 const videos = ref([])
 const originalVideos = ref([]) // keep original order from server
-const currentVideo = ref('')
-const currentVideoName = ref('')
+const currentVideo = ref("")
+const currentVideoName = ref("")
 const videoRef = ref(null)
-const deletingVideoName = ref('')
+const deletingVideoName = ref("")
 const currentPlaybackRate = ref(1.0)
 
 const loadingStatus = reactive({
@@ -302,11 +290,11 @@ const loadingStatus = reactive({
   fetchingVideos: false,
   loadingVideo: false,
   deletingVideo: false,
-  deletingAll: false
+  deletingAll: false,
 })
 
 const MobileSpinner = {
-  template: `<div class="mobile-spinner"></div>`
+  template: "<div class=\"mobile-spinner\"></div>",
 }
 
 // --- 倍速控制 ---
@@ -318,15 +306,15 @@ function setPlaybackRate(rate) {
 }
 
 function handleRateChange(e) {
-  if(e.target) {
+  if (e.target) {
     currentPlaybackRate.value = e.target.playbackRate
   }
 }
 
 function closePlayer() {
-  if(videoRef.value) videoRef.value.pause();
-  currentVideo.value = '';
-  currentVideoName.value = '';
+  if (videoRef.value) videoRef.value.pause()
+  currentVideo.value = ""
+  currentVideoName.value = ""
 }
 
 // --- API 方法 (包含连接检测逻辑) ---
@@ -343,12 +331,12 @@ async function getRecordingStatus() {
   try {
     const res = await apiMethods.IsRecording()
     // 如果 API 成功返回，说明连接正常
-    isObsConnected.value = true 
+    isObsConnected.value = true
     isRecording.value = res.msg?.outputActive === true
   } catch (err) {
     console.error("OBS Connection Error:", err)
     // 如果报错，判定为断开连接
-    isObsConnected.value = false 
+    isObsConnected.value = false
     isRecording.value = false
   } finally {
     loadingStatus.gettingStatus = false
@@ -370,31 +358,31 @@ async function getReplayBufferStatus() {
 }
 
 async function startRecording() {
-  if (!isObsConnected.value) return; // 双重保险
+  if (!isObsConnected.value) return // 双重保险
   loadingStatus.starting = true
   try {
     const res = await apiMethods.StartRecording()
-    if (res.status === 'success') {
+    if (res.status === "success") {
       isRecording.value = true
       setTimeout(() => getRecordingStatus(), 500)
       fetchVideos()
     } else {
-      alert('❌ ' + res.msg)
+      alert(`❌ ${res.msg}`)
     }
   } catch (err) {
     console.error(err)
-    alert('请求失败，请检查网络')
+    alert("请求失败，请检查网络")
   } finally {
     loadingStatus.starting = false
   }
 }
 
 async function stopRecording() {
-  if (!isObsConnected.value) return;
+  if (!isObsConnected.value) return
   loadingStatus.stopping = true
   try {
     const res = await apiMethods.StopRecording()
-    if (res.status === 'success') {
+    if (res.status === "success") {
       isRecording.value = false
       setTimeout(() => getRecordingStatus(), 1000)
       fetchVideos()
@@ -407,15 +395,15 @@ async function stopRecording() {
 }
 
 async function startReplayBuffer() {
-  if (!isObsConnected.value) return;
+  if (!isObsConnected.value) return
   loadingStatus.startingReplay = true
   try {
     const res = await apiMethods.StartReplayBuffer()
-    if (res.status === 'success') {
+    if (res.status === "success") {
       isReplayBufferActive.value = true
       setTimeout(() => getReplayBufferStatus(), 500)
     } else {
-      alert('❌ ' + res.msg)
+      alert(`❌ ${res.msg}`)
     }
   } catch (err) {
     console.error(err)
@@ -425,15 +413,15 @@ async function startReplayBuffer() {
 }
 
 async function stopReplayBuffer() {
-  if (!isObsConnected.value) return;
+  if (!isObsConnected.value) return
   loadingStatus.stoppingReplay = true
   try {
     const res = await apiMethods.StopReplayBuffer()
-    if (res.status === 'success') {
+    if (res.status === "success") {
       isReplayBufferActive.value = false
       setTimeout(() => getReplayBufferStatus(), 500)
     } else {
-      alert('❌ ' + res.msg)
+      alert(`❌ ${res.msg}`)
     }
   } catch (err) {
     console.error(err)
@@ -443,15 +431,15 @@ async function stopReplayBuffer() {
 }
 
 async function saveReplayBuffer() {
-  if (!isObsConnected.value) return;
+  if (!isObsConnected.value) return
   loadingStatus.savingReplay = true
   try {
     const res = await apiMethods.SaveReplayBuffer()
-    if (res.status === 'success') {
-      alert('✨ 回放已保存！')
+    if (res.status === "success") {
+      alert("✨ 回放已保存！")
       fetchVideos()
     } else {
-      alert('❌ ' + res.msg)
+      alert(`❌ ${res.msg}`)
     }
   } catch (err) {
     console.error(err)
@@ -464,7 +452,7 @@ async function fetchVideos() {
   loadingStatus.fetchingVideos = true
   try {
     const res = await apiMethods.GetVideoInfo()
-    if (res.status === 'success') {
+    if (res.status === "success") {
       // 保存原始服务器顺序，后续可用于切换排序/恢复
       originalVideos.value = res.msg || []
       // 根据当前排序开关决定展示顺序
@@ -478,7 +466,7 @@ async function fetchVideos() {
 }
 
 async function comeBack() {
-  window.location.href = '/'
+  window.location.href = "/"
 }
 
 async function playVideo(name) {
@@ -486,13 +474,13 @@ async function playVideo(name) {
   try {
     currentVideo.value = name
     const videoItem = videos.value.find(v => v.name === name)
-    currentVideoName.value = videoItem ? videoItem.name : ''
-    
+    currentVideoName.value = videoItem ? videoItem.name : ""
+
     // 手机端滚动
-    if ($mq.value === 'mobile') {
+    if ($mq.value === "mobile") {
       setTimeout(() => {
-        const player = document.querySelector('.player-section')
-        if(player) player.scrollIntoView({ behavior: 'smooth' })
+        const player = document.querySelector(".player-section")
+        if (player) player.scrollIntoView({ behavior: "smooth" })
       }, 100)
     }
 
@@ -502,7 +490,7 @@ async function playVideo(name) {
       videoRef.value.load()
       try {
         await videoRef.value.play()
-      } catch(e) { console.log('Autoplay blocked', e) }
+      } catch(e) { console.log("Autoplay blocked", e) }
     }
   } catch (err) {
     console.error(err)
@@ -514,16 +502,16 @@ async function playVideo(name) {
 async function DeleteVideo(name) {
   Modal.confirm({
     title: `确认删除 "${name}" 吗？`,
-    content: '此操作不可恢复',
-    okText: '确认',
-    cancelText: '取消',
+    content: "此操作不可恢复",
+    okText: "确认",
+    cancelText: "取消",
     onOk: async () => {
       deletingVideoName.value = name
       loadingStatus.deletingVideo = true
       try {
         const res = await apiMethods.DeleteVideo(name)
-        if (res && res.status === 'success') {
-          notification.success({ message: '删除成功' })
+        if (res && res.status === "success") {
+          notification.success({ message: "删除成功" })
           fetchVideos()
           if (currentVideo.value === name) closePlayer()
         } else if (res && res.message) {
@@ -531,40 +519,40 @@ async function DeleteVideo(name) {
         }
       } catch (err) {
         console.error(err)
-        notification.error({ message: '删除失败，请检查后端或网络' })
+        notification.error({ message: "删除失败，请检查后端或网络" })
       } finally {
         loadingStatus.deletingVideo = false
-        deletingVideoName.value = ''
+        deletingVideoName.value = ""
       }
-    }
+    },
   })
 }
 
 async function confirmDeleteAll() {
   if (!videos.value || videos.value.length === 0) {
-    notification.info({ message: '当前没有视频可删除' })
+    notification.info({ message: "当前没有视频可删除" })
     return
   }
 
   // 第一次确认
   Modal.confirm({
-    title: '确认清空所有视频吗？',
-    content: '此操作将删除服务器上所有视频，无法恢复。',
-    okText: '下一步',
-    cancelText: '取消',
+    title: "确认清空所有视频吗？",
+    content: "此操作将删除服务器上所有视频，无法恢复。",
+    okText: "下一步",
+    cancelText: "取消",
     onOk() {
       // 第二次更强烈确认
       Modal.confirm({
-        title: '最终确认：彻底删除所有视频？',
-        content: '这是不可逆操作，确定要继续吗？',
-        okText: '确认删除',
-        okType: 'danger',
-        cancelText: '取消',
+        title: "最终确认：彻底删除所有视频？",
+        content: "这是不可逆操作，确定要继续吗？",
+        okText: "确认删除",
+        okType: "danger",
+        cancelText: "取消",
         async onOk() {
           await DeleteAllVideos()
-        }
+        },
       })
-    }
+    },
   })
 }
 
@@ -572,23 +560,23 @@ async function DeleteAllVideos() {
   loadingStatus.deletingAll = true
   try {
     const res = await apiMethods.DeleteAllVideo()
-    if (res && res.status === 'success') {
-      notification.success({ message: res.message || '已删除所有视频' })
+    if (res && res.status === "success") {
+      notification.success({ message: res.message || "已删除所有视频" })
 
       closePlayer()
     } else if (res && res.message) {
       notification.error({ message: res.message })
     } else {
-      notification.error({ message: '删除失败，未知响应' })
+      notification.error({ message: "删除失败，未知响应" })
     }
   } catch (err) {
     console.error(err)
-    notification.error({ message: '删除失败，请检查后端或网络' })
+    notification.error({ message: "删除失败，请检查后端或网络" })
   } finally {
     loadingStatus.deletingAll = false
-          //延迟
-      await new Promise(resolve => setTimeout(resolve, 3000))
-      await fetchVideos()
+    //延迟
+    await new Promise(resolve => setTimeout(resolve, 3000))
+    await fetchVideos()
   }
 }
 
@@ -596,7 +584,7 @@ function formatTime(sizeMB) {
   const seconds = Math.round(sizeMB * 60)
   const mins = Math.floor(seconds / 60)
   const secs = seconds % 60
-  return `${mins}:${secs.toString().padStart(2, '0')}`
+  return `${mins}:${secs.toString().padStart(2, "0")}`
 }
 
 onMounted(() => {
@@ -630,15 +618,15 @@ function toggleSortByModified() {
 
 // 格式化 modifiedTime，兼容 ISO 或 已经格式化为 "YYYY-MM-DD HH:mm:ss" 的字符串
 function formatModifiedTime(ts) {
-  if (!ts) return ''
+  if (!ts) return ""
   // 如果已经是类似 "YYYY-MM-DD HH:mm:ss" 的简洁格式，直接返回
   if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(ts)) {
     return ts
   }
   try {
-    return dayjs(ts).format('YYYY-MM-DD HH:mm:ss')
+    return dayjs(ts).format("YYYY-MM-DD HH:mm:ss")
   } catch (e) {
-    return ts || ''
+    return ts || ""
   }
 }
 </script>
@@ -872,12 +860,12 @@ function formatModifiedTime(ts) {
   .player-section.active { display: block; height: auto; }
   .card { border-radius: 16px; }
   .video-list { max-height: 400px; }
-  
+
   /* 手机端倍速面板优化 */
   .speed-control-panel { flex-direction: column; align-items: flex-start; gap: 8px; }
   .speed-grid { width: 100%; justify-content: space-between; }
   .speed-btn { flex: 1; text-align: center; padding: 8px 0; }
-  
+
   .mobile-spinner { width: 18px; height: 18px; border: 2px solid transparent; border-top: 2px solid currentColor; border-radius: 50%; animation: spin 0.8s linear infinite; }
   .list-spinner { width: 30px; height: 30px; border: 3px solid var(--pink-primary); border-top-color: transparent; border-radius: 50%; margin: 20px auto; animation: spin 0.8s linear infinite; }
 }

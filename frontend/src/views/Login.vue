@@ -1,12 +1,12 @@
 <template>
   <div class="login-container">
-    <div class="bg-layer"></div>
-    <div class="grid-pattern"></div>
-    
+    <div class="bg-layer" />
+    <div class="grid-pattern" />
+
     <div class="bg-decoration">
-      <div class="floating-shape shape-1"></div>
-      <div class="floating-shape shape-2"></div>
-      <div class="floating-shape shape-3"></div>
+      <div class="floating-shape shape-1" />
+      <div class="floating-shape shape-2" />
+      <div class="floating-shape shape-3" />
       <div class="star star-1">✨</div>
       <div class="star star-2">⭐</div>
       <div class="star star-3">✨</div>
@@ -26,16 +26,14 @@
       <a-form
         ref="formRef"
         :model="formState"
-        @finish="onFinish"
-        @finishFailed="onFinishFailed"
         :label-col="{ span: 0 }"
         :wrapper-col="{ span: 24 }"
         class="login-form"
-      >
+        @finish="onFinish"
+        @finish-failed="onFinishFailed">
         <a-form-item
           name="username"
-          :rules="[{ required: true, message: '请输入用户名哦~' }]"
-        >
+          :rules="[{ required: true, message: '请输入用户名哦~' }]">
           <div class="input-group">
             <span class="input-icon">👤</span>
             <a-input
@@ -43,15 +41,13 @@
               placeholder="请输入用户名..."
               class="kawaii-input"
               :bordered="false"
-              @keyup.enter="handleEnter"
-            />
+              @keyup.enter="handleEnter" />
           </div>
         </a-form-item>
 
         <a-form-item
           name="password"
-          :rules="[{ required: true, message: '请输入密码哦~' }]"
-        >
+          :rules="[{ required: true, message: '请输入密码哦~' }]">
           <div class="input-group">
             <span class="input-icon">🔐</span>
             <a-input-password
@@ -59,8 +55,7 @@
               placeholder="请输入密码..."
               class="kawaii-input"
               :bordered="false"
-              @keyup.enter="handleEnter"
-            />
+              @keyup.enter="handleEnter" />
           </div>
         </a-form-item>
 
@@ -70,8 +65,7 @@
             html-type="submit"
             :loading="loading"
             block
-            class="kawaii-button"
-          >
+            class="kawaii-button">
             {{ loading ? '少女祈祷中...✨' : '进入异世界 →' }}
           </a-button>
         </a-form-item>
@@ -84,7 +78,7 @@
       </a-form>
 
       <div class="card-footer">
-        <div class="footer-divider"></div>
+        <div class="footer-divider" />
         <p class="footer-text" @click="aaa">嘿~这是一个神秘的地方呢🎀</p>
         <div class="contact-pill">qq群：215053644</div>
       </div>
@@ -93,20 +87,20 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { message } from 'ant-design-vue'
-import { apiMethods } from '@/api'
+import { ref, onMounted } from "vue"
+import { useRouter } from "vue-router"
+import { message } from "ant-design-vue"
+import { apiMethods } from "@/api"
 
 const router = useRouter()
 const formRef = ref(null)
 const loading = ref(false)
-const errorMessage = ref('')
-const systemName = ref('登录')
+const errorMessage = ref("")
+const systemName = ref("登录")
 
 const formState = ref({
-  username: '',
-  password: ''
+  username: "",
+  password: "",
 })
 
 // 页面挂载时获取系统配置
@@ -117,7 +111,7 @@ onMounted(async () => {
       systemName.value = response.systemName
     }
   } catch (error) {
-    console.error('获取系统配置失败:', error)
+    console.error("获取系统配置失败:", error)
   }
 })
 
@@ -129,57 +123,56 @@ const handleEnter = () => {
 
 
 const aaa = () => {
-    console.log("Check Uni Object:", window.uni);
+  console.log("Check Uni Object:", window.uni)
 
-      // 在 Uniapp WebView 中，官方 SDK 会挂载 window.uni
-      if (window.uni && window.uni.postMessage) {
-        window.uni.postMessage({
-          data: { 
-            action: '思姐真可爱',
-            content: '来自神秘地方的数据🎀' 
-          }
-        });
-        message.success('已向异世界发送信号✨');
-      } else {
-        console.error("【提示】当前不在 UniApp 环境，或 SDK 尚未加载。");
-        message.warning('咒语失效了，请在 App 中尝试哦~');
-      }
-};
+  // 在 Uniapp WebView 中，官方 SDK 会挂载 window.uni
+  if (window.uni && window.uni.postMessage) {
+    window.uni.postMessage({
+      data: {
+        action: "思姐真可爱",
+        content: "来自神秘地方的数据🎀",
+      },
+    })
+    message.success("已向异世界发送信号✨")
+  } else {
+    console.error("【提示】当前不在 UniApp 环境，或 SDK 尚未加载。")
+    message.warning("咒语失效了，请在 App 中尝试哦~")
+  }
+}
 
 const onFinish = async () => {
   loading.value = true
-  errorMessage.value = ''
+  errorMessage.value = ""
 
   try {
     const response = await apiMethods.login(
       formState.value.username,
-      formState.value.password
+      formState.value.password,
     )
 
     if (response.status === 401 || response.error) {
-      errorMessage.value = response.error || '登录失败，请检查用户名和密码'
-      message.error('登录失败：' + (response.error || '未知错误'))
+      errorMessage.value = response.error || "登录失败，请检查用户名和密码"
+      message.error(`登录失败：${response.error || "未知错误"}`)
     } else if (response.status === 200 && response.data?.aBgiToken) {
-      localStorage.setItem('bbgi-token', response.data.aBgiToken)
-      message.success('登录成功！')
-      router.push('/')
-    }  else {
+      localStorage.setItem("bbgi-token", response.data.aBgiToken)
+      message.success("登录成功！")
+      router.push("/")
+    } else {
       console.debug("登录失败：", response)
-      errorMessage.value = '登录失败，请重试'
-      message.error('登录失败，请重试')
+      errorMessage.value = "登录失败，请重试"
+      message.error("登录失败，请重试")
     }
   } catch (error) {
-    errorMessage.value = error.message || '登录失败，请重试'
-    message.error('网络错误：' + error.message)
+    errorMessage.value = error.message || "登录失败，请重试"
+    message.error(`网络错误：${error.message}`)
   } finally {
     loading.value = false
   }
 }
 
 const onFinishFailed = (errorInfo) => {
-  console.log('Failed:', errorInfo)
+  console.log("Failed:", errorInfo)
 }
-
 
 
 </script>
@@ -211,7 +204,7 @@ const onFinishFailed = (errorInfo) => {
 .grid-pattern {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  background-image: 
+  background-image:
     radial-gradient(#ffffff 2px, transparent 2px),
     linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
@@ -281,7 +274,7 @@ const onFinishFailed = (errorInfo) => {
   -webkit-backdrop-filter: blur(15px);
   border-radius: 24px;
   padding: 40px 30px;
-  box-shadow: 
+  box-shadow:
     0 10px 40px rgba(255, 154, 158, 0.3),
     0 0 0 5px rgba(255, 255, 255, 0.4);
   border: 2px solid #fff;
@@ -377,9 +370,9 @@ const onFinishFailed = (errorInfo) => {
   color: #666;
 }
 
-:deep(.ant-input-password), 
-:deep(.ant-input), 
-:deep(.ant-input:focus), 
+:deep(.ant-input-password),
+:deep(.ant-input),
+:deep(.ant-input:focus),
 :deep(.ant-input-focused) {
   box-shadow: none !important;
   border: none !important;
@@ -407,7 +400,7 @@ const onFinishFailed = (errorInfo) => {
   margin-top: 10px;
 }
 
-.kawaii-button:hover, 
+.kawaii-button:hover,
 .kawaii-button:focus {
   background: linear-gradient(90deg, #ff85b3 0%, #ff9a9e 100%);
   transform: translateY(-3px) scale(1.02);
@@ -487,16 +480,16 @@ const onFinishFailed = (errorInfo) => {
     width: 85%;
     padding: 30px 20px;
   }
-  
+
   .system-title {
     font-size: 22px;
   }
-  
+
   .kawaii-button {
     height: 44px;
     font-size: 15px;
   }
-  
+
   .star-4 { display: none; }
 }
 </style>

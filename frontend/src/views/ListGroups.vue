@@ -1,29 +1,29 @@
 <template>
   <div class="list-groups-page">
     <div class="floating-hearts">
-      <div class="heart" v-for="i in 15" :key="i" :style="{ animationDelay: (i * 0.5) + 's' }">♡</div>
+      <div v-for="i in 15" :key="i" class="heart" :style="{ animationDelay: (i * 0.5) + 's' }">♡</div>
     </div>
-    
+
     <header class="page-header">
-      <div class="header-carousel" v-if="carouselImages.length > 0">
+      <div v-if="carouselImages.length > 0" class="header-carousel">
         <div class="carousel-container">
           <div v-for="(image, index) in carouselImages" :key="index" class="carousel-slide" :class="{ active: currentImageIndex === index }">
             <img :src="image" :alt="`carousel-${index}`" />
           </div>
         </div>
       </div>
-      
-      <div class="header-overlay"></div> <div class="header-decoration">
+
+      <div class="header-overlay" /> <div class="header-decoration">
         <div class="sparkle">✨</div>
         <div class="sparkle">⭐</div>
         <div class="sparkle">💫</div>
       </div>
-      
+
       <div class="container header-content">
         <h1 class="page-title">
-           <span class="title-decoration">🎀</span>
-           {{ pageTitle }}
-           <span class="title-decoration">🎀</span>
+          <span class="title-decoration">🎀</span>
+          {{ pageTitle }}
+          <span class="title-decoration">🎀</span>
         </h1>
         <p class="subtitle">管理并启动您的配置实例</p>
       </div>
@@ -33,25 +33,29 @@
       <div v-if="loading" class="loading-container">
         <div class="modern-loading">
           <div class="loading-orbits">
-            <div class="orbit orbit-1"></div>
-            <div class="orbit orbit-2"></div>
-            <div class="orbit orbit-3"></div>
+            <div class="orbit orbit-1" />
+            <div class="orbit orbit-2" />
+            <div class="orbit orbit-3" />
             <div class="loading-core">
-              <div class="core-inner"></div>
+              <div class="core-inner" />
             </div>
           </div>
           <div class="loading-particles">
-            <div class="particle" v-for="i in 12" :key="i" :style="{
-              '--i': i,
-              '--delay': i * 0.1 + 's'
-            }"></div>
+            <div
+              v-for="i in 12"
+              :key="i"
+              class="particle"
+              :style="{
+                '--i': i,
+                '--delay': i * 0.1 + 's'
+              }" />
           </div>
           <div class="loading-text-container">
             <p class="loading-text">正在加载配置组</p>
             <div class="loading-dots">
-              <span class="dot"></span>
-              <span class="dot"></span>
-              <span class="dot"></span>
+              <span class="dot" />
+              <span class="dot" />
+              <span class="dot" />
             </div>
           </div>
         </div>
@@ -66,10 +70,10 @@
               <span class="groups-count">{{ groups.length }}</span>
             </h2>
           </div>
-          
+
           <div class="header-right">
             <button class="btn ghost" @click="$router.push('/')">
-              <span class="btn-icon">🏠</span> 
+              <span class="btn-icon">🏠</span>
               <span class="btn-text">主页</span>
             </button>
             <button class="btn ghost" @click="toggleSelectAll">
@@ -80,28 +84,25 @@
         </div>
 
         <div class="groups-grid">
-          <div 
-            v-for="(group, index) in groups" 
-            :key="group" 
+          <div
+            v-for="(group, index) in groups"
+            :key="group"
             class="group-card"
             :class="{ selected: isSelected(group) }"
             :style="{ animationDelay: (index * 0.05) + 's' }"
-            @click="toggleSelect(group)"
-          >
+            @click="toggleSelect(group)">
             <div class="select-checkbox-wrapper">
-              <div class="checkbox-ui" :class="{ checked: isSelected(group) }"></div>
+              <div class="checkbox-ui" :class="{ checked: isSelected(group) }" />
             </div>
 
             <div class="card-header">
               <div class="group-icon">⚙️</div>
               <h3 class="group-name">{{ group }}</h3>
             </div>
-            
-            <div class="card-status" v-if="isSelected(group)">
-               <span class="selected-tag">已选择</span>
+
+            <div v-if="isSelected(group)" class="card-status">
+              <span class="selected-tag">已选择</span>
             </div>
-  
-       
           </div>
         </div>
       </div>
@@ -115,15 +116,14 @@
       </div>
     </div>
 
-<transition name="slide-up">
-      <div class="selection-footer" v-if="selectedGroups.length > 0">
+    <transition name="slide-up">
+      <div v-if="selectedGroups.length > 0" class="selection-footer">
         <div class="selection-info">
-          
           <div class="count-badge clickable" @click="showDetailModal = true">
             {{ selectedGroups.length }}
             <span class="badge-hint">🔍</span>
           </div>
-          
+
           <div class="selection-text-col">
             <span class="label">已选择:</span>
             <span class="preview-text">{{ selectionPreview }}</span>
@@ -132,7 +132,7 @@
 
         <div class="selection-actions">
           <button class="btn ghost small" @click="clearSelection">取消</button>
-          <button class="btn primary glow" @click="startSelected" :disabled="isStarting">
+          <button class="btn primary glow" :disabled="isStarting" @click="startSelected">
             <span class="btn-icon">🚀</span> 启动
           </button>
         </div>
@@ -141,17 +141,17 @@
 
     <!-- 全局加载遮罩 -->
     <transition name="fade-modal">
-      <div class="loading-overlay" v-if="showLoadingOverlay">
+      <div v-if="showLoadingOverlay" class="loading-overlay">
         <div class="loading-spinner-container">
-          <div class="spinner-ring"></div>
-          <div class="spinner-ring"></div>
-          <div class="spinner-ring"></div>
+          <div class="spinner-ring" />
+          <div class="spinner-ring" />
+          <div class="spinner-ring" />
           <div class="loading-message">
             <div class="message-icon">🚀</div>
             <h3>正在启动服务...</h3>
             <p>已选择 {{ selectedGroups.length }} 个服务</p>
             <div class="progress-dots">
-              <span></span><span></span><span></span>
+              <span /><span /><span />
             </div>
           </div>
         </div>
@@ -159,7 +159,7 @@
     </transition>
 
     <transition name="fade-modal">
-      <div class="modal-overlay" v-if="showDetailModal" @click="showDetailModal = false">
+      <div v-if="showDetailModal" class="modal-overlay" @click="showDetailModal = false">
         <div class="modal-content" @click.stop>
           <div class="modal-header">
             <h3>已选列表 ({{ selectedGroups.length }})</h3>
@@ -182,12 +182,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { message } from 'ant-design-vue'
-import api, { apiMethods } from '@/utils/api'
+import { ref, computed, onMounted, onUnmounted } from "vue"
+import { message } from "ant-design-vue"
+import api, { apiMethods } from "@/utils/api"
 
 // 响应式数据
-const pageTitle = ref('配置组列表')
+const pageTitle = ref("配置组列表")
 const groups = ref([])
 const loading = ref(true)
 const isStarting = ref(false)
@@ -205,22 +205,22 @@ const isAllSelected = computed(() => {
 
 // 显示选中的文本预览（如：GroupA, GroupB...）
 const selectedGroupsText = computed(() => {
-  const text = selectedGroups.value.join(', ')
-  return text.length > 20 ? text.substring(0, 20) + '...' : text
+  const text = selectedGroups.value.join(", ")
+  return text.length > 20 ? `${text.substring(0, 20)}...` : text
 })
 
 //智能生成预览文字
 const selectionPreview = computed(() => {
   const count = selectedGroups.value.length
-  if (count === 0) return ''
-  
+  if (count === 0) return ""
+
   // 策略：手机屏幕小，只显示前 2 个名字，剩下的显示数量
-  const maxNames = 2 
-  
+  const maxNames = 2
+
   if (count <= maxNames) {
-    return selectedGroups.value.join(', ')
+    return selectedGroups.value.join(", ")
   } else {
-    const firstFew = selectedGroups.value.slice(0, maxNames).join(', ')
+    const firstFew = selectedGroups.value.slice(0, maxNames).join(", ")
     const remaining = count // 这里显示总数，或者 count - maxNames 显示剩余数
     return `${firstFew} 等 ${remaining} 个`
   }
@@ -256,16 +256,16 @@ const loadGroups = async () => {
     const response = await apiMethods.getListGroups()
     if (response && response.items) {
       groups.value = response.items
-      pageTitle.value = response.title || '配置组列表'
+      pageTitle.value = response.title || "配置组列表"
     } else if (Array.isArray(response)) {
       groups.value = response
     } else {
       groups.value = []
     }
   } catch (error) {
-    console.error('API Error:', error)
+    console.error("API Error:", error)
     // 模拟数据用于展示效果 (实际使用请删除)
-    groups.value = ['LoginServer', 'GameServer', 'ChatService', 'Database', 'Gateway']
+    groups.value = ["LoginServer", "GameServer", "ChatService", "Database", "Gateway"]
   } finally {
     loading.value = false
   }
@@ -279,7 +279,7 @@ const startGroup = async (groupName) => {
     await apiMethods.startGroups([groupName])
     message.success(`已启动: ${groupName}`)
   } catch (error) {
-    message.error('启动失败')
+    message.error("启动失败")
   } finally {
     isStarting.value = false
   }
@@ -310,7 +310,7 @@ const clearSelection = () => {
 
 const startSelected = async () => {
   if (isStarting.value || selectedGroups.value.length === 0) return
-  
+
   isStarting.value = true
   showLoadingOverlay.value = true
   try {
@@ -318,7 +318,7 @@ const startSelected = async () => {
     message.success(`成功启动 ${selectedGroups.value.length} 个服务`)
     clearSelection()
   } catch (error) {
-    message.error('批量启动失败')
+    message.error("批量启动失败")
   } finally {
     isStarting.value = false
     showLoadingOverlay.value = false
@@ -1918,12 +1918,12 @@ onUnmounted(() => {
 .progress-dots span:nth-child(3) { animation-delay: 0.4s; }
 
 @keyframes dotPulse {
-  0%, 60%, 100% { 
-    transform: scale(1); 
+  0%, 60%, 100% {
+    transform: scale(1);
     opacity: 0.7;
   }
-  30% { 
-    transform: scale(1.5); 
+  30% {
+    transform: scale(1.5);
     opacity: 1;
   }
 }

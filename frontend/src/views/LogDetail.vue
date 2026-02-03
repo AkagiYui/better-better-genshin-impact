@@ -1,6 +1,6 @@
 <template>
-    <div class="log-detail-page">
-        <!-- 页面头部 - 已隐藏
+  <div class="log-detail-page">
+    <!-- 页面头部 - 已隐藏
         <header class="page-header enhanced-header">
             <div class="header-bg"></div>
             <div class="header-content">
@@ -17,89 +17,88 @@
         </header>
         -->
 
-        <div class="container">
-            <!-- 加载状态 -->
-            <section v-if="loading" class="panel">
-                <p class="loading-text">正在加载日志内容...</p>
-            </section>
+    <div class="container">
+      <!-- 加载状态 -->
+      <section v-if="loading" class="panel">
+        <p class="loading-text">正在加载日志内容...</p>
+      </section>
 
-            <!-- 日志内容展示区域 -->
-            <section v-else-if="logContent" class="panel log-content-panel">
-                <iframe 
-                    ref="logIframe"
-                    class="log-iframe"
-                    :srcdoc="iframeContent"
-                    @load="onIframeLoad"
-                ></iframe>
-            </section>
+      <!-- 日志内容展示区域 -->
+      <section v-else-if="logContent" class="panel log-content-panel">
+        <iframe
+          ref="logIframe"
+          class="log-iframe"
+          :srcdoc="iframeContent"
+          @load="onIframeLoad" />
+      </section>
 
-            <!-- 无数据状态 -->
-            <section v-else class="panel">
-                <p class="no-data-text">无日志数据</p>
-            </section>
-        </div>
+      <!-- 无数据状态 -->
+      <section v-else class="panel">
+        <p class="no-data-text">无日志数据</p>
+      </section>
     </div>
+  </div>
 </template>
 
 <script>
-import api from '@/utils/api'
-import indexHtmlContent from '@/assets/index.html?raw'
+import api from "@/utils/api"
+import indexHtmlContent from "@/assets/index.html?raw"
 
 export default {
-    name: 'LogDetail',
-    data() {
-        return {
-            currentFileName: '',
-            logContent: '',
-            loading: false,
-            iframeContent: ''
-        }
-    },
-    async mounted() {
-        // 从路由参数获取文件名
-        this.currentFileName = this.$route.query.file || ''
-        if (this.currentFileName) {
-            await this.loadLogContent()
-        }
-    },
-    methods: {
-        // 加载日志内容
-        async loadLogContent() {
-            if (!this.currentFileName) return
+  name: "LogDetail",
+  data() {
+    return {
+      currentFileName: "",
+      logContent: "",
+      loading: false,
+      iframeContent: "",
+    }
+  },
+  async mounted() {
+    // 从路由参数获取文件名
+    this.currentFileName = this.$route.query.file || ""
+    if (this.currentFileName) {
+      await this.loadLogContent()
+    }
+  },
+  methods: {
+    // 加载日志内容
+    async loadLogContent() {
+      if (!this.currentFileName) return
 
-            this.loading = true
-            try {
-                // 调用接口获取日志内容
-                const response = await api.get(`/api/logInfo?fileName=${encodeURIComponent(this.currentFileName)}`)
-                this.logContent = response || ''
-                
-                // 加载 index.html 模板并注入日志内容
-                await this.loadIndexHtml()
-            } catch (error) {
-                console.error('加载日志内容失败:', error)
-                this.$message?.error('加载日志内容失败')
-                this.logContent = ''
-            } finally {
-                this.loading = false
-            }
-        },
+      this.loading = true
+      try {
+        // 调用接口获取日志内容
+        const response = await api.get(`/api/logInfo?fileName=${encodeURIComponent(this.currentFileName)}`)
+        this.logContent = response || ""
 
-        // 加载 index.html 模板
-        async loadIndexHtml() {
-            try {
-                // 使用导入的 HTML 内容
-                let htmlContent = indexHtmlContent
-                
-                // 转义日志内容以便安全地注入到 JavaScript 中
-                const escapedLogContent = this.logContent
-                    .replace(/\\/g, '\\\\')
-                    .replace(/`/g, '\\`')
-                    .replace(/\$/g, '\\$')
-                
-                // 将日志内容注入到 HTML 中,直接调用 parseLog 函数处理
-                this.iframeContent = htmlContent.replace(
-                    '</body>',
-                    `<script>
+        // 加载 index.html 模板并注入日志内容
+        await this.loadIndexHtml()
+      } catch (error) {
+        console.error("加载日志内容失败:", error)
+        this.$message?.error("加载日志内容失败")
+        this.logContent = ""
+      } finally {
+        this.loading = false
+      }
+    },
+
+    // 加载 index.html 模板
+    async loadIndexHtml() {
+      try {
+        // 使用导入的 HTML 内容
+        const htmlContent = indexHtmlContent
+
+        // 转义日志内容以便安全地注入到 JavaScript 中
+        const escapedLogContent = this.logContent
+          .replace(/\\/g, "\\\\")
+          .replace(/`/g, "\\`")
+          .replace(/\$/g, "\\$")
+
+        // 将日志内容注入到 HTML 中,直接调用 parseLog 函数处理
+        this.iframeContent = htmlContent.replace(
+          "</body>",
+          `<script>
                         // 等待页面完全加载后直接处理日志内容
                         window.addEventListener('load', function() {
                             try {
@@ -208,36 +207,36 @@ export default {
                             }
                         });
                     <\/script>
-                    </body>`
-                )
-            } catch (error) {
-                console.error('加载 index.html 失败:', error)
-                this.$message?.error('加载页面模板失败')
-            }
-        },
+                    </body>`,
+        )
+      } catch (error) {
+        console.error("加载 index.html 失败:", error)
+        this.$message?.error("加载页面模板失败")
+      }
+    },
 
-        // iframe 加载完成回调
-        onIframeLoad() {
-            try {
-                const iframe = this.$refs.logIframe
-                if (iframe && iframe.contentWindow) {
-                    // 向 iframe 传递日志数据
-                    iframe.contentWindow.postMessage({
-                        type: 'LOG_DATA',
-                        fileName: this.currentFileName,
-                        content: this.logContent
-                    }, '*')
-                }
-            } catch (error) {
-                console.error('向 iframe 发送数据失败:', error)
-            }
-        },
-
-        // 返回上一页
-        goBack() {
-            this.$router.back()
+    // iframe 加载完成回调
+    onIframeLoad() {
+      try {
+        const iframe = this.$refs.logIframe
+        if (iframe && iframe.contentWindow) {
+          // 向 iframe 传递日志数据
+          iframe.contentWindow.postMessage({
+            type: "LOG_DATA",
+            fileName: this.currentFileName,
+            content: this.logContent,
+          }, "*")
         }
-    }
+      } catch (error) {
+        console.error("向 iframe 发送数据失败:", error)
+      }
+    },
+
+    // 返回上一页
+    goBack() {
+      this.$router.back()
+    },
+  },
 }
 </script>
 
@@ -284,7 +283,7 @@ export default {
 
 .header-bg {
     position: absolute;
-    
+
     top: 0; left: 0; right: 0; bottom: 0;
     background: radial-gradient(circle at 20% 40%, #e9a0d1 0%, #ecccde 60%, transparent 100%);
     opacity: 0.7;

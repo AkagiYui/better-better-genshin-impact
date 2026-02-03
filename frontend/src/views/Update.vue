@@ -1,7 +1,7 @@
 <template>
   <div class="anime-bg">
     <div class="update-card">
-      <div class="card-deco"></div>
+      <div class="card-deco" />
 
       <div class="sponsor-badge">
         <span class="heart">❤</span> 感谢 <span class="name">思姐</span> 赞助
@@ -13,7 +13,7 @@
         <div class="section-header">
           <span class="icon">🌸</span>
           <span class="text">ABGI 在线更新</span>
-          <button class="refresh-btn" @click="refresh" :disabled="checking" title="刷新状态">
+          <button class="refresh-btn" :disabled="checking" title="刷新状态" @click="refresh">
             <span :class="{ 'spin': checking }">↻</span>
           </button>
         </div>
@@ -31,26 +31,25 @@
         </div>
 
         <div class="action-area">
-          <button 
-            class="anime-btn primary" 
-            @click="doUpdate" 
+          <button
+            class="anime-btn primary"
             :disabled="!isDifferent || loading"
-          >
+            @click="doUpdate">
             <span v-if="loading">更新中...</span>
             <span v-else>{{ isDifferent ? '立即更新 (Update)' : '已是最新版' }}</span>
           </button>
-          <p class="tip-text" v-if="isDifferent">⚠️ 更新成功后将自动跳转至登录页</p>
+          <p v-if="isDifferent" class="tip-text">⚠️ 更新成功后将自动跳转至登录页</p>
         </div>
       </div>
 
-      <div class="divider"></div>
+      <div class="divider" />
 
       <div class="section-block">
         <div class="section-header">
           <span class="icon">🎀</span>
           <span class="text">茶包BGI 在线更新</span>
-          <button class="help-btn" @click="openDisclaimer" title="免责声明">?</button>
-          <button class="refresh-btn" @click="refreshBgiVersions" :disabled="downloading" title="刷新状态">
+          <button class="help-btn" title="免责声明" @click="openDisclaimer">?</button>
+          <button class="refresh-btn" :disabled="downloading" title="刷新状态" @click="refreshBgiVersions">
             <span>↻</span>
           </button>
         </div>
@@ -68,18 +67,17 @@
         </div>
 
         <div class="action-area">
-          <button 
-            class="anime-btn secondary" 
-            @click="downloadByUrl" 
+          <button
+            class="anime-btn secondary"
             :disabled="!bgiCanUpdate || downloading"
-          >
+            @click="downloadByUrl">
             <span v-if="downloading">下载中 {{ downloadPercent }}%</span>
             <span v-else>{{ bgiCanUpdate ? '在线更新 (Download)' : '无需更新' }}</span>
           </button>
 
           <div v-if="downloading" class="progress-wrapper">
             <div class="progress-container">
-              <div class="progress-bar" :style="{ width: downloadPercent + '%' }"></div>
+              <div class="progress-bar" :style="{ width: downloadPercent + '%' }" />
             </div>
             <div class="progress-info">正在从服务器获取分片数据...</div>
           </div>
@@ -94,7 +92,7 @@
         <div class="disclaimer-modal" role="dialog" aria-modal="true">
           <div class="modal-header">
             <h3>免责声明</h3>
-            <button class="modal-close" @click="closeDisclaimer" aria-label="关闭">✕</button>
+            <button class="modal-close" aria-label="关闭" @click="closeDisclaimer">✕</button>
           </div>
           <div class="modal-body">
             <p>请确保bgi的文件夹是默认名字：BetterGI</p>
@@ -110,45 +108,45 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { message } from 'ant-design-vue'
-import { apiMethods } from '@/utils/api'
+import { ref, computed, onMounted, onUnmounted } from "vue"
+import { message } from "ant-design-vue"
+import { apiMethods } from "@/utils/api"
 
 // --- State Definitions ---
-const currentVersion = ref('加载中...')
-const latestVersion = ref('加载中...')
+const currentVersion = ref("加载中...")
+const latestVersion = ref("加载中...")
 const loading = ref(false)
 const checking = ref(false)
-const note = ref('')
+const note = ref("")
 const downloading = ref(false)
 const downloadPercent = ref(0) // 新增：下载进度百分比
 
 // BGI State
-const bgiCurrentVersion = ref('加载中...')
-const bgiLatestVersion = ref('加载中...')
+const bgiCurrentVersion = ref("加载中...")
+const bgiLatestVersion = ref("加载中...")
 const bgiCanUpdate = ref(false)
 
 // --- Helpers ---
-const normalize = (v) => (v == null ? '' : String(v).trim())
+const normalize = (v) => (v == null ? "" : String(v).trim())
 
 // --- Computed ---
 const isDifferent = computed(() => {
-  return normalize(currentVersion.value) !== normalize(latestVersion.value) && latestVersion.value !== ''
+  return normalize(currentVersion.value) !== normalize(latestVersion.value) && latestVersion.value !== ""
 })
 
 // --- Methods ---
 
 const refresh = async () => {
   checking.value = true
-  note.value = ''
+  note.value = ""
   try {
     const cur = await apiMethods.aBgiGetCurrentVersion()
-    currentVersion.value = cur?.version ?? cur?.data?.version ?? (typeof cur === 'string' ? cur : JSON.stringify(cur))
+    currentVersion.value = cur?.version ?? cur?.data?.version ?? (typeof cur === "string" ? cur : JSON.stringify(cur))
 
     const last = await apiMethods.aBgiGetLastVersion()
-    latestVersion.value = last?.version ?? last?.data?.version ?? (typeof last === 'string' ? last : JSON.stringify(last))
+    latestVersion.value = last?.version ?? last?.data?.version ?? (typeof last === "string" ? last : JSON.stringify(last))
   } catch (err) {
-    message.error('获取版本信息失败')
+    message.error("获取版本信息失败")
     note.value = err?.message || String(err)
   } finally {
     checking.value = false
@@ -158,15 +156,15 @@ const refresh = async () => {
 const doUpdate = async () => {
   if (!isDifferent.value) return
   loading.value = true
-  note.value = ''
+  note.value = ""
   try {
     await apiMethods.aBgiUpdate()
     setTimeout(() => {
-      window.location.href = '/'
+      window.location.href = "/"
     }, 3500)
   } catch (err) {
     if (err.status === 888) {
-      message.info('更新已启动，等待系统重启中，请稍后...')
+      message.info("更新已启动，等待系统重启中，请稍后...")
       return
     }
     message.error((err?.message || String(err)))
@@ -176,8 +174,8 @@ const doUpdate = async () => {
 }
 
 const refreshBgiVersions = async () => {
-  bgiCurrentVersion.value = '加载中...'
-  bgiLatestVersion.value = '加载中...'
+  bgiCurrentVersion.value = "加载中..."
+  bgiLatestVersion.value = "加载中..."
   bgiCanUpdate.value = false
   try {
     const res = await apiMethods.aBgiGetVersions()
@@ -185,14 +183,14 @@ const refreshBgiVersions = async () => {
       bgiCurrentVersion.value = res.currentVersion ?? res.current ?? bgiCurrentVersion.value
       bgiLatestVersion.value = res.lastVersion ?? res.latest ?? bgiLatestVersion.value
       // bgiCanUpdate.value = !!res.canUpdate
-      if (normalize(bgiCurrentVersion.value) !== normalize(bgiLatestVersion.value) && bgiLatestVersion.value !== '') {
+      if (normalize(bgiCurrentVersion.value) !== normalize(bgiLatestVersion.value) && bgiLatestVersion.value !== "") {
         bgiCanUpdate.value = true
       } else {
         bgiCanUpdate.value = false
       }
     }
   } catch (err) {
-    console.warn('刷新 BGI 版本失败', err)
+    console.warn("刷新 BGI 版本失败", err)
   }
 }
 
@@ -207,28 +205,28 @@ const startBgiPolling = () => {
       const status = await apiMethods.getBgiDownloadStatus()
       if (!status) return
 
-      if (typeof status.percent !== 'undefined') {
+      if (typeof status.percent !== "undefined") {
         downloadPercent.value = parseFloat(status.percent) || 0
       }
 
-      if (status.status === 'done') {
+      if (status.status === "done") {
         downloading.value = false
         downloadPercent.value = 100
         clearInterval(bgiTimerId)
         bgiTimerId = null
         await refreshBgiVersions()
-        message.success('更新包下载完成！')
+        message.success("更新包下载完成！")
       }
 
-      if (status.status === 'error') {
+      if (status.status === "error") {
         downloading.value = false
         clearInterval(bgiTimerId)
         bgiTimerId = null
-        note.value = status.error || '下载失败'
+        note.value = status.error || "下载失败"
         message.error(note.value)
       }
     } catch (err) {
-      console.warn('轮询 BGI 下载状态失败', err)
+      console.warn("轮询 BGI 下载状态失败", err)
     }
   }, 1000)
 }
@@ -237,14 +235,14 @@ const downloadByUrl = () => {
   if (downloading.value) return
   downloading.value = true
   downloadPercent.value = 0
-  note.value = ''
+  note.value = ""
   apiMethods.downloadBgi()
     .then(() => {
       startBgiPolling()
     })
     .catch((err) => {
       downloading.value = false
-      message.error(err?.message || '启动下载失败')
+      message.error(err?.message || "启动下载失败")
     })
 }
 
@@ -252,15 +250,15 @@ const resumeBgiDownloadIfNeeded = async () => {
   try {
     const status = await apiMethods.getBgiDownloadStatus()
     if (!status) return
-    if (status.status === 'downloading') {
+    if (status.status === "downloading") {
       downloading.value = true
-      if (typeof status.percent !== 'undefined') {
+      if (typeof status.percent !== "undefined") {
         downloadPercent.value = parseFloat(status.percent) || 0
       }
       startBgiPolling()
     }
   } catch (err) {
-    console.warn('检查 BGI 下载状态失败', err)
+    console.warn("检查 BGI 下载状态失败", err)
   }
 }
 
@@ -289,17 +287,17 @@ const closeDisclaimer = () => {
 }
 
 const _onKeydown = (e) => {
-  if (e && e.key === 'Escape') {
+  if (e && e.key === "Escape") {
     showDisclaimer.value = false
   }
 }
 
 onMounted(() => {
-  window.addEventListener('keydown', _onKeydown)
+  window.addEventListener("keydown", _onKeydown)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('keydown', _onKeydown)
+  window.removeEventListener("keydown", _onKeydown)
 })
 </script>
 

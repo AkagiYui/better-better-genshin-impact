@@ -4,8 +4,7 @@
       <a-result
         status="error"
         title="出现了一些问题"
-        sub-title="抱歉，页面遇到了错误。请稍后再试或联系管理员。"
-      >
+        sub-title="抱歉，页面遇到了错误。请稍后再试或联系管理员。">
         <template #extra>
           <a-space>
             <a-button type="primary" @click="goHome">
@@ -30,15 +29,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { ref, onMounted } from "vue"
+import { useRouter, useRoute } from "vue-router"
 
 const router = useRouter()
 const route = useRoute()
-const errorDetails = ref('')
+const errorDetails = ref("")
 
 const goHome = () => {
-  router.push('/')
+  router.push("/")
 }
 
 const refreshPage = () => {

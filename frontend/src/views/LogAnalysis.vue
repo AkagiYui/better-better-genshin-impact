@@ -1,8 +1,8 @@
 <template>
   <div class="sakura-container" role="application" aria-label="LogAnalysis">
     <div class="bg-layer" aria-hidden="true">
-      <div class="sakura-petal" v-for="i in 12" :key="'p'+i" :style="getParticleStyle(i)"></div>
-      <div class="magic-circle"></div>
+      <div v-for="i in 12" :key="'p'+i" class="sakura-petal" :style="getParticleStyle(i)" />
+      <div class="magic-circle" />
     </div>
 
     <div class="main-card animate-pop-in" :class="{ 'is-loading': loading }">
@@ -21,15 +21,14 @@
           <label class="input-label" for="logSelect">
             <span class="label-icon">📜</span> 选择契约书 (日志)
           </label>
-          
+
           <div class="select-wrapper">
             <select
               id="logSelect"
               v-model="selectedFile"
-              @change="onFileChange"
               class="magic-select"
               :disabled="loading && !selectedFile"
-            >
+              @change="onFileChange">
               <option value="" disabled>请选择日志文件...</option>
               <option v-for="file in logFiles" :key="file" :value="file">
                 {{ file }}
@@ -41,7 +40,7 @@
 
         <div class="status-bar">
           <div class="status-pill" :class="chipClass">
-            <span class="status-dot"></span>
+            <span class="status-dot" />
             {{ chipText }}
           </div>
         </div>
@@ -49,7 +48,7 @@
 
       <div class="display-area">
         <div v-if="loading" class="state-box loading-state">
-          <div class="spinner-heart"></div>
+          <div class="spinner-heart" />
           <p>正在以此方世界的魔力解析中...</p>
         </div>
 
@@ -66,8 +65,8 @@
         </div>
 
         <div v-else class="data-grid">
-          <div 
-            v-for="(item, index) in sortedData" 
+          <div
+            v-for="(item, index) in sortedData"
             :key="item.name"
             class="item-card"
             :class="{
@@ -76,18 +75,17 @@
               'rank-3': index === 2,
               'is-focused': item.isFocus
             }"
-            :style="{ animationDelay: `${index * 0.05}s` }"
-          >
+            :style="{ animationDelay: `${index * 0.05}s` }">
             <div class="rank-badge">NO.{{ index + 1 }}</div>
-            
+
             <div class="card-content">
               <div class="info-col name-col">
-                <span class="item-icon" v-if="index < 3">{{ getMedal(index) }}</span>
+                <span v-if="index < 3" class="item-icon">{{ getMedal(index) }}</span>
                 <span class="item-name" :title="item.name">{{ item.name }}</span>
               </div>
 
               <div class="divider-line">
-                <span class="line-deco"></span>
+                <span class="line-deco" />
               </div>
 
               <div class="info-col count-col">
@@ -98,13 +96,12 @@
 
               <div class="action-col">
                 <template v-if="!isExcluded(item.name)">
-                  <button 
+                  <button
                     v-if="!item.isFocus"
-                    class="focus-btn" 
-                    @click="addToFocus(item.name)"
+                    class="focus-btn"
                     :disabled="addingItem === item.name"
                     title="添加到关注列表"
-                  >
+                    @click="addToFocus(item.name)">
                     {{ addingItem === item.name ? '⏳' : '⭐' }}
                   </button>
                   <span v-else class="focused-badge" title="已在关注列表中">✅</span>
@@ -125,19 +122,19 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue'
-import { Modal, message } from 'ant-design-vue'
-import { apiMethods } from '../utils/api.js'
+import { ref, computed, onMounted } from "vue"
+import { Modal, message } from "ant-design-vue"
+import { apiMethods } from "../utils/api.js"
 
 export default {
-  name: 'LogAnalysis',
+  name: "LogAnalysis",
   setup() {
     const logFiles = ref([])
-    const selectedFile = ref('')
+    const selectedFile = ref("")
     const analysisData = ref([])
     const loading = ref(false)
-    const error = ref('')
-    const addingItem = ref('')
+    const error = ref("")
+    const addingItem = ref("")
 
     const sortedData = computed(() => {
       // 后端返回的是数组，直接按 count 降序排序
@@ -145,17 +142,17 @@ export default {
     })
 
     const chipText = computed(() => {
-      if (loading.value) return '解析中'
-      if (error.value) return '异常'
-      if (!selectedFile.value) return '待选择'
-      return '就绪'
+      if (loading.value) return "解析中"
+      if (error.value) return "异常"
+      if (!selectedFile.value) return "待选择"
+      return "就绪"
     })
 
     const chipClass = computed(() => {
-      if (loading.value) return 'chip--loading'
-      if (error.value) return 'chip--error'
-      if (!selectedFile.value) return 'chip--idle'
-      return 'chip--ok'
+      if (loading.value) return "chip--loading"
+      if (error.value) return "chip--error"
+      if (!selectedFile.value) return "chip--idle"
+      return "chip--ok"
     })
 
     const loadLogFiles = async () => {
@@ -168,7 +165,7 @@ export default {
           await loadAnalysisData()
         }
       } catch (err) {
-        error.value = '加载日志文件列表失败：' + err.message
+        error.value = `加载日志文件列表失败：${err.message}`
       }
     }
 
@@ -179,14 +176,14 @@ export default {
       }
 
       loading.value = true
-      error.value = ''
+      error.value = ""
 
       try {
         const data = await apiMethods.getLogAnalysis(selectedFile.value)
         // 确保返回的是数组格式
         analysisData.value = Array.isArray(data) ? data : []
       } catch (err) {
-        error.value = '加载失败：' + err.message
+        error.value = `加载失败：${err.message}`
         analysisData.value = []
       } finally {
         loading.value = false
@@ -199,7 +196,7 @@ export default {
 
     const addToFocus = async (materialName) => {
       if (!materialName) return
-      
+
       addingItem.value = materialName
       try {
         await apiMethods.addBagStatistics(materialName)
@@ -212,38 +209,38 @@ export default {
       } catch (err) {
         message.error(`添加失败：${err.message}`)
       } finally {
-        addingItem.value = ''
+        addingItem.value = ""
       }
     }
 
     const isExcluded = (name) => {
-      const excludedItems = ['圣遗物', '调查']
+      const excludedItems = ["圣遗物", "调查"]
       return excludedItems.includes(name)
     }
 
     const getRankClass = (index) => {
-      if (index === 0) return 'first'
-      if (index === 1) return 'second'
-      if (index === 2) return 'third'
-      return 'normal'
+      if (index === 0) return "first"
+      if (index === 1) return "second"
+      if (index === 2) return "third"
+      return "normal"
     }
 
     const getMedal = (index) => {
-      const medals = ['👑', '💎', '🌟'] // 稍微换了一下图标更符合风格
-      return medals[index] || ''
+      const medals = ["👑", "💎", "🌟"] // 稍微换了一下图标更符合风格
+      return medals[index] || ""
     }
 
     const getParticleStyle = (index) => {
       // 保留原有逻辑，CSS中会重新利用这些值
       const positions = [
-        { left: '10%', top: '20%', animationDelay: '0s' },
-        { left: '85%', top: '15%', animationDelay: '2s' },
-        { left: '20%', top: '80%', animationDelay: '4s' },
-        { left: '80%', top: '70%', animationDelay: '1s' },
-        { left: '50%', top: '10%', animationDelay: '3s' },
-        { left: '15%', top: '50%', animationDelay: '5s' }
+        { left: "10%", top: "20%", animationDelay: "0s" },
+        { left: "85%", top: "15%", animationDelay: "2s" },
+        { left: "20%", top: "80%", animationDelay: "4s" },
+        { left: "80%", top: "70%", animationDelay: "1s" },
+        { left: "50%", top: "10%", animationDelay: "3s" },
+        { left: "15%", top: "50%", animationDelay: "5s" },
       ]
-      return positions[index - 1] || { left: '50%', top: '50%' }
+      return positions[index - 1] || { left: "50%", top: "50%" }
     }
 
     // 虽然模板里没用到getStarStyle了，但为了不报错保留它
@@ -269,9 +266,9 @@ export default {
       getStarStyle,
       addToFocus,
       addingItem,
-      isExcluded
+      isExcluded,
     }
-  }
+  },
 }
 </script>
 
@@ -290,7 +287,7 @@ export default {
   --white: #ffffff;
   --border-radius: 20px;
   --card-shadow: 0 8px 32px rgba(255, 158, 205, 0.25);
-  
+
   min-height: 100vh;
   background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
   font-family: "Varela Round", "Microsoft YaHei", "Rounded Mplus 1c", sans-serif;
@@ -788,33 +785,33 @@ export default {
   .sakura-container {
     padding: 10px;
   }
-  
+
   .main-card {
     padding: 20px 15px;
     border-width: 2px;
   }
-  
+
   .main-title { font-size: 22px; }
   .control-panel { padding: 15px; }
-  
+
   /* 手机端列表卡片调整 */
   .item-card {
     border-radius: 12px;
   }
-  
+
   .rank-badge {
     padding: 0 4px;
     font-size: 10px;
   }
-  
+
   .card-content {
     padding: 10px 12px;
     gap: 5px;
   }
-  
+
   .item-name { font-size: 14px; }
   .count-num { font-size: 18px; }
-  
+
   .divider-line {
     flex: 0 0 20px;
   }

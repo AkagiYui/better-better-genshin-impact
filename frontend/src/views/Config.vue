@@ -1,8 +1,8 @@
 <template>
   <div class="config-container">
     <div class="floating-elements">
-      <div class="floating-heart" v-for="i in 6" :key="`heart-${i}`" :style="{ animationDelay: `${i * 0.5}s` }">💖</div>
-      <div class="floating-star" v-for="i in 4" :key="`star-${i}`" :style="{ animationDelay: `${i * 0.7}s` }">✨</div>
+      <div v-for="i in 6" :key="`heart-${i}`" class="floating-heart" :style="{ animationDelay: `${i * 0.5}s` }">💖</div>
+      <div v-for="i in 4" :key="`star-${i}`" class="floating-star" :style="{ animationDelay: `${i * 0.7}s` }">✨</div>
     </div>
 
     <div class="content-wrapper">
@@ -12,18 +12,17 @@
         <span class="title-icon">🌸</span>
       </h1>
 
-      <a-form :model="formData" layout="vertical" @finish="handleSubmit" ref="formRef" class="config-form">
-        
+      <a-form ref="formRef" :model="formData" layout="vertical" class="config-form" @finish="handleSubmit">
         <a-card title="基础设置" class="config-card">
           <template #extra><span class="card-icon">⚙️</span></template>
           <a-row :gutter="24">
             <a-col :xs="24" :md="12">
-               <a-form-item label="BetterGI 本地路径" name="BetterGIAddress" class="form-item-enhanced">
-                  <a-input v-model:value="formData.BetterGIAddress" placeholder="例如 D:\subject\lua\BetterGI" class="enhanced-input">
-                    <template #prefix><span class="input-icon">📂</span></template>
-                  </a-input>
-                  <div class="help-text">💡 填写路径，不能包含逗号，请使用单斜杠</div>
-               </a-form-item>
+              <a-form-item label="BetterGI 本地路径" name="BetterGIAddress" class="form-item-enhanced">
+                <a-input v-model:value="formData.BetterGIAddress" placeholder="例如 D:\subject\lua\BetterGI" class="enhanced-input">
+                  <template #prefix><span class="input-icon">📂</span></template>
+                </a-input>
+                <div class="help-text">💡 填写路径，不能包含逗号，请使用单斜杠</div>
+              </a-form-item>
             </a-col>
             <a-col :xs="24" :md="12">
               <a-form-item label="端口号" name="post" class="form-item-enhanced">
@@ -83,11 +82,11 @@
                   <a-input v-model:value="formData.LogKeywords[index]" placeholder="输入日志关键字" class="enhanced-input">
                     <template #prefix>🔑</template>
                   </a-input>
-                  <a-button type="primary" danger shape="circle" @click="removeLogKeyword(index)" v-if="formData.LogKeywords.length > 1" class="icon-btn">
+                  <a-button v-if="formData.LogKeywords.length > 1" type="primary" danger shape="circle" class="icon-btn" @click="removeLogKeyword(index)">
                     <DeleteOutlined />
                   </a-button>
                 </div>
-                <a-button type="dashed" block @click="addLogKeyword" class="add-btn">
+                <a-button type="dashed" block class="add-btn" @click="addLogKeyword">
                   <PlusOutlined /> 添加关键字
                 </a-button>
               </div>
@@ -99,19 +98,19 @@
           <template #extra><span class="card-icon">🎮</span></template>
           <div class="switch-grid">
             <div class="switch-item">
-               <a-checkbox v-model:checked="formData.OneLong.AutoUpdateJs" class="enhanced-checkbox">🔄 自动更新 JS</a-checkbox>
+              <a-checkbox v-model:checked="formData.OneLong.AutoUpdateJs" class="enhanced-checkbox">🔄 自动更新 JS</a-checkbox>
             </div>
             <div class="switch-item">
-               <a-checkbox v-model:checked="formData.Control.OBSReplayBuffer" class="enhanced-checkbox">📼 OBS 重放缓冲</a-checkbox>
+              <a-checkbox v-model:checked="formData.Control.OBSReplayBuffer" class="enhanced-checkbox">📼 OBS 重放缓冲</a-checkbox>
             </div>
             <div class="switch-item">
-               <a-checkbox v-model:checked="formData.Control.SendWeChatImage" class="enhanced-checkbox">📸 每小时发截图</a-checkbox>
+              <a-checkbox v-model:checked="formData.Control.SendWeChatImage" class="enhanced-checkbox">📸 每小时发截图</a-checkbox>
             </div>
             <div class="switch-item">
-               <a-checkbox v-model:checked="formData.Control.AbgiScreen" class="enhanced-checkbox">🖥️ 实时屏幕 (高功耗)</a-checkbox>
+              <a-checkbox v-model:checked="formData.Control.AbgiScreen" class="enhanced-checkbox">🖥️ 实时屏幕 (高功耗)</a-checkbox>
             </div>
             <div class="switch-item">
-               <a-checkbox v-model:checked="formData.Control.IsCloseYuanShen" class="enhanced-checkbox">❌ BGI关闭时关闭原神</a-checkbox>
+              <a-checkbox v-model:checked="formData.Control.IsCloseYuanShen" class="enhanced-checkbox">❌ BGI关闭时关闭原神</a-checkbox>
             </div>
           </div>
         </a-card>
@@ -127,7 +126,7 @@
                 <template #prefix>📂</template>
               </a-input>
             </a-form-item>
-            </div>
+          </div>
         </a-card>
 
         <a-card title="录屏设置 (OBS)" class="config-card">
@@ -142,18 +141,18 @@
           <a-form-item class="checkbox-item">
             <a-checkbox v-model:checked="formData.ScreenRecord.IsRecord" class="enhanced-checkbox">启用录屏功能</a-checkbox>
           </a-form-item>
-          <a-row :gutter="24" v-if="formData.ScreenRecord.IsRecord" class="fade-in-section">
+          <a-row v-if="formData.ScreenRecord.IsRecord" :gutter="24" class="fade-in-section">
             <a-col :xs="24" :md="12">
               <a-form-item label="OBS 地址" class="form-item-enhanced">
                 <a-input-password v-model:value="formData.ScreenRecord.StartScreen" placeholder="ws://..." class="enhanced-input" />
               </a-form-item>
             </a-col>
-             <a-col :xs="24" :md="12">
+            <a-col :xs="24" :md="12">
               <a-form-item label="密码" class="form-item-enhanced">
                 <a-input-password v-model:value="formData.ScreenRecord.EndScreen" placeholder="根据后端需求填写" class="enhanced-input" />
               </a-form-item>
             </a-col>
-                 <a-col :xs="24" :md="12">
+            <a-col :xs="24" :md="12">
               <a-form-item label="obs保存文件的地址" class="form-item-enhanced">
                 <a-input v-model:value="formData.ScreenRecord.ObsSavePath" placeholder="ws://..." class="enhanced-input" />
               </a-form-item>
@@ -163,7 +162,7 @@
 
         <a-card title="消息通知" class="config-card">
           <template #extra><span class="card-icon">📢</span></template>
-          
+
           <a-form-item label="通知类型" class="form-item-enhanced">
             <a-select v-model:value="formData.Notice.Type" class="enhanced-select">
               <a-select-option value="Wechat">企业微信 (Wechat)</a-select-option>
@@ -186,13 +185,13 @@
             <a-form-item label="Chat ID" class="form-item-enhanced">
               <a-input-password v-model:value="formData.Notice.TGNotice.ChatID" class="enhanced-input"><template #prefix>🆔</template></a-input-password>
             </a-form-item>
-             <a-form-item label="代理地址" class="form-item-enhanced">
+            <a-form-item label="代理地址" class="form-item-enhanced">
               <a-input-password v-model:value="formData.Notice.TGNotice.Proxy" class="enhanced-input"><template #prefix>🌐</template></a-input-password>
             </a-form-item>
           </div>
 
           <div v-if="formData.Notice.Type === 'FeiShu'" class="fade-in-section">
-             <a-form-item label="Webhook URL" class="form-item-enhanced">
+            <a-form-item label="Webhook URL" class="form-item-enhanced">
               <a-input-password v-model:value="formData.Notice.FeiShu.FeiShuWebhookURL" class="enhanced-input"><template #prefix>🔗</template></a-input-password>
             </a-form-item>
             <a-form-item label="App ID" class="form-item-enhanced">
@@ -204,33 +203,33 @@
           </div>
 
           <div v-if="formData.Notice.Type === 'OneBot'" class="fade-in-section">
-             <a-form-item label="API Base" class="form-item-enhanced">
+            <a-form-item label="API Base" class="form-item-enhanced">
               <a-input-password v-model:value="formData.Notice.OneBot.APIBase" class="enhanced-input"><template #prefix>🌐</template></a-input-password>
             </a-form-item>
             <a-form-item label="Token" class="form-item-enhanced">
               <a-input-password v-model:value="formData.Notice.OneBot.Token" class="enhanced-input"><template #prefix>🎟️</template></a-input-password>
             </a-form-item>
-             <a-form-item label="QQ号" class="form-item-enhanced">
+            <a-form-item label="QQ号" class="form-item-enhanced">
               <a-input-password v-model:value="formData.Notice.OneBot.QQNum" class="enhanced-input"><template #prefix>🐧</template></a-input-password>
             </a-form-item>
           </div>
           <!-- 新增：米游社签到推送按钮 -->
           <div class="mys-push-section">
-            <a-button type="default" @click="handleMysPush" :loading="mysPushLoading">设置为米游社签到推送</a-button>
+            <a-button type="default" :loading="mysPushLoading" @click="handleMysPush">设置为米游社签到推送</a-button>
             <div class="help-text" style="margin-top:8px">需要先保存配置</div>
           </div>
         </a-card>
 
         <a-card title="命令机器人" class="config-card">
-           <template #extra><span class="card-icon">🤖</span></template>
-           <div class="switch-grid">
-             <div class="switch-item">
-               <a-checkbox v-model:checked="formData.CommandBot.TgBOT" class="enhanced-checkbox">启用 TG 机器人</a-checkbox>
-             </div>
-             <div class="switch-item">
-               <a-checkbox v-model:checked="formData.CommandBot.FeiShuBot" class="enhanced-checkbox">启用飞书机器人</a-checkbox>
-             </div>
-           </div>
+          <template #extra><span class="card-icon">🤖</span></template>
+          <div class="switch-grid">
+            <div class="switch-item">
+              <a-checkbox v-model:checked="formData.CommandBot.TgBOT" class="enhanced-checkbox">启用 TG 机器人</a-checkbox>
+            </div>
+            <div class="switch-item">
+              <a-checkbox v-model:checked="formData.CommandBot.FeiShuBot" class="enhanced-checkbox">启用飞书机器人</a-checkbox>
+            </div>
+          </div>
         </a-card>
 
         <a-card title="联机设置" class="config-card account-card">
@@ -247,13 +246,13 @@
               </a-form-item>
             </a-col>
           </a-row>
-          
+
           <div class="highlight-box">
-             <a-checkbox v-model:checked="formData.Account.IsMultiUser" class="enhanced-checkbox">批发是否是多账号</a-checkbox>
+            <a-checkbox v-model:checked="formData.Account.IsMultiUser" class="enhanced-checkbox">批发是否是多账号</a-checkbox>
           </div>
 
           <a-row :gutter="24">
-             <a-col :xs="24" :md="12">
+            <a-col :xs="24" :md="12">
               <a-form-item label="狗粮联机配置组" class="form-item-enhanced">
                 <a-input v-model:value="formData.Account.GouLangGroupName" class="enhanced-input"><template #prefix>🐶</template></a-input>
               </a-form-item>
@@ -267,23 +266,22 @@
         </a-card>
 
         <div class="submit-section">
-          <a-button type="primary" size="large" @click="handleSubmit" :loading="loading" class="submit-btn">
+          <a-button type="primary" size="large" :loading="loading" class="submit-btn" @click="handleSubmit">
             <span class="submit-icon">💾</span> 保存所有配置 <span class="submit-icon">💾</span>
           </a-button>
         </div>
-
       </a-form>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
-import { message } from 'ant-design-vue'
-import { QuestionCircleOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons-vue'
-import { useRouter } from 'vue-router'
+import { ref, reactive, onMounted } from "vue"
+import { message } from "ant-design-vue"
+import { QuestionCircleOutlined, PlusOutlined, DeleteOutlined } from "@ant-design/icons-vue"
+import { useRouter } from "vue-router"
 // 假设这是你的API路径，保持不变
-import { apiMethods } from '@/utils/api'
+import { apiMethods } from "@/utils/api"
 
 const router = useRouter()
 const formRef = ref()
@@ -293,50 +291,50 @@ const configOptions = ref([])
 
 // 表单数据 - 保持你的原始结构不变
 const formData = reactive({
-  BetterGIAddress: '',
-  content: '',
-  post: '10086',
-  bagKeywords: [''],
-  LogKeywords: [''],
+  BetterGIAddress: "",
+  content: "",
+  post: "10086",
+  bagKeywords: [""],
+  LogKeywords: [""],
   OneLong: {
-    AutoUpdateJs: true
+    AutoUpdateJs: true,
   },
   Control: {
     IsCloseYuanShen: false,
     SendWeChatImage: false,
     AbgiScreen: false,
-    OBSReplayBuffer: false
+    OBSReplayBuffer: false,
   },
   OneRemote: {
     IsMonitor: false,
-    LogFilePath: '',
-    LogKeywords: ['']
+    LogFilePath: "",
+    LogKeywords: [""],
   },
   ScreenRecord: {
     IsRecord: false,
-    StartScreen: '',
-    EndScreen: '',
+    StartScreen: "",
+    EndScreen: "",
   },
-  BgiLog: '',
-  basePath: '',
+  BgiLog: "",
+  basePath: "",
   Notice: {
-    Type: 'Wechat',
-    Wechat: '',
+    Type: "Wechat",
+    Wechat: "",
     TGNotice: {
-      TGToken: '',
+      TGToken: "",
       ChatID: 0,
-      Proxy: ''
+      Proxy: "",
     },
     OneBot: {
       APIBase: "",
       Token: "",
       QQNum: 0,
-      groupNum: 0
+      groupNum: 0,
     },
     FeiShu: {
-      FeiShuWebhookURL: '',
-      AppID: '',
-      AppSecret: ''
+      FeiShuWebhookURL: "",
+      AppID: "",
+      AppSecret: "",
     },
   },
   RepoUrl: "",
@@ -356,7 +354,7 @@ const formData = reactive({
     ApiKey: "",
     ApiUrl: "",
     Model: "",
-  }
+  },
 })
 
 // 获取配置选项
@@ -364,21 +362,21 @@ const fetchConfigOptions = async () => {
   try {
     const response = await apiMethods.getOneLongAllName()
     configOptions.value = response.data?.map(item => ({
-      label: item.replace('.json', ''),
-      value: item
+      label: item.replace(".json", ""),
+      value: item,
     })) || []
   } catch (error) {
-    console.error('获取配置选项失败:', error)
+    console.error("获取配置选项失败:", error)
   }
 }
 
 // 动态数组操作
-const addBagKeyword = () => { formData.bagKeywords.push('') }
+const addBagKeyword = () => { formData.bagKeywords.push("") }
 const removeBagKeyword = (index) => {
   if (formData.bagKeywords.length > 1) formData.bagKeywords.splice(index, 1)
 }
 
-const addLogKeyword = () => { formData.LogKeywords.push('') }
+const addLogKeyword = () => { formData.LogKeywords.push("") }
 const removeLogKeyword = (index) => {
   if (formData.LogKeywords.length > 1) formData.LogKeywords.splice(index, 1)
 }
@@ -391,22 +389,22 @@ const loadConfig = async () => {
     console.log(data)
 
     if (data) {
-      formData.BetterGIAddress = data.BetterGIAddress || ''
-      formData.content = data.content || ''
-      formData.post = (data.post || '').replace(':', '')
-      formData.basePath = data.basePath || ''
-      formData.BgiLog = data.BgiLog || ''
-      formData.RepoUrl = data.RepoUrl || ''
-      
+      formData.BetterGIAddress = data.BetterGIAddress || ""
+      formData.content = data.content || ""
+      formData.post = (data.post || "").replace(":", "")
+      formData.basePath = data.basePath || ""
+      formData.BgiLog = data.BgiLog || ""
+      formData.RepoUrl = data.RepoUrl || ""
+
       if (data.BagStatistics) {
-        formData.bagKeywords = data.BagStatistics.split(',').map(k => k.trim()).filter(k => k)
+        formData.bagKeywords = data.BagStatistics.split(",").map(k => k.trim()).filter(k => k)
       }
-      if (formData.bagKeywords.length === 0) formData.bagKeywords = ['']
+      if (formData.bagKeywords.length === 0) formData.bagKeywords = [""]
 
       if (data.LogKeywords && Array.isArray(data.LogKeywords)) {
         formData.LogKeywords = data.LogKeywords.filter(LogKeywords => LogKeywords)
       }
-      if (formData.LogKeywords.length === 0) formData.LogKeywords = ['']
+      if (formData.LogKeywords.length === 0) formData.LogKeywords = [""]
 
       if (data.OneLong) Object.assign(formData.OneLong, data.OneLong)
       if (data.Control) Object.assign(formData.Control, data.Control)
@@ -432,7 +430,7 @@ const loadConfig = async () => {
       if (data.AbgiAiConfig) Object.assign(formData.AbgiAiConfig, data.AbgiAiConfig)
     }
   } catch (error) {
-    message.error('加载配置失败: ' + error.message)
+    message.error(`加载配置失败: ${error.message}`)
   }
 }
 
@@ -443,11 +441,11 @@ const handleSubmit = async () => {
     const payload = {
       BetterGIAddress: formData.BetterGIAddress,
       content: formData.content,
-      BagStatistics: formData.bagKeywords.filter(k => k.trim()).join(','),
-      post: ':' + formData.post,
+      BagStatistics: formData.bagKeywords.filter(k => k.trim()).join(","),
+      post: `:${formData.post}`,
       LogKeywords: formData.LogKeywords.filter(k => k.trim()).length > 0
         ? formData.LogKeywords.filter(k => k.trim())
-        : [''],
+        : [""],
       OneLong: formData.OneLong,
       Control: formData.Control,
       OneRemote: formData.OneRemote,
@@ -458,7 +456,7 @@ const handleSubmit = async () => {
       Account: formData.Account,
       RepoUrl: formData.RepoUrl,
       CommandBot: formData.CommandBot,
-      AbgiAiConfig: formData.AbgiAiConfig
+      AbgiAiConfig: formData.AbgiAiConfig,
     }
 
     // 提交前确保某些应该为数值的字段被转换成 Number（避免输入组件或用户输入导致为字符串）
@@ -472,14 +470,14 @@ const handleSubmit = async () => {
       }
     }
 
-    console.log('提交的配置:', payload)
+    console.log("提交的配置:", payload)
     await apiMethods.updateConfig(payload)
-    message.success('保存成功！')
+    message.success("保存成功！")
     setTimeout(() => {
-      router.push('/')
+      router.push("/")
     }, 2000)
   } catch (error) {
-    message.error('保存失败: ' + error.message)
+    message.error(`保存失败: ${error.message}`)
   } finally {
     loading.value = false
   }
@@ -489,17 +487,17 @@ const handleSubmit = async () => {
 const handleMysPush = async () => {
   mysPushLoading.value = true
   try {
-    const noticeType = formData.Notice.Type || ''
+    const noticeType = formData.Notice.Type || ""
     const res = await apiMethods.mysPush(noticeType)
     // api.js 的响应拦截器返回的是 response.data，后端可能返回 { status, message }
-    if (res && (res.status === 200 || res.status === '200')) {
-      message.success('米游社签到推送设置成功')
+    if (res && (res.status === 200 || res.status === "200")) {
+      message.success("米游社签到推送设置成功")
     } else {
-      message.success('操作已发送，后端返回: ' + (res?.message || JSON.stringify(res)))
+      message.success(`操作已发送，后端返回: ${res?.message || JSON.stringify(res)}`)
     }
   } catch (error) {
-    console.error('设置米游社签到推送失败', error)
-    message.error('设置米游社签到推送失败: ' + (error?.message || error))
+    console.error("设置米游社签到推送失败", error)
+    message.error(`设置米游社签到推送失败: ${error?.message || error}`)
   } finally {
     mysPushLoading.value = false
   }

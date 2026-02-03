@@ -1,29 +1,28 @@
 <template>
   <div class="cd-aware-container">
     <!-- 樱花动画背景 -->
-    <canvas ref="animeCanvas" class="anime-canvas"></canvas>
-    
+    <canvas ref="animeCanvas" class="anime-canvas" />
+
     <!-- 页面标题 -->
     <div class="page-header">
       <h1>🔄 CD管理自动采集</h1>
       <div class="header-actions">
         <a-select
           v-model:value="filterStatus"
-          @change="handleFilterChange"
           class="filter-select"
           :disabled="loading"
           placeholder="选择筛选条件"
-        >
+          @change="handleFilterChange">
           <a-select-option value="3">显示全部</a-select-option>
           <a-select-option value="1">仅显示可采集</a-select-option>
           <a-select-option value="2">仅显示未到时间</a-select-option>
         </a-select>
-        <button @click="refreshData" class="refresh-btn" :disabled="loading">
+        <button class="refresh-btn" :disabled="loading" @click="refreshData">
           {{ loading ? '加载中...' : '刷新数据' }}
         </button>
       </div>
-      <button @click="CDAllMaterial" class="refresh-btn">是否加入背包统计</button>
-      <button @click="UpdateAllCD" class="refresh-btn">一键更新全部材料</button>
+      <button class="refresh-btn" @click="CDAllMaterial">是否加入背包统计</button>
+      <button class="refresh-btn" @click="UpdateAllCD">一键更新全部材料</button>
     </div>
 
     <!-- 加载状态 -->
@@ -39,8 +38,7 @@
         type="error"
         show-icon
         closable
-        @close="error = ''"
-      />
+        @close="error = ''" />
     </div>
 
     <!-- 数据展示 -->
@@ -49,17 +47,15 @@
         <div class="account-header">
           <h2>👤 {{ account.UID }}---({{ getFilteredGathers(account.CDAwareAutoGather).length }})</h2>
         </div>
-        
+
         <div class="gather-list">
-          <div 
-            v-for="(gather, gatherIndex) in getFilteredGathers(account.CDAwareAutoGather)" 
-            :key="gatherIndex" 
-            class="gather-item"
-          >
-            <div 
-              class="gather-header" 
-              @click="toggleGather(accountIndex, getOriginalGatherIndex(account.CDAwareAutoGather, gather))"
-            >
+          <div
+            v-for="(gather, gatherIndex) in getFilteredGathers(account.CDAwareAutoGather)"
+            :key="gatherIndex"
+            class="gather-item">
+            <div
+              class="gather-header"
+              @click="toggleGather(accountIndex, getOriginalGatherIndex(account.CDAwareAutoGather, gather))">
               <div class="gather-title">
                 <h3>📄 {{ gather.TextName }}</h3>
                 <span class="file-count">{{ gather.Detail.length }} 个文件</span>
@@ -68,20 +64,18 @@
                 ▼
               </div>
             </div>
-            
-            <a-collapse 
-              :activeKey="gather.expanded ? ['details'] : []"
+
+            <a-collapse
+              :active-key="gather.expanded ? ['details'] : []"
               :bordered="false"
-              class="detail-collapse"
-            >
-              <a-collapse-panel key="details" :showArrow="false">
+              class="detail-collapse">
+              <a-collapse-panel key="details" :show-arrow="false">
                 <div class="detail-list">
-                  <div 
-                    v-for="(detail, detailIndex) in gather.Detail" 
+                  <div
+                    v-for="(detail, detailIndex) in gather.Detail"
                     :key="detailIndex"
                     class="detail-item"
-                    :class="{ 'expired': detail.CDExpired }"
-                  >
+                    :class="{ 'expired': detail.CDExpired }">
                     <div class="file-info">
                       <div class="file-name">{{ detail.FileName }}</div>
                       <div class="cd-time">
@@ -109,15 +103,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
-import { apiMethods } from '../utils/api.js'
+import { ref, onMounted, onUnmounted } from "vue"
+import { apiMethods } from "../utils/api.js"
 
 // 响应式数据
 const loading = ref(false)
-const error = ref('')
+const error = ref("")
 const data = ref([])
 const animeCanvas = ref(null)
-const filterStatus = ref('1') // 默认显示可采集
+const filterStatus = ref("1") // 默认显示可采集
 
 // 动画相关
 let petals = []
@@ -171,7 +165,7 @@ const initAnime = () => {
   const canvas = animeCanvas.value
   if (!canvas) return
 
-  const ctx = canvas.getContext('2d')
+  const ctx = canvas.getContext("2d")
   canvas.width = window.innerWidth
   canvas.height = window.innerHeight
 
@@ -184,7 +178,7 @@ const initAnime = () => {
   // 动画循环
   const animate = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
-    
+
     petals.forEach(petal => {
       petal.update()
       petal.draw(ctx)
@@ -200,10 +194,10 @@ const initAnime = () => {
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
   }
-  window.addEventListener('resize', handleResize)
+  window.addEventListener("resize", handleResize)
 
   return () => {
-    window.removeEventListener('resize', handleResize)
+    window.removeEventListener("resize", handleResize)
     if (animationId) {
       cancelAnimationFrame(animationId)
     }
@@ -213,8 +207,8 @@ const initAnime = () => {
 // 获取数据
 const fetchData = async () => {
   loading.value = true
-  error.value = ''
-  
+  error.value = ""
+
   try {
     const response = await apiMethods.getCDAwareAutoGather(filterStatus.value)
     // 为每个gather项添加expanded属性用于控制折叠状态
@@ -222,13 +216,13 @@ const fetchData = async () => {
       ...account,
       CDAwareAutoGather: account.CDAwareAutoGather.map(gather => ({
         ...gather,
-        expanded: false
-      }))
+        expanded: false,
+      })),
     }))
     data.value = processedData
   } catch (err) {
-    console.error('获取CD管理自动采集数据失败:', err)
-    error.value = '获取数据失败: ' + (err.message || '未知错误')
+    console.error("获取CD管理自动采集数据失败:", err)
+    error.value = `获取数据失败: ${err.message || "未知错误"}`
   } finally {
     loading.value = false
   }
@@ -236,7 +230,7 @@ const fetchData = async () => {
 
 // 切换折叠状态
 const toggleGather = (accountIndex, gatherIndex) => {
-  data.value[accountIndex].CDAwareAutoGather[gatherIndex].expanded = 
+  data.value[accountIndex].CDAwareAutoGather[gatherIndex].expanded =
     !data.value[accountIndex].CDAwareAutoGather[gatherIndex].expanded
 }
 
@@ -266,16 +260,16 @@ const CDAllMaterial = async () => {
     await apiMethods.CDAllMaterial()
     fetchData()
   } catch (err) {
-    console.error('CDAllMaterial失败:', err)
+    console.error("CDAllMaterial失败:", err)
   }
 }
 
 const UpdateAllCD = async () => {
   try {
     await apiMethods.UpdateAllCD()
-    alert('更新成功,具体请看日志:logs/。没有更新的材料，请联系abgi')
+    alert("更新成功,具体请看日志:logs/。没有更新的材料，请联系abgi")
   } catch (err) {
-    console.error('CDAllMaterial失败:', err)
+    console.error("CDAllMaterial失败:", err)
   }
 }
 
@@ -595,33 +589,33 @@ onUnmounted(() => {
     gap: 15px;
     text-align: center;
   }
-  
+
   .page-header h1 {
     font-size: 2rem;
   }
-  
+
   .header-actions {
     flex-direction: column;
     gap: 10px;
     width: 100%;
   }
-  
+
   .filter-select, .refresh-btn {
     width: 100%;
     max-width: 200px;
   }
-  
+
   .gather-header {
     flex-direction: column;
     gap: 10px;
     text-align: center;
   }
-  
+
   .gather-title {
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .detail-item {
     flex-direction: column;
     gap: 10px;

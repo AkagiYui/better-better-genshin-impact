@@ -14,8 +14,8 @@
     <div class="main-container">
       <header class="kawaii-header">
         <div class="header-top">
-          <div class="header-actions left" >
-            <button @click="goBack" class="kawaii-btn home-btn icon-btn" style="margin-right: 30px;">
+          <div class="header-actions left">
+            <button class="kawaii-btn home-btn icon-btn" style="margin-right: 30px;" @click="goBack">
               ← <span class="btn-text">返回</span>
             </button>
           </div>
@@ -26,14 +26,14 @@
           </div>
 
           <div class="header-actions right">
-            <button @click="updateMoraleRecord" class="kawaii-btn update-btn icon-btn" :disabled="isUpdating">
+            <button class="kawaii-btn update-btn icon-btn" :disabled="isUpdating" @click="updateMoraleRecord">
               <span v-if="!isUpdating">💫 <span class="btn-text">更新记录</span></span>
               <span v-else>⏳ <span class="btn-text">更新中...</span></span>
             </button>
-            <button @click="resetFilters" class="kawaii-btn reset-btn icon-btn">
+            <button class="kawaii-btn reset-btn icon-btn" @click="resetFilters">
               🔄 <span class="btn-text">重置筛选</span>
             </button>
-            <button @click="exportToExcel" class="kawaii-btn export-btn icon-btn" :disabled="!resultData || !resultData.items || resultData.items.length === 0">
+            <button class="kawaii-btn export-btn icon-btn" :disabled="!resultData || !resultData.items || resultData.items.length === 0" @click="exportToExcel">
               📊 <span class="btn-text">导出Excel</span>
             </button>
           </div>
@@ -43,7 +43,7 @@
       <section class="filter-section">
         <div class="filter-card">
           <h3 class="filter-title">🔍 筛选条件</h3>
-          
+
           <div class="filter-grid">
             <div class="filter-item">
               <label class="filter-label">📅 统计周期</label>
@@ -56,7 +56,7 @@
 
             <div class="filter-item">
               <label class="filter-label">📅 查询日期</label>
-              <a-date-picker 
+              <a-date-picker
                 v-if="filters.type === 'day'"
                 v-model:value="dateValue"
                 format="YYYY-MM-DD"
@@ -64,10 +64,9 @@
                 placeholder="选择日期"
                 class="kawaii-date-picker"
                 :locale="locale"
-                @change="onDateChange"
                 :get-popup-container="trigger => trigger.parentElement"
-              />
-              <a-month-picker 
+                @change="onDateChange" />
+              <a-month-picker
                 v-else-if="filters.type === 'month'"
                 v-model:value="dateValue"
                 format="YYYY-MM"
@@ -75,10 +74,9 @@
                 placeholder="选择月份"
                 class="kawaii-date-picker"
                 :locale="locale"
-                @change="onDateChange"
                 :get-popup-container="trigger => trigger.parentElement"
-              />
-              <a-date-picker 
+                @change="onDateChange" />
+              <a-date-picker
                 v-else
                 v-model:value="dateValue"
                 picker="year"
@@ -87,9 +85,8 @@
                 placeholder="选择年份"
                 class="kawaii-date-picker"
                 :locale="locale"
-                @change="onDateChange"
                 :get-popup-container="trigger => trigger.parentElement"
-              />
+                @change="onDateChange" />
             </div>
 
             <div class="filter-item">
@@ -111,7 +108,7 @@
           </div>
 
           <div class="filter-actions">
-            <button @click="searchRecords" class="kawaii-btn primary">
+            <button class="kawaii-btn primary" @click="searchRecords">
               🔍 查询
             </button>
           </div>
@@ -152,8 +149,7 @@
             :pagination="false"
             :loading="isLoading"
             row-key="id"
-            class="morale-table desktop-view"
-          >
+            class="morale-table desktop-view">
             <template #bodyCell="{ column, record }">
               <template v-if="column.key === 'time'">
                 <span class="time-cell">{{ formatTime(record.Time) }}</span>
@@ -199,56 +195,52 @@
 </template>
 
 <script>
-import api from '@/utils/api'
-import { message } from 'ant-design-vue'
-import locale from 'ant-design-vue/es/date-picker/locale/zh_CN'
-import dayjs from 'dayjs'
-import 'dayjs/locale/zh-cn'
-import * as XLSX from 'xlsx'
+import api from "@/utils/api"
+import { message } from "ant-design-vue"
+import locale from "ant-design-vue/es/date-picker/locale/zh_CN"
+import dayjs from "dayjs"
+import "dayjs/locale/zh-cn"
+import * as XLSX from "xlsx"
 
-dayjs.locale('zh-cn')
+dayjs.locale("zh-cn")
 
 export default {
-  name: 'Morale',
+  name: "Morale",
   data() {
     return {
       locale,
       columns: [
         {
-          title: '📅 时间',
-          key: 'time',
-          dataIndex: 'Time',
-          width: '40%'
+          title: "📅 时间",
+          key: "time",
+          dataIndex: "Time",
+          width: "40%",
         },
         {
-          title: '📊 类型',
-          key: 'action',
-          dataIndex: 'action',
-          width: '30%',
-          align: 'center'
+          title: "📊 类型",
+          key: "action",
+          dataIndex: "action",
+          width: "30%",
+          align: "center",
         },
         {
-          title: '💰 数量',
-          key: 'num',
-          dataIndex: 'morale',
-          width: '30%',
-          align: 'right'
-        }
+          title: "💰 数量",
+          key: "num",
+          dataIndex: "morale",
+          width: "30%",
+          align: "right",
+        },
       ],
       filters: {
-        type: 'day',
+        type: "day",
         date: this.getTodayDate(),
-        action: ''
+        action: "",
       },
       dateValue: null,
       resultData: null,
       isLoading: false,
-      isUpdating: false
+      isUpdating: false,
     }
-  },
-  mounted() {
-    this.dateValue = this.getTodayDate()
-    this.searchRecords()
   },
   computed: {
     filteredItems() {
@@ -260,7 +252,7 @@ export default {
       }
       return this.resultData.items.filter(item => item.action === this.filters.action)
     },
-    
+
     // 根据筛选条件计算总收益
     filteredTotalMorale() {
       if (!this.filteredItems || this.filteredItems.length === 0) {
@@ -269,64 +261,68 @@ export default {
       return this.filteredItems.reduce((total, item) => {
         return total + (item.morale || 0)
       }, 0)
-    }
+    },
+  },
+  mounted() {
+    this.dateValue = this.getTodayDate()
+    this.searchRecords()
   },
   methods: {
     goBack() {
       this.$router.go(-1)
     },
-    
+
     getTodayDate() {
       const today = new Date()
       const year = today.getFullYear()
-      const month = String(today.getMonth() + 1).padStart(2, '0')
-      const day = String(today.getDate()).padStart(2, '0')
+      const month = String(today.getMonth() + 1).padStart(2, "0")
+      const day = String(today.getDate()).padStart(2, "0")
       return `${year}-${month}-${day}`
     },
-    
+
     onDateChange(date, dateString) {
       // Ant Design 组件的日期变化回调
-      this.filters.date = dateString || ''
+      this.filters.date = dateString || ""
     },
-    
+
     onTypeChange() {
       // 当切换统计周期时，自动调整日期格式
       const today = new Date()
       const year = today.getFullYear()
-      const month = String(today.getMonth() + 1).padStart(2, '0')
-      const day = String(today.getDate()).padStart(2, '0')
-      
-      if (this.filters.type === 'day') {
+      const month = String(today.getMonth() + 1).padStart(2, "0")
+      const day = String(today.getDate()).padStart(2, "0")
+
+      if (this.filters.type === "day") {
         this.dateValue = `${year}-${month}-${day}`
         this.filters.date = `${year}-${month}-${day}`
-      } else if (this.filters.type === 'month') {
+      } else if (this.filters.type === "month") {
         this.dateValue = `${year}-${month}`
         this.filters.date = `${year}-${month}`
-      } else if (this.filters.type === 'year') {
+      } else if (this.filters.type === "year") {
         this.dateValue = `${year}`
         this.filters.date = `${year}`
       }
     },
-    
+
     async searchRecords() {
       if (!this.filters.date) {
-        message.warning('请选择查询日期')
+        message.warning("请选择查询日期")
         return
       }
-      
+
       try {
         this.isLoading = true
-        
+
         // 构建查询参数
         const params = {
           type: this.filters.type,
-          date: this.filters.date
+          date: this.filters.date,
         }
-        
-        const response = await api.get('/api/BagStatistics/Morale', { params })
-        console.log('API返回数据:', response)
-        console.log('response.data:', response.data)
-        
+
+        const response = await api.get("/api/BagStatistics/Morale", { params })
+        console.log("API返回数据:", response)
+        console.log("response.data:", response.data)
+
         // 后端返回的是 { data: { target_date, total_morale, items } }
         if (response.data && response.data.data) {
           // 如果有嵌套的data字段
@@ -335,119 +331,119 @@ export default {
           // 如果没有嵌套，直接使用
           this.resultData = response.data
         }
-        console.log('resultData:', this.resultData)
-        
+        console.log("resultData:", this.resultData)
+
         if (!this.resultData || !this.resultData.items || this.resultData.items.length === 0) {
-          message.info('该日期暂无摩拉记录')
+          message.info("该日期暂无摩拉记录")
         }
       } catch (error) {
-        console.error('查询摩拉记录失败:', error)
-        message.error('查询失败，请稍后重试')
+        console.error("查询摩拉记录失败:", error)
+        message.error("查询失败，请稍后重试")
         this.resultData = null
       } finally {
         this.isLoading = false
       }
     },
-    
+
     resetFilters() {
       this.filters = {
-        type: 'day',
+        type: "day",
         date: this.getTodayDate(),
-        action: ''
+        action: "",
       }
       this.searchRecords()
     },
-    
+
     formatTime(timeStr) {
-      if (!timeStr) return '-'
-      return timeStr.replace('T', ' ').substring(0, 19)
+      if (!timeStr) return "-"
+      return timeStr.replace("T", " ").substring(0, 19)
     },
-    
+
     async updateMoraleRecord() {
       try {
         this.isUpdating = true
-        
+
         // 显示加载提示
-        const loadingMessage = message.loading('正在更新摩拉记录，请耐心等待...', 0)
-        
-        const response = await api.post('/api/BagStatistics/updateMorale')
-        console.log('更新摩拉记录返回:', response)
-        
+        const loadingMessage = message.loading("正在更新摩拉记录，请耐心等待...", 0)
+
+        const response = await api.post("/api/BagStatistics/updateMorale")
+        console.log("更新摩拉记录返回:", response)
+
         // 关闭加载提示
         loadingMessage()
-        
+
         // 获取后端返回的消息
         const messageText = response.message
-        
+
         // 弹框提示，显示时间更长
         message.success({
           content: messageText,
-          duration: 10  // 增加到10秒
+          duration: 10, // 增加到10秒
         })
-        
+
         // 更新成功后自动刷新当前数据
         await this.searchRecords()
       } catch (error) {
-        console.error('更新摩拉记录失败:', error)
+        console.error("更新摩拉记录失败:", error)
         message.error({
-          content: '更新失败，请稍后重试',
-          duration: 5
+          content: "更新失败，请稍后重试",
+          duration: 5,
         })
       } finally {
         this.isUpdating = false
       }
     },
-    
+
     exportToExcel() {
       if (!this.resultData || !this.resultData.items || this.resultData.items.length === 0) {
-        message.warning('暂无数据可导出')
+        message.warning("暂无数据可导出")
         return
       }
-      
+
       try {
         // 准备Excel数据
         const excelData = this.filteredItems.map((item, index) => ({
-          '序号': index + 1,
-          '时间': this.formatTime(item.Time),
-          '类型': item.action,
-          '数量': item.morale
+          "序号": index + 1,
+          "时间": this.formatTime(item.Time),
+          "类型": item.action,
+          "数量": item.morale,
         }))
-        
+
         // 添加汇总行
         excelData.push({
-          '序号': '',
-          '时间': '',
-          '类型': '总计',
-          '数量': this.resultData.total_morale || 0
+          "序号": "",
+          "时间": "",
+          "类型": "总计",
+          "数量": this.resultData.total_morale || 0,
         })
-        
+
         // 创建工作簿
         const ws = XLSX.utils.json_to_sheet(excelData)
-        
+
         // 设置列宽
-        ws['!cols'] = [
-          { wch: 8 },  // 序号
+        ws["!cols"] = [
+          { wch: 8 }, // 序号
           { wch: 20 }, // 时间
           { wch: 18 }, // 类型
-          { wch: 15 }  // 数量
+          { wch: 15 }, // 数量
         ]
-        
+
         const wb = XLSX.utils.book_new()
-        XLSX.utils.book_append_sheet(wb, ws, '摩拉收益统计')
-        
+        XLSX.utils.book_append_sheet(wb, ws, "摩拉收益统计")
+
         // 生成文件名
         const fileName = `摩拉收益统计_${this.resultData.target_date || this.filters.date}_${Date.now()}.xlsx`
-        
+
         // 导出文件
         XLSX.writeFile(wb, fileName)
-        
-        message.success('导出Excel成功！')
+
+        message.success("导出Excel成功！")
       } catch (error) {
-        console.error('导出Excel失败:', error)
-        message.error('导出失败，请稍后重试')
+        console.error("导出Excel失败:", error)
+        message.error("导出失败，请稍后重试")
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

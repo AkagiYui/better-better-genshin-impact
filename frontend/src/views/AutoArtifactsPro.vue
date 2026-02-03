@@ -11,7 +11,7 @@
       </div>
 
       <div class="button-group">
-        <button @click="goToHome" class="btn btn-ghost">
+        <button class="btn btn-ghost" @click="goToHome">
           <span class="btn-icon">⟲</span>
           返回主页
         </button>
@@ -19,10 +19,10 @@
     </header>
 
     <!-- 主面板 -->
-    <section class="panel" id="executionPanel">
+    <section id="executionPanel" class="panel">
       <!-- 状态：加载中 -->
       <div v-if="loading" class="state state-loading">
-        <div class="loading-spinner"></div>
+        <div class="loading-spinner" />
         <p class="state-text">正在召唤数据中…</p>
         <p class="state-sub">（请稍候，命运齿轮正在转动）</p>
       </div>
@@ -40,10 +40,9 @@
           <!-- 角落轮播装饰 -->
           <div
             v-if="images.length > 0"
-            class="swiper corner-icon-swiper"
             :ref="`swiper-${index}`"
-            aria-label="corner swiper"
-          >
+            class="swiper corner-icon-swiper"
+            aria-label="corner swiper">
             <div class="swiper-wrapper">
               <div v-for="(image, imgIndex) in images" :key="imgIndex" class="swiper-slide">
                 <img :src="`/static/image/${image}`" :alt="`image-${imgIndex}`" />
@@ -84,7 +83,7 @@
               <span class="detail-hint">（逐条展开）</span>
             </div>
 
-            <div class="detail-item" v-for="(detail, detailIndex) in item.Detail" :key="detailIndex">
+            <div v-for="(detail, detailIndex) in item.Detail" :key="detailIndex" class="detail-item">
               <span class="detail-dot">◆</span>
               <span class="detail-text">{{ detail }}</span>
             </div>
@@ -101,21 +100,21 @@
 </template>
 
 <script>
-import { ref, onMounted, nextTick, onBeforeUnmount } from 'vue'
-import { useRouter } from 'vue-router'
-import { Swiper } from 'swiper'
-import 'swiper/css'
-import 'swiper/css/effect-fade'
-import { apiMethods } from '@/utils/api'
+import { ref, onMounted, nextTick, onBeforeUnmount } from "vue"
+import { useRouter } from "vue-router"
+import { Swiper } from "swiper"
+import "swiper/css"
+import "swiper/css/effect-fade"
+import { apiMethods } from "@/utils/api"
 
 export default {
-  name: 'AutoArtifactsPro',
+  name: "AutoArtifactsPro",
   setup() {
     const router = useRouter()
 
     // 响应式数据
-    const title = ref('狗粮批发-联机收益查询')
-    const jsVersion = ref('')
+    const title = ref("狗粮批发-联机收益查询")
+    const jsVersion = ref("")
     const items = ref([])
     const images = ref([])
     const loading = ref(false)
@@ -125,15 +124,15 @@ export default {
 
     // 方法
     const goToHome = () => {
-      router.push('/')
+      router.push("/")
     }
 
-        setInterval(() => {
-  debugger
-}, 100)
+    setInterval(() => {
+      debugger
+    }, 100)
 
     const getAutoArtifactsPro2Btn = (fileName) => {
-      router.push({ path: '/getAutoArtifactsPro2', query: { fileName } })
+      router.push({ path: "/getAutoArtifactsPro2", query: { fileName } })
     }
 
     const loadImages = async () => {
@@ -158,19 +157,19 @@ export default {
       })
       swipers.value = []
 
-      const swiperContainers = document.querySelectorAll('.corner-icon-swiper')
+      const swiperContainers = document.querySelectorAll(".corner-icon-swiper")
       swiperContainers.forEach((swiperContainer) => {
         if (images.value.length > 0) {
           const ins = new Swiper(swiperContainer, {
             loop: true,
             autoplay: {
               delay: 5000,
-              disableOnInteraction: false
+              disableOnInteraction: false,
             },
-            effect: 'fade',
+            effect: "fade",
             fadeEffect: {
-              crossFade: true
-            }
+              crossFade: true,
+            },
           })
           swipers.value.push(ins)
         }
@@ -183,19 +182,19 @@ export default {
         const data = await apiMethods.getAutoArtifactsPro()
 
         if (data) {
-          title.value = data.title || 'AutoArtifactsPro'
-          jsVersion.value = data.JsVersion || ''
+          title.value = data.title || "AutoArtifactsPro"
+          jsVersion.value = data.JsVersion || ""
           items.value = data.items || []
         }
       } catch (err) {
-        console.error('Failed to load AutoArtifactsPro data:', err)
+        console.error("Failed to load AutoArtifactsPro data:", err)
         items.value = [
           {
-            FileName: 'example1.txt',
-            Detail: ['暂无数据，请检查后端服务'],
-            Mark: '暂无数据',
-            ActivateTime: ''
-          }
+            FileName: "example1.txt",
+            Detail: ["暂无数据，请检查后端服务"],
+            Mark: "暂无数据",
+            ActivateTime: "",
+          },
         ]
       } finally {
         loading.value = false
@@ -226,9 +225,9 @@ export default {
       images,
       loading,
       goToHome,
-      getAutoArtifactsPro2Btn
+      getAutoArtifactsPro2Btn,
     }
-  }
+  },
 }
 </script>
 

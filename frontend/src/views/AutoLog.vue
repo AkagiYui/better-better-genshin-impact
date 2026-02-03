@@ -2,9 +2,9 @@
   <div class="auto-log-page">
     <!-- 动态背景 -->
     <div class="page-background" aria-hidden="true">
-      <div class="gradient-orb orb-1"></div>
-      <div class="gradient-orb orb-2"></div>
-      <div class="gradient-orb orb-3"></div>
+      <div class="gradient-orb orb-1" />
+      <div class="gradient-orb orb-2" />
+      <div class="gradient-orb orb-3" />
     </div>
 
     <!-- 搜索筛选卡片 -->
@@ -12,7 +12,7 @@
       <div class="section-header">
         <div class="header-left">
           <div class="header-icon">
-            <file-search-outlined />
+            <FileSearchOutlined />
           </div>
           <div class="header-title">
             <h2>日志查询</h2>
@@ -33,15 +33,14 @@
               :disabled="loading"
               allow-clear
               placeholder="选择日期"
-              @change="handleFetchData"
               class="custom-date-picker"
               :show-time="false"
               format="YYYY-MM-DD"
               :locale="datePickerLocale"
               :popup-style="{ width: '280px' }"
-            >
+              @change="handleFetchData">
               <template #suffixIcon>
-                <calendar-outlined />
+                <CalendarOutlined />
               </template>
             </a-date-picker>
           </div>
@@ -53,10 +52,9 @@
               allow-clear
               :disabled="loading || logs.length === 0"
               placeholder="搜索日志内容..."
-              class="custom-input"
-            >
+              class="custom-input">
               <template #prefix>
-                <search-outlined />
+                <SearchOutlined />
               </template>
             </a-input>
           </div>
@@ -67,8 +65,7 @@
               v-model:value="levelFilter"
               :disabled="loading || logs.length === 0"
               placeholder="全部"
-              class="custom-select"
-            >
+              class="custom-select">
               <a-select-option value="ALL">全部</a-select-option>
               <a-select-option value="ERROR">错误</a-select-option>
               <a-select-option value="WARN">警告</a-select-option>
@@ -81,10 +78,10 @@
         <div class="action-row">
           <div class="left-actions">
             <a-button type="primary" class="action-btn primary" :loading="loading" @click="handleFetchData">
-              <cloud-sync-outlined /> 查询
+              <CloudSyncOutlined /> 查询
             </a-button>
             <a-button class="action-btn" @click="handleReset">
-              <reload-outlined /> 重置
+              <ReloadOutlined /> 重置
             </a-button>
           </div>
 
@@ -93,24 +90,23 @@
               <a-switch
                 v-model:checked="autoRefresh"
                 size="small"
-                @change="handleAutoRefreshChange"
-              />
+                @change="handleAutoRefreshChange" />
             </a-tooltip>
-            
+
             <a-dropdown :trigger="['click']" placement="bottomRight">
               <a-button class="action-btn icon-btn">
-                <ellipsis-outlined />
+                <EllipsisOutlined />
               </a-button>
               <template #overlay>
                 <a-menu>
-                  <a-menu-item key="1" @click="exportLogs" :disabled="!filteredLogs.length">
-                    <download-outlined /> 导出CSV
+                  <a-menu-item key="1" :disabled="!filteredLogs.length" @click="exportLogs">
+                    <DownloadOutlined /> 导出CSV
                   </a-menu-item>
-                  <a-menu-item key="2" @click="copyAllLogs" :disabled="!filteredLogs.length">
-                    <copy-outlined /> 复制全部
+                  <a-menu-item key="2" :disabled="!filteredLogs.length" @click="copyAllLogs">
+                    <CopyOutlined /> 复制全部
                   </a-menu-item>
-                  <a-menu-item key="3" @click="clearLogs" :disabled="!logs.length">
-                    <delete-outlined /> 清空日志
+                  <a-menu-item key="3" :disabled="!logs.length" @click="clearLogs">
+                    <DeleteOutlined /> 清空日志
                   </a-menu-item>
                 </a-menu>
               </template>
@@ -126,15 +122,15 @@
       <transition name="fade-in">
         <div v-if="logSummary.total" class="stats-panel">
           <div class="stat-card total">
-            <div class="stat-icon"><bars-outlined /></div>
+            <div class="stat-icon"><BarsOutlined /></div>
             <div class="stat-content">
               <div class="stat-label">日志总数</div>
               <div class="stat-value">{{ logSummary.total }}</div>
             </div>
           </div>
-          
+
           <div class="stat-card error" :class="{ 'has-error': logSummary.error > 0 }">
-            <div class="stat-icon"><close-circle-outlined /></div>
+            <div class="stat-icon"><CloseCircleOutlined /></div>
             <div class="stat-content">
               <div class="stat-label">错误数</div>
               <div class="stat-value">{{ logSummary.error }}</div>
@@ -142,7 +138,7 @@
           </div>
 
           <div class="stat-card success">
-            <div class="stat-icon"><check-circle-outlined /></div>
+            <div class="stat-icon"><CheckCircleOutlined /></div>
             <div class="stat-content">
               <div class="stat-label">成功率</div>
               <div class="stat-value">{{ logSummary.successRate }}%</div>
@@ -150,7 +146,7 @@
           </div>
 
           <div class="stat-card time">
-            <div class="stat-icon"><clock-circle-outlined /></div>
+            <div class="stat-icon"><ClockCircleOutlined /></div>
             <div class="stat-content">
               <div class="stat-label">时间段</div>
               <div class="stat-value time-range">
@@ -170,23 +166,23 @@
             <span v-if="localKeyword">筛选 <strong>{{ filteredLogs.length }}</strong> 条</span>
             <span v-else>共 <strong>{{ filteredLogs.length }}</strong> 条</span>
           </span>
-          
+
           <a-radio-group v-model:value="levelFilter" button-style="solid" size="small" class="level-tabs">
             <a-radio-button value="ALL">全部</a-radio-button>
             <a-radio-button value="ERROR">错误({{ logSummary.error }})</a-radio-button>
             <a-radio-button value="WARN">警告({{ logSummary.warn }})</a-radio-button>
           </a-radio-group>
         </div>
-        
+
         <div class="toolbar-right">
-          <a-button type="text" size="small" class="icon-btn" @click="refresh" :loading="loading">
-            <reload-outlined :spin="loading" />
+          <a-button type="text" size="small" class="icon-btn" :loading="loading" @click="refresh">
+            <ReloadOutlined :spin="loading" />
           </a-button>
         </div>
       </div>
 
       <!-- PC端表格布局 -->
-      <div class="table-wrapper" v-if="!showCardLayout">
+      <div v-if="!showCardLayout" class="table-wrapper">
         <a-table
           :data-source="filteredLogs"
           :columns="columns"
@@ -196,8 +192,7 @@
           row-key="id"
           :row-class-name="getRowClassName"
           class="custom-table"
-          :loading="loading"
-        >
+          :loading="loading">
           <template #bodyCell="{ column, record }">
             <template v-if="column.dataIndex === 'level'">
               <span class="level-badge" :class="getLevelConfig(record.level).class">
@@ -212,10 +207,9 @@
                   class="log-text"
                   :ellipsis="ellipsisConfig"
                   :copyable="{ text: record.msg }"
-                  :content="record.msg"
-                >
+                  :content="record.msg">
                   <template v-if="localKeyword && record.msg">
-                    <span v-html="highlightKeyword(record.msg)"></span>
+                    <span v-html="highlightKeyword(record.msg)" />
                   </template>
                 </a-typography-paragraph>
               </div>
@@ -236,17 +230,16 @@
       </div>
 
       <!-- 移动端卡片布局 -->
-      <div class="mobile-layout" v-else>
-        <div class="log-cards" v-if="mobilePagedLogs.length > 0">
+      <div v-else class="mobile-layout">
+        <div v-if="mobilePagedLogs.length > 0" class="log-cards">
           <div
             v-for="log in mobilePagedLogs"
             :key="log.id"
             class="log-card"
-            :class="getRowClassName(log)"
-          >
+            :class="getRowClassName(log)">
             <div class="card-header">
               <span class="card-time">
-                <clock-circle-outlined />
+                <ClockCircleOutlined />
                 {{ log.time.split(' ')[1] || log.time }}
               </span>
               <span class="card-level" :class="getLevelConfig(log.level).class">
@@ -260,10 +253,9 @@
                 class="card-text"
                 :ellipsis="{ rows: 3, expandable: true, symbol: '展开' }"
                 :copyable="{ text: log.msg }"
-                :content="log.msg"
-              >
+                :content="log.msg">
                 <template v-if="localKeyword && log.msg">
-                  <span v-html="highlightKeyword(log.msg)"></span>
+                  <span v-html="highlightKeyword(log.msg)" />
                 </template>
               </a-typography-paragraph>
             </div>
@@ -274,13 +266,13 @@
           </div>
         </div>
 
-        <div class="empty-placeholder" v-else>
+        <div v-else class="empty-placeholder">
           <img src="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg" alt="empty" />
           <p>{{ logs.length === 0 ? '暂无日志数据' : '没有找到匹配的结果' }}</p>
         </div>
 
         <!-- 移动端分页 -->
-        <div class="mobile-pagination" v-if="filteredLogs.length > 0">
+        <div v-if="filteredLogs.length > 0" class="mobile-pagination">
           <a-pagination
             v-model:current="mobileCurrentPage"
             :page-size="mobilePageSize"
@@ -288,8 +280,7 @@
             size="small"
             show-less-items
             :show-total="total => `共 ${total} 条`"
-            class="custom-pagination"
-          />
+            class="custom-pagination" />
         </div>
       </div>
     </a-card>
@@ -297,11 +288,11 @@
 </template>
 
 <script setup>
-import dayjs from 'dayjs'
-import 'dayjs/locale/zh-cn'
-import locale from 'ant-design-vue/es/date-picker/locale/zh_CN'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { message } from 'ant-design-vue'
+import dayjs from "dayjs"
+import "dayjs/locale/zh-cn"
+import locale from "ant-design-vue/es/date-picker/locale/zh_CN"
+import { computed, onMounted, onUnmounted, ref } from "vue"
+import { message } from "ant-design-vue"
 import {
   FileSearchOutlined,
   ReloadOutlined,
@@ -321,50 +312,50 @@ import {
   DeleteOutlined,
   DatabaseOutlined,
   EllipsisOutlined,
-  SyncOutlined
-} from '@ant-design/icons-vue'
+  SyncOutlined,
+} from "@ant-design/icons-vue"
 // 请确保路径正确
-import { apiMethods } from '@/utils/api'
+import { apiMethods } from "@/utils/api"
 
 // 设置 dayjs 为中文
-dayjs.locale('zh-cn')
+dayjs.locale("zh-cn")
 
 // --- State Definition ---
 const datePickerLocale = ref(locale)
-const localKeyword = ref('')
+const localKeyword = ref("")
 const selectedDate = ref(null)
 const loading = ref(false)
 const logs = ref([])
-const levelFilter = ref('ALL')
+const levelFilter = ref("ALL")
 const windowWidth = ref(window.innerWidth)
 const mobileCurrentPage = ref(1)
 const mobilePageSize = ref(10)
 const autoRefresh = ref(false)
-let refreshTimer = null 
+let refreshTimer = null
 
 // --- Table Config ---
 const columns = [
-  { title: '时间', dataIndex: 'time', key: 'time', width: 120, fixed: 'left', align: 'center' },
-  { title: '级别', dataIndex: 'level', key: 'level', width: 110, align: 'center' },
-  { title: '日志内容', dataIndex: 'msg', key: 'msg' }
+  { title: "时间", dataIndex: "time", key: "time", width: 120, fixed: "left", align: "center" },
+  { title: "级别", dataIndex: "level", key: "level", width: 110, align: "center" },
+  { title: "日志内容", dataIndex: "msg", key: "msg" },
 ]
 
-const ellipsisConfig = { rows: 2, expandable: true, symbol: '展开' }
+const ellipsisConfig = { rows: 2, expandable: true, symbol: "展开" }
 // --- Computed Properties ---
 const filteredLogs = computed(() => {
   let result = logs.value
 
-  if (levelFilter.value !== 'ALL') {
+  if (levelFilter.value !== "ALL") {
     const target = levelFilter.value.toUpperCase()
-    result = result.filter((log) => (log.level || '').toUpperCase().includes(target))
+    result = result.filter((log) => (log.level || "").toUpperCase().includes(target))
   }
 
   if (localKeyword.value) {
     const k = localKeyword.value.toLowerCase().trim()
     result = result.filter((log) => {
-      const msgMatch = (log.msg || '').toLowerCase().includes(k)
-      const timeMatch = (log.time || '').includes(k)
-      const idMatch = (log.id || '').toLowerCase().includes(k)
+      const msgMatch = (log.msg || "").toLowerCase().includes(k)
+      const timeMatch = (log.time || "").includes(k)
+      const idMatch = (log.id || "").toLowerCase().includes(k)
       return msgMatch || timeMatch || idMatch
     })
   }
@@ -375,26 +366,26 @@ const filteredLogs = computed(() => {
 const tablePagination = computed(() => ({
   pageSize: 50,
   showSizeChanger: true,
-  pageSizeOptions: ['20', '50', '100', '200'],
+  pageSizeOptions: ["20", "50", "100", "200"],
   showTotal: (total) => `共 ${total} 条`,
-  size: 'default'
+  size: "default",
 }))
 
 // 响应式表格滚动高度
 const tableScroll = computed(() => {
   const screenWidth = windowWidth.value
-  let y = 'calc(100vh - 480px)' // 默认PC端高度
+  let y = "calc(100vh - 480px)" // 默认PC端高度
 
   if (screenWidth <= 992) {
-    y = 'calc(100vh - 500px)' // 平板调整
+    y = "calc(100vh - 500px)" // 平板调整
   }
 
   if (screenWidth <= 768) {
-    y = 'calc(100vh - 520px)' // 移动端调整
+    y = "calc(100vh - 520px)" // 移动端调整
   }
 
   if (screenWidth <= 480) {
-    y = 'calc(100vh - 500px)' // 小屏幕进一步调整
+    y = "calc(100vh - 500px)" // 小屏幕进一步调整
   }
 
   // 确保最小高度
@@ -403,7 +394,7 @@ const tableScroll = computed(() => {
 
   return {
     x: Math.min(800, screenWidth - 40), // 根据屏幕宽度调整水平滚动
-    y: calculatedHeight
+    y: calculatedHeight,
   }
 })
 
@@ -422,33 +413,33 @@ const mobilePagedLogs = computed(() => {
 // 快速筛选器
 const quickFilters = computed(() => [
   {
-    value: 'ALL',
-    label: '全部',
+    value: "ALL",
+    label: "全部",
     icon: BarsOutlined,
-    color: 'default',
-    count: logs.value.length
+    color: "default",
+    count: logs.value.length,
   },
   {
-    value: 'ERROR',
-    label: '错误',
+    value: "ERROR",
+    label: "错误",
     icon: CloseCircleOutlined,
-    color: 'red',
-    count: logSummary.value.error
+    color: "red",
+    count: logSummary.value.error,
   },
   {
-    value: 'WARN',
-    label: '警告',
+    value: "WARN",
+    label: "警告",
     icon: WarningOutlined,
-    color: 'orange',
-    count: logSummary.value.warn
+    color: "orange",
+    count: logSummary.value.warn,
   },
   {
-    value: 'INFO',
-    label: '信息',
+    value: "INFO",
+    label: "信息",
     icon: InfoCircleOutlined,
-    color: 'blue',
-    count: logs.value.length - logSummary.value.error - logSummary.value.warn
-  }
+    color: "blue",
+    count: logs.value.length - logSummary.value.error - logSummary.value.warn,
+  },
 ])
 
 // 应用快速筛选
@@ -463,24 +454,24 @@ const toggleAutoRefresh = () => {
 }
 
 const logSummary = computed(() => {
-  if (!logs.value.length) return { total: 0, error: 0, warn: 0, successRate: '0.0', earliestTime: '', latestTime: '' }
-  
+  if (!logs.value.length) return { total: 0, error: 0, warn: 0, successRate: "0.0", earliestTime: "", latestTime: "" }
+
   let error = 0, warn = 0
   const validTimes = []
 
   logs.value.forEach(log => {
-    const lvl = (log.level || '').toUpperCase()
-    if (lvl.includes('ERR')) error++
-    else if (lvl.includes('WARN')) warn++
-    
+    const lvl = (log.level || "").toUpperCase()
+    if (lvl.includes("ERR")) error++
+    else if (lvl.includes("WARN")) warn++
+
     if (log.time && dayjs(log.time).isValid()) validTimes.push(dayjs(log.time))
   })
 
-  let earliest = '-', latest = '-'
+  let earliest = "-", latest = "-"
   if (validTimes.length) {
-      validTimes.sort((a, b) => a.valueOf() - b.valueOf())
-      earliest = validTimes[0].format('HH:mm:ss')
-      latest = validTimes[validTimes.length - 1].format('HH:mm:ss')
+    validTimes.sort((a, b) => a.valueOf() - b.valueOf())
+    earliest = validTimes[0].format("HH:mm:ss")
+    latest = validTimes[validTimes.length - 1].format("HH:mm:ss")
   }
 
   return {
@@ -489,7 +480,7 @@ const logSummary = computed(() => {
     warn,
     successRate: (((logs.value.length - error) / logs.value.length) * 100).toFixed(1),
     earliestTime: earliest,
-    latestTime: latest
+    latestTime: latest,
   }
 })
 
@@ -497,8 +488,8 @@ const logSummary = computed(() => {
 const normalizeLogs = (raw) => {
   if (!raw) return []
   let items = raw
-  
-  if (typeof raw === 'string') {
+
+  if (typeof raw === "string") {
     try {
       items = JSON.parse(raw)
     } catch {
@@ -509,15 +500,15 @@ const normalizeLogs = (raw) => {
 
   return items.map((item, index) => {
     let parsed = item
-    if (typeof item === 'string') {
+    if (typeof item === "string") {
       try { parsed = JSON.parse(item) } catch { parsed = { msg: item } }
     }
-    
+
     return {
       id: `${parsed.id || index}`,
-      time: parsed.time || parsed.timestamp || parsed.date || dayjs().format('YYYY-MM-DD HH:mm:ss'),
-      level: (parsed.level || parsed.Level || 'INFO').toUpperCase(),
-      msg: typeof parsed.msg === 'object' ? JSON.stringify(parsed.msg) : (parsed.msg || parsed.message || JSON.stringify(parsed))
+      time: parsed.time || parsed.timestamp || parsed.date || dayjs().format("YYYY-MM-DD HH:mm:ss"),
+      level: (parsed.level || parsed.Level || "INFO").toUpperCase(),
+      msg: typeof parsed.msg === "object" ? JSON.stringify(parsed.msg) : (parsed.msg || parsed.message || JSON.stringify(parsed)),
     }
   })
 }
@@ -526,15 +517,15 @@ const fetchLogs = async () => {
   loading.value = true
   try {
     const res = await apiMethods.queryAutoLogs(selectedDate.value)
-    if (res?.status === 'success') {
+    if (res?.status === "success") {
       logs.value = normalizeLogs(res.msg).reverse()
     } else {
       logs.value = []
-      message.warning(res?.msg || '未查询到数据')
+      message.warning(res?.msg || "未查询到数据")
     }
   } catch (err) {
     logs.value = []
-    message.error('日志获取失败: ' + err.message)
+    message.error(`日志获取失败: ${err.message}`)
   } finally {
     loading.value = false
   }
@@ -545,71 +536,71 @@ const handleFetchData = () => {
 }
 
 const handleReset = () => {
-  localKeyword.value = ''
+  localKeyword.value = ""
   selectedDate.value = null
-  levelFilter.value = 'ALL'
+  levelFilter.value = "ALL"
   fetchLogs()
 }
 
 const refresh = () => fetchLogs()
 
 const highlightKeyword = (text) => {
-    if (!localKeyword.value) return text
-    const k = localKeyword.value
-    // 简单的正则替换，生产环境建议转义正则字符
-    const reg = new RegExp(`(${k})`, 'gi') 
-    return text.replace(reg, '<span style="background-color: #ffe58f; color: #d46b08; font-weight: bold; padding: 0 2px; border-radius: 2px;">$1</span>')
+  if (!localKeyword.value) return text
+  const k = localKeyword.value
+  // 简单的正则替换，生产环境建议转义正则字符
+  const reg = new RegExp(`(${k})`, "gi")
+  return text.replace(reg, '<span style="background-color: #ffe58f; color: #d46b08; font-weight: bold; padding: 0 2px; border-radius: 2px;">$1</span>')
 }
 
 // 修改：返回 class 名称而非 color，便于 CSS 控制
-const getLevelConfig = (level = '') => {
+const getLevelConfig = (level = "") => {
   const upper = level.toUpperCase()
-  if (upper.includes('ERR')) return { class: 'tag-error', icon: CloseCircleOutlined }
-  if (upper.includes('WARN')) return { class: 'tag-warn', icon: WarningOutlined }
-  if (upper.includes('DEBUG')) return { class: 'tag-debug', icon: InfoCircleOutlined }
-  return { class: 'tag-info', icon: InfoCircleOutlined }
+  if (upper.includes("ERR")) return { class: "tag-error", icon: CloseCircleOutlined }
+  if (upper.includes("WARN")) return { class: "tag-warn", icon: WarningOutlined }
+  if (upper.includes("DEBUG")) return { class: "tag-debug", icon: InfoCircleOutlined }
+  return { class: "tag-info", icon: InfoCircleOutlined }
 }
 
 const getRowClassName = (record) => {
-  const upper = (record?.level || '').toUpperCase()
-  if (upper.includes('ERR')) return 'row-error'
-  if (upper.includes('WARN')) return 'row-warn'
-  return ''
+  const upper = (record?.level || "").toUpperCase()
+  if (upper.includes("ERR")) return "row-error"
+  if (upper.includes("WARN")) return "row-warn"
+  return ""
 }
 
 const exportLogs = () => {
-    const header = 'Time,Level,Message\n'
-    const content = filteredLogs.value.map(l => {
-        const safeMsg = `"${(l.msg || '').replace(/"/g, '""')}"`
-        return `${l.time},${l.level},${safeMsg}`
-    }).join('\n')
+  const header = "Time,Level,Message\n"
+  const content = filteredLogs.value.map(l => {
+    const safeMsg = `"${(l.msg || "").replace(/"/g, '""')}"`
+    return `${l.time},${l.level},${safeMsg}`
+  }).join("\n")
 
-    const blob = new Blob([header + content], { type: 'text/csv;charset=utf-8;' })
-    const link = document.createElement('a')
-    link.href = URL.createObjectURL(blob)
-    link.download = `logs_${dayjs().format('MMDD_HHmm')}.csv`
-    link.click()
+  const blob = new Blob([header + content], { type: "text/csv;charset=utf-8;" })
+  const link = document.createElement("a")
+  link.href = URL.createObjectURL(blob)
+  link.download = `logs_${dayjs().format("MMDD_HHmm")}.csv`
+  link.click()
 }
 
 // 复制到剪贴板
 const copyToClipboard = async (text) => {
+  try {
+    await navigator.clipboard.writeText(text)
+    message.success("已复制到剪贴板")
+  } catch (err) {
+    // 降级方案
+    const textArea = document.createElement("textarea")
+    textArea.value = text
+    document.body.appendChild(textArea)
+    textArea.select()
     try {
-        await navigator.clipboard.writeText(text)
-        message.success('已复制到剪贴板')
-    } catch (err) {
-        // 降级方案
-        const textArea = document.createElement('textarea')
-        textArea.value = text
-        document.body.appendChild(textArea)
-        textArea.select()
-        try {
-            document.execCommand('copy')
-            message.success('已复制到剪贴板')
-        } catch (err2) {
-            message.error('复制失败')
-        }
-        document.body.removeChild(textArea)
+      document.execCommand("copy")
+      message.success("已复制到剪贴板")
+    } catch (err2) {
+      message.error("复制失败")
     }
+    document.body.removeChild(textArea)
+  }
 }
 
 // 自动刷新处理
@@ -620,21 +611,21 @@ const handleAutoRefreshChange = (checked) => {
         fetchLogs()
       }
     }, 5000) // 5秒自动刷新
-    message.info('已开启自动刷新（5秒）')
+    message.info("已开启自动刷新（5秒）")
   } else {
     if (refreshTimer) {
       clearInterval(refreshTimer)
       refreshTimer = null
     }
-    message.info('已关闭自动刷新')
+    message.info("已关闭自动刷新")
   }
 }
 
 // 复制所有日志
 const copyAllLogs = async () => {
   const allText = filteredLogs.value.map(log =>
-    `[${log.time}] ${log.level}: ${log.msg}`
-  ).join('\n')
+    `[${log.time}] ${log.level}: ${log.msg}`,
+  ).join("\n")
 
   await copyToClipboard(allText)
 }
@@ -642,7 +633,7 @@ const copyAllLogs = async () => {
 // 清空日志
 const clearLogs = () => {
   logs.value = []
-  message.success('已清空日志')
+  message.success("已清空日志")
 }
 
 // 窗口大小变化处理
@@ -652,86 +643,86 @@ const handleResize = () => {
 
 onMounted(() => {
   fetchLogs()
-  window.addEventListener('resize', handleResize)
-  
+  window.addEventListener("resize", handleResize)
+
   // 修复日期选择器样式 - 终极版
   const fixDatePickerStyles = () => {
     const applyFix = () => {
       // 修复所有日历面板
-      const panels = document.querySelectorAll('.ant-picker-dropdown')
+      const panels = document.querySelectorAll(".ant-picker-dropdown")
       panels.forEach(panel => {
-        panel.setAttribute('style', panel.getAttribute('style') + '; z-index: 99999 !important;')
+        panel.setAttribute("style", `${panel.getAttribute("style")}; z-index: 99999 !important;`)
       })
-      
+
       // 修复容器
-      const containers = document.querySelectorAll('.ant-picker-panel-container, .ant-picker-panel, .ant-picker-date-panel, .ant-picker-body')
+      const containers = document.querySelectorAll(".ant-picker-panel-container, .ant-picker-panel, .ant-picker-date-panel, .ant-picker-body")
       containers.forEach(container => {
-        container.setAttribute('style', container.getAttribute('style') + '; width: 280px !important; min-width: 280px !important;')
+        container.setAttribute("style", `${container.getAttribute("style")}; width: 280px !important; min-width: 280px !important;`)
       })
-      
+
       // 修复表格
-      const tables = document.querySelectorAll('.ant-picker-dropdown table')
+      const tables = document.querySelectorAll(".ant-picker-dropdown table")
       tables.forEach(table => {
-        table.setAttribute('style', 'width: 100% !important; min-width: 100% !important; table-layout: fixed !important; border-collapse: separate !important; border-spacing: 0 !important;')
+        table.setAttribute("style", "width: 100% !important; min-width: 100% !important; table-layout: fixed !important; border-collapse: separate !important; border-spacing: 0 !important;")
       })
-      
+
       // 修复 thead 和 tbody
-      const groups = document.querySelectorAll('.ant-picker-dropdown thead, .ant-picker-dropdown tbody')
+      const groups = document.querySelectorAll(".ant-picker-dropdown thead, .ant-picker-dropdown tbody")
       groups.forEach(group => {
-        group.setAttribute('style', 'width: 100% !important; display: table-row-group !important;')
+        group.setAttribute("style", "width: 100% !important; display: table-row-group !important;")
       })
-      
+
       // 修复表行
-      const rows = document.querySelectorAll('.ant-picker-dropdown tr')
+      const rows = document.querySelectorAll(".ant-picker-dropdown tr")
       rows.forEach(row => {
-        row.setAttribute('style', 'width: 100% !important; display: table-row !important;')
+        row.setAttribute("style", "width: 100% !important; display: table-row !important;")
       })
-      
+
       // 修复单元格 - 最关键
-      const cells = document.querySelectorAll('.ant-picker-dropdown th, .ant-picker-dropdown td')
+      const cells = document.querySelectorAll(".ant-picker-dropdown th, .ant-picker-dropdown td")
       cells.forEach(cell => {
-        cell.setAttribute('style', 'width: 14.285714% !important; min-width: 14.285714% !important; max-width: 14.285714% !important; display: table-cell !important; border: none !important; padding: 4px !important; margin: 0 !important; text-align: center !important; box-sizing: border-box !important;')
+        cell.setAttribute("style", "width: 14.285714% !important; min-width: 14.285714% !important; max-width: 14.285714% !important; display: table-cell !important; border: none !important; padding: 4px !important; margin: 0 !important; text-align: center !important; box-sizing: border-box !important;")
       })
-      
-      console.log('日历修复已执行:', {
+
+      console.log("日历修复已执行:", {
         panels: panels.length,
         tables: tables.length,
         rows: rows.length,
-        cells: cells.length
+        cells: cells.length,
       })
     }
-    
+
     // 立即执行
     setTimeout(applyFix, 0)
     setTimeout(applyFix, 100)
     setTimeout(applyFix, 300)
     setTimeout(applyFix, 500)
-    
+
     // 监听DOM变化
     const observer = new MutationObserver(() => {
       applyFix()
     })
-    
+
     observer.observe(document.body, {
       childList: true,
       subtree: true,
-      attributes: false
+      attributes: false,
     })
-    
+
     // 持续检查
     const interval = setInterval(applyFix, 200)
-    
+
     setTimeout(() => {
       clearInterval(interval)
-      console.log('日历修复监听结束')
+      console.log("日历修复监听结束")
     }, 10000)
   }
-  
+
   fixDatePickerStyles()
 })
 
 onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
+  window.removeEventListener("resize", handleResize)
   if (refreshTimer) {
     clearInterval(refreshTimer)
     refreshTimer = null

@@ -1,22 +1,21 @@
 <template>
   <div class="js-names-page">
     <header class="page-header">
-      <div class="header-carousel" v-if="headerCarouselImages.length > 0">
+      <div v-if="headerCarouselImages.length > 0" class="header-carousel">
         <div class="carousel-container">
-          <div 
-            v-for="(image, index) in headerCarouselImages" 
-            :key="index" 
-            class="carousel-slide" 
-            :class="{ active: headerCurrentImageIndex === index }"
-          >
+          <div
+            v-for="(image, index) in headerCarouselImages"
+            :key="index"
+            class="carousel-slide"
+            :class="{ active: headerCurrentImageIndex === index }">
             <img :src="image" :alt="`header-bg-${index}`" />
           </div>
         </div>
-        <div class="carousel-overlay"></div>
+        <div class="carousel-overlay" />
       </div>
 
       <button class="btn home-btn" @click="goHome">
-        <span class="icon">🏠</span> 
+        <span class="icon">🏠</span>
         <span class="text">返回首页</span>
       </button>
 
@@ -52,7 +51,7 @@
       </section>
 
       <div v-if="gitLogLoading" class="loading-state">
-        <div class="spinner"></div>
+        <div class="spinner" />
         <p>正在从异世界获取数据...</p>
       </div>
 
@@ -63,7 +62,6 @@
         </div>
 
         <div v-else class="data-wrapper">
-          
           <div class="table-view hidden-mobile">
             <div class="table-wrapper">
               <table>
@@ -72,9 +70,9 @@
                     <th>📦 类型</th>
                     <th>📄 文件路径</th>
                     <th>👤 作者</th>
-                    <th @click="sortTable('LastUpdated')" class="sortable">
+                    <th class="sortable" @click="sortTable('LastUpdated')">
                       🕒 更新时间
-                      <span :class="['sort-icon', getSortIcon('LastUpdated')]"></span>
+                      <span :class="['sort-icon', getSortIcon('LastUpdated')]" />
                     </th>
                     <th>🏷️ 标签</th>
                     <th>🔢 版本</th>
@@ -94,11 +92,10 @@
                       {{ item.Description ? item.Description.slice(0, 30) + (item.Description.length > 30 ? '...' : '') : '-' }}
                     </td>
                     <td>
-                      <button 
+                      <button
                         class="btn-action"
-                        @click="openDetailFromFile(item.FilePath)"
                         :disabled="isLoadingDetail[getRepoKey(item.FilePath)]"
-                      >
+                        @click="openDetailFromFile(item.FilePath)">
                         {{ isLoadingDetail[getRepoKey(item.FilePath)] ? '⏳' : '📖' }} 详情
                       </button>
                     </td>
@@ -109,7 +106,7 @@
           </div>
 
           <div class="card-view hidden-desktop">
-            <div class="mobile-card" v-for="(item, index) in sortedGitLogs" :key="index" :style="{ '--delay': index * 0.1 + 's' }">
+            <div v-for="(item, index) in sortedGitLogs" :key="index" class="mobile-card" :style="{ '--delay': index * 0.1 + 's' }">
               <div class="card-header">
                 <span class="tag-badge">{{ item.TypeName }}</span>
                 <span class="version-badge">{{ item.Version }}</span>
@@ -127,27 +124,25 @@
                   <span class="row-icon">🕒</span>
                   <span class="row-text">{{ item.LastUpdated }}</span>
                 </div>
-                <div class="card-desc" v-if="item.Description">
+                <div v-if="item.Description" class="card-desc">
                   {{ item.Description }}
                 </div>
               </div>
               <div class="card-footer">
-                <button 
+                <button
                   class="btn-card-action"
-                  @click="openDetailFromFile(item.FilePath)"
                   :disabled="isLoadingDetail[getRepoKey(item.FilePath)]"
-                >
+                  @click="openDetailFromFile(item.FilePath)">
                   {{ isLoadingDetail[getRepoKey(item.FilePath)] ? '加载中...' : '查看详情 README' }}
                 </button>
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
 
-    <div class="modal-overlay" v-if="showDetailModal" @click.self="closeDetailModal">
+    <div v-if="showDetailModal" class="modal-overlay" @click.self="closeDetailModal">
       <div class="modal-content">
         <div class="modal-header">
           <h3>📖 {{ currentJsName }} - 详情</h3>
@@ -155,10 +150,10 @@
         </div>
         <div class="modal-body custom-scrollbar">
           <div v-if="!jsDetailContent" class="loading-state small">
-            <div class="spinner"></div>
+            <div class="spinner" />
             <p>正在读取卷轴...</p>
           </div>
-          <div v-else class="markdown-body" v-html="jsDetailHtml"></div>
+          <div v-else class="markdown-body" v-html="jsDetailHtml" />
         </div>
       </div>
     </div>
@@ -166,37 +161,37 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, reactive } from 'vue'
-import { marked } from 'marked'
-import DOMPurify from 'dompurify'
-import { useRouter } from 'vue-router'
-import { apiMethods } from '../utils/api'
-// import '../assets/markdown.css' 
-import api from '@/utils/api'
+import { ref, computed, onMounted, reactive } from "vue"
+import { marked } from "marked"
+import DOMPurify from "dompurify"
+import { useRouter } from "vue-router"
+import { apiMethods } from "../utils/api"
+// import '../assets/markdown.css'
+import api from "@/utils/api"
 
 export default {
-  name: 'JsNames',
+  name: "JsNames",
   setup() {
     const router = useRouter()
     const pluginData = ref([])
     const gitLogs = ref([])
     const gitLogLoading = ref(true)
-    const currentSort = ref({ key: 'LastUpdated', asc: false }) // 默认按时间倒序
+    const currentSort = ref({ key: "LastUpdated", asc: false }) // 默认按时间倒序
     const isUpdating = reactive({})
 
     // 详情模态框相关
     const showDetailModal = ref(false)
-    const currentJsName = ref('')
-    const jsDetailContent = ref('')
-    const jsDetailHtml = ref('')
+    const currentJsName = ref("")
+    const jsDetailContent = ref("")
+    const jsDetailHtml = ref("")
     const isLoadingDetail = reactive({})
 
     const renderMarkdownToHtml = (markdownText) => {
       try {
-        const rawHtml = marked.parse(markdownText || '')
+        const rawHtml = marked.parse(markdownText || "")
         return DOMPurify.sanitize(rawHtml)
       } catch (e) {
-        return ''
+        return ""
       }
     }
 
@@ -222,7 +217,7 @@ export default {
 
     const startHeaderCarousel = () => {
       if (headerCarouselImages.value.length > 1) {
-        if(headerCarouselInterval) clearInterval(headerCarouselInterval)
+        if (headerCarouselInterval) clearInterval(headerCarouselInterval)
         headerCarouselInterval = setInterval(() => {
           headerCurrentImageIndex.value = (headerCurrentImageIndex.value + 1) % headerCarouselImages.value.length
         }, 7000)
@@ -230,7 +225,7 @@ export default {
     }
 
     const goHome = () => {
-      router.push('/')
+      router.push("/")
     }
 
     const sortTable = (key) => {
@@ -243,8 +238,8 @@ export default {
     }
 
     const getSortIcon = (key) => {
-      if (currentSort.value.key !== key) return 'sort-default'
-      return currentSort.value.asc ? 'sort-asc' : 'sort-desc'
+      if (currentSort.value.key !== key) return "sort-default"
+      return currentSort.value.asc ? "sort-asc" : "sort-desc"
     }
 
     // 扁平化 gitLogs
@@ -256,7 +251,7 @@ export default {
           for (const file of group.Repo) {
             arr.push({
               TypeName: group.TypeName,
-              ...file
+              ...file,
             })
           }
         }
@@ -265,12 +260,12 @@ export default {
     })
 
     const groupOptions = [
-      { value: 'pathing', label: '地图追踪' },
-      { value: 'js', label: '脚本' },
-      { value: 'combat', label: '战斗策略' }
+      { value: "pathing", label: "地图追踪" },
+      { value: "js", label: "脚本" },
+      { value: "combat", label: "战斗策略" },
     ]
-    const selectedGroup = ref('')
-    const selectedAuthor = ref('')
+    const selectedGroup = ref("")
+    const selectedAuthor = ref("")
 
     const authorOptions = computed(() => {
       if (!gitLogs.value || !Array.isArray(gitLogs.value)) return []
@@ -279,7 +274,7 @@ export default {
         if (group && group.Repo && Array.isArray(group.Repo)) {
           for (const file of group.Repo) {
             if (file.Authors) {
-              const authors = file.Authors.split(',').map(author => author.trim())
+              const authors = file.Authors.split(",").map(author => author.trim())
               authors.forEach(author => { if (author) authorsSet.add(author) })
             }
           }
@@ -290,39 +285,39 @@ export default {
 
     const sortedGitLogs = computed(() => {
       let logs = flatGitLogs.value
-      
+
       if (selectedGroup.value) {
         logs = logs.filter(item => {
-          if (selectedGroup.value == 'pathing') return item.TypeName?.toLowerCase().includes('pathing')
-          if (selectedGroup.value == 'js') return item.TypeName?.toLowerCase().includes('js')
-          if (selectedGroup.value === 'combat') return item.TypeName?.toLowerCase().includes('combat')
+          if (selectedGroup.value == "pathing") return item.TypeName?.toLowerCase().includes("pathing")
+          if (selectedGroup.value == "js") return item.TypeName?.toLowerCase().includes("js")
+          if (selectedGroup.value === "combat") return item.TypeName?.toLowerCase().includes("combat")
           return false
         })
       }
-      
+
       if (selectedAuthor.value) {
         logs = logs.filter(item => {
           if (!item.Authors) return false
-          const authors = item.Authors.split(',').map(author => author.trim())
+          const authors = item.Authors.split(",").map(author => author.trim())
           return authors.includes(selectedAuthor.value)
         })
       }
-      
+
       return [...logs].sort((a, b) => {
         let valA = a[currentSort.value.key]
         let valB = b[currentSort.value.key]
 
         // 特殊处理日期
-        if(currentSort.value.key === 'LastUpdated') {
-           valA = new Date(valA).getTime()
-           valB = new Date(valB).getTime()
+        if (currentSort.value.key === "LastUpdated") {
+          valA = new Date(valA).getTime()
+          valB = new Date(valB).getTime()
         }
 
         if (valA < valB) return currentSort.value.asc ? -1 : 1
         if (valA > valB) return currentSort.value.asc ? 1 : -1
         return 0
       })
-    });
+    })
 
     const loadGitLog = async () => {
       try {
@@ -330,7 +325,7 @@ export default {
         const response = await apiMethods.getLog()
         gitLogs.value = response.gitLog || []
       } catch (error) {
-        console.error('加载提交记录失败：', error)
+        console.error("加载提交记录失败：", error)
         gitLogs.value = []
       } finally {
         gitLogLoading.value = false
@@ -341,7 +336,7 @@ export default {
 
     const getRepoSegments = (filePath) => {
       const match = filePath.match(/^repo\/(\/+)\/(\/+)\//)
-      if (!match) return { group: '', name: '' }
+      if (!match) return { group: "", name: "" }
       return { group: match[1], name: match[2] }
     }
 
@@ -349,15 +344,15 @@ export default {
 
     const openDetailFromFile = async (filePath) => {
       // 提取文件名作为标题
-      const parts = filePath.split('/')
+      const parts = filePath.split("/")
       const name = parts[parts.length - 1] || filePath
       const key = filePath
 
       currentJsName.value = name
       showDetailModal.value = true
       isLoadingDetail[key] = true
-      jsDetailContent.value = ''
-      
+      jsDetailContent.value = ""
+
       try {
         // 注意：这里需要根据实际后端API路径调整
         const result = await api.get(`/api/md?filePath=${encodeURIComponent(filePath)}`)
@@ -365,11 +360,11 @@ export default {
           jsDetailContent.value = result.data || result.content
           jsDetailHtml.value = renderMarkdownToHtml(jsDetailContent.value)
         } else {
-          jsDetailContent.value = '# 暂无详情\n无法读取该文件的说明文档。'
+          jsDetailContent.value = "# 暂无详情\n无法读取该文件的说明文档。"
           jsDetailHtml.value = renderMarkdownToHtml(jsDetailContent.value)
         }
       } catch (error) {
-        jsDetailContent.value = '获取README失败：' + error.message
+        jsDetailContent.value = `获取README失败：${error.message}`
         jsDetailHtml.value = renderMarkdownToHtml(jsDetailContent.value)
       } finally {
         isLoadingDetail[key] = false
@@ -404,9 +399,9 @@ export default {
       groupOptions,
       selectedGroup,
       selectedAuthor,
-      authorOptions
+      authorOptions,
     }
-  }
+  },
 }
 </script>
 
@@ -443,7 +438,7 @@ export default {
   min-height: 100vh;
   background-color: #fffafc;
   /* 更细腻的背景网格 */
-  background-image: 
+  background-image:
     linear-gradient(rgba(255, 158, 205, 0.1) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 158, 205, 0.1) 1px, transparent 1px);
   background-size: 30px 30px;
@@ -465,7 +460,7 @@ export default {
   justify-content: center;
   margin-bottom: 30px;
   /* 确保按钮可以定位 */
-  z-index: 1; 
+  z-index: 1;
 }
 
 .header-carousel {
@@ -670,7 +665,7 @@ tr:hover td { background: rgba(255, 240, 248, 0.6); }
   margin-bottom: 16px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.03);
   border: 1px solid rgba(255, 255, 255, 0.8);
-  
+
   /* 动画 */
   animation: slideUp 0.5s ease backwards;
   animation-delay: var(--delay);

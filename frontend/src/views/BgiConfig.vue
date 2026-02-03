@@ -1,6 +1,6 @@
 <template>
   <div class="bgi-config-page">
-    <div class="bg-pattern"></div>
+    <div class="bg-pattern" />
 
     <div class="floating-elements">
       <div class="float-item flower">🌸</div>
@@ -14,7 +14,7 @@
       <span class="mascot-emoji">👧</span>
       <span class="mascot-tip">Back</span>
     </div>
-    
+
     <div class="main-container">
       <div class="page-header">
         <div class="header-left">
@@ -30,9 +30,8 @@
             :options="configList.map(n => ({ value: n, label: n }))"
             placeholder="请选择配置目录..."
             class="cute-select"
-            @change="selectConfig"
             allow-clear
-          />
+            @change="selectConfig" />
         </div>
       </div>
 
@@ -44,7 +43,7 @@
               <span>{{ currentName ? `配置：${currentName}` : '等待选择...' }}</span>
             </div>
           </template>
-          
+
           <div v-if="!currentName" class="placeholder">
             <div class="empty-state">
               <div class="empty-icon">🎐</div>
@@ -54,7 +53,7 @@
 
           <div v-else>
             <div class="task-scroll custom-scrollbar">
-              <a-list :dataSource="visibleTasks" :split="false">
+              <a-list :data-source="visibleTasks" :split="false">
                 <template #renderItem="{ item, index }">
                   <a-list-item class="cute-list-item">
                     <div class="item-content-wrapper">
@@ -62,32 +61,29 @@
                         <div class="item-index-badge">{{ index + 1 }}</div>
                         <div class="task-name" :title="item.Name">{{ item.Name }}</div>
                         <div class="task-switch">
-                           <a-switch 
-                            v-model:checked="visibleEnabled[index]" 
-                            checked-children="开" 
+                          <a-switch
+                            v-model:checked="visibleEnabled[index]"
+                            checked-children="开"
                             un-checked-children="关"
-                            class="cute-switch"
-                          />
+                            class="cute-switch" />
                         </div>
                       </div>
-                      
+
                       <div class="item-right">
-                        <a-button 
+                        <a-button
                           type="text"
-                          class="action-btn up-btn" 
-                          @click="moveUp(index)" 
+                          class="action-btn up-btn"
                           :disabled="index===0"
                           title="上移"
-                        >
+                          @click="moveUp(index)">
                           ⬆
                         </a-button>
-                        <a-button 
+                        <a-button
                           type="text"
-                          class="action-btn down-btn" 
-                          @click="moveDown(index)" 
+                          class="action-btn down-btn"
                           :disabled="index===visibleTasks.length-1"
                           title="下移"
-                        >
+                          @click="moveDown(index)">
                           ⬇
                         </a-button>
                       </div>
@@ -96,20 +92,19 @@
                 </template>
               </a-list>
             </div>
-            
+
             <div class="detail-actions">
               <div class="batch-btns">
                 <a-button class="cute-btn" @click="enableAll">✅ 全部开启</a-button>
                 <a-button class="cute-btn" @click="disableAll">⛔ 全部关闭</a-button>
               </div>
-              <a-button 
-                type="primary" 
-                @click="saveConfig" 
-                :loading="saving" 
-                class="save-btn" 
+              <a-button
+                type="primary"
+                :loading="saving"
+                class="save-btn"
                 size="large"
                 block
-              >
+                @click="saveConfig">
                 {{ saving ? '保存中...' : '💾 保存当前配置' }}
               </a-button>
             </div>
@@ -123,13 +118,13 @@
 <script setup>
 /** * 逻辑代码完全保持原样，未做任何功能性修改
  */
-import { ref, reactive, onMounted } from 'vue'
-import { message } from 'ant-design-vue'
-import { apiMethods } from '@/utils/api'
-import { useRouter } from 'vue-router'
+import { ref, reactive, onMounted } from "vue"
+import { message } from "ant-design-vue"
+import { useRouter } from "vue-router"
+import { apiMethods } from "@/utils/api"
 
 const configList = ref([])
-const currentName = ref('')
+const currentName = ref("")
 const taskList = ref([])
 // visibleTasks 用于展示和调序（为不修改原始 taskList，使用副本）
 const visibleTasks = ref([])
@@ -144,7 +139,7 @@ const loadConfigList = async () => {
     configList.value = Array.isArray(res.msg) ? res.msg : []
   } catch (err) {
     console.error(err)
-    message.error('获取配置目录失败')
+    message.error("获取配置目录失败")
   }
 }
 
@@ -161,13 +156,13 @@ const selectConfig = async (name) => {
     visibleEnabled.value = visibleTasks.value.map(t => !!t.Enabled)
   } catch (err) {
     console.error(err)
-    message.error('读取配置失败')
+    message.error("读取配置失败")
   }
 }
 
 const saveConfig = async () => {
   if (!currentName.value) {
-    message.warning('未选择配置')
+    message.warning("未选择配置")
     return
   }
   saving.value = true
@@ -176,10 +171,10 @@ const saveConfig = async () => {
     const orderedList = visibleTasks.value.map((t, idx) => {
       const item = {
         Name: t.Name,
-        Enabled: !!visibleEnabled.value[idx]
+        Enabled: !!visibleEnabled.value[idx],
       }
       // 只有当原始条目包含 Index（非空）时，才更新 Index 为新的顺序值；否则不发送 Index 字段
-      if (t.Index !== undefined && t.Index !== null && t.Index !== '') {
+      if (t.Index !== undefined && t.Index !== null && t.Index !== "") {
         // 后端接收字符串类型的 Index，使用 1-based 的序号并转为字符串
         item.Index = String(idx + 1)
       }
@@ -187,13 +182,13 @@ const saveConfig = async () => {
     })
     const payload = {
       Name: currentName.value,
-      TaskEnabledList: orderedList
+      TaskEnabledList: orderedList,
     }
     await apiMethods.saveBgiConfig(payload)
-    message.success('保存成功')
+    message.success("保存成功")
   } catch (err) {
     console.error(err)
-    message.error('保存失败')
+    message.error("保存失败")
   } finally {
     saving.value = false
   }
@@ -238,7 +233,7 @@ onMounted(() => {
 })
 
 const goHome = () => {
-  router.push('/')
+  router.push("/")
 }
 </script>
 
@@ -250,7 +245,7 @@ const goHome = () => {
   --deep-pink: #ff69b4;
   --glass-bg: rgba(255, 255, 255, 0.75);
   --glass-border: rgba(255, 255, 255, 0.9);
-  
+
   position: relative;
   /* 柔和的渐变背景 */
   background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
@@ -414,15 +409,15 @@ const goHome = () => {
   width: 8px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: #fff0f5; 
+  background: #fff0f5;
   border-radius: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #ffb6c1; 
+  background: #ffb6c1;
   border-radius: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #ff69b4; 
+  background: #ff69b4;
 }
 
 /* 列表项样式重写 */
@@ -630,11 +625,11 @@ const goHome = () => {
   .bgi-config-page {
     padding: 10px;
   }
-  
+
   .card-detail {
     border-radius: 16px !important;
   }
-  
+
   :deep(.ant-card-body) {
     padding: 12px !important;
   }
@@ -659,7 +654,7 @@ const goHome = () => {
     width: 32px;
     height: 32px;
   }
-  
+
   .mascot {
     right: 15px;
     bottom: 15px;

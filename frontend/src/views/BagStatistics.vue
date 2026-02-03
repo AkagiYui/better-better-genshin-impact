@@ -10,7 +10,7 @@
     <div class="main-container">
       <header class="kawaii-header">
         <div class="header-actions left">
-          <button @click="goHome" class="kawaii-btn home-btn icon-btn">
+          <button class="kawaii-btn home-btn icon-btn" @click="goHome">
             🏠 <span class="btn-text">主页</span>
           </button>
         </div>
@@ -21,20 +21,20 @@
         </div>
 
         <div class="header-actions right">
-          <button @click="checkBag()" class="kawaii-btn overflow-btn icon-btn">
+          <button class="kawaii-btn overflow-btn icon-btn" @click="checkBag()">
             🔍 <span class="btn-text">溢出检查</span>
           </button>
-          
-          <button @click="deleteBag" class="kawaii-btn clean-btn icon-btn">
+
+          <button class="kawaii-btn clean-btn icon-btn" @click="deleteBag">
             🧹 <span class="btn-text">清理统计</span>
           </button>
-          <button @click="goBagStatisticsTrend" class="kawaii-btn trend-btn icon-btn">
+          <button class="kawaii-btn trend-btn icon-btn" @click="goBagStatisticsTrend">
             📈 <span class="btn-text">变化图</span>
           </button>
-          <button @click="openEatStatisticsModal" class="kawaii-btn eat-btn icon-btn">
+          <button class="kawaii-btn eat-btn icon-btn" @click="openEatStatisticsModal">
             💊 <span class="btn-text">吃药查看</span>
           </button>
-          <button @click="goMoralePage" class="kawaii-btn morale-btn icon-btn">
+          <button class="kawaii-btn morale-btn icon-btn" @click="goMoralePage">
             💰 <span class="btn-text">摩拉收益</span>
           </button>
         </div>
@@ -50,21 +50,20 @@
           <div v-show="!filterCollapsed" class="filter-content-box">
             <div class="filter-tools">
               <span class="tool-label">🧸 快速操作:</span>
-              <button @click="cancelSelection" class="kawaii-btn small outline">✨ 取消选择</button>
-              <button @click="selectAllOre" class="kawaii-btn small outline">💎 全选矿石</button>
+              <button class="kawaii-btn small outline" @click="cancelSelection">✨ 取消选择</button>
+              <button class="kawaii-btn small outline" @click="selectAllOre">💎 全选矿石</button>
             </div>
-            
+
             <div class="material-checkbox-grid">
-              <label 
-                v-for="material in uniqueMaterials" 
-                :key="material" 
+              <label
+                v-for="material in uniqueMaterials"
+                :key="material"
                 class="kawaii-checkbox"
-                :class="{ checked: selectedMaterials.includes(material) }"
-              >
-                <input type="checkbox" :value="material" v-model="selectedMaterials" class="hidden-input">
+                :class="{ checked: selectedMaterials.includes(material) }">
+                <input v-model="selectedMaterials" type="checkbox" :value="material" class="hidden-input">
                 <span class="checkbox-deco">🌸</span>
                 <span class="material-name">{{ material }}</span>
-                <button @click.stop="deleteMaterial(material)" class="material-delete-btn" title="删除此材料">
+                <button class="material-delete-btn" title="删除此材料" @click.stop="deleteMaterial(material)">
                   ✖
                 </button>
               </label>
@@ -78,13 +77,13 @@
           🎁 共统计 <span class="highlight-num">{{ sortedItems.length }}</span> 条记录
         </div>
         <div class="action-bar-buttons">
-          <button @click="openAddMaterialModal" class="kawaii-btn small" style="background: #E1F5FE; border-color: #0288D1; color: #01579B; box-shadow: 0 3px 0 #0288D1;">
+          <button class="kawaii-btn small" style="background: #E1F5FE; border-color: #0288D1; color: #01579B; box-shadow: 0 3px 0 #0288D1;" @click="openAddMaterialModal">
             ➕ 新增关注材料
           </button>
-          <button @click="clearAllStatistics" class="kawaii-btn small" style="background: #FFEBEE; border-color: #EF5350; color: #C62828; box-shadow: 0 3px 0 #EF5350;">
+          <button class="kawaii-btn small" style="background: #FFEBEE; border-color: #EF5350; color: #C62828; box-shadow: 0 3px 0 #EF5350;" @click="clearAllStatistics">
             🗑️ 清空所有
           </button>
-          <button @click="openBlackListModal" class="kawaii-btn danger-btn small">
+          <button class="kawaii-btn danger-btn small" @click="openBlackListModal">
             🚫 黑名单管理
           </button>
         </div>
@@ -101,7 +100,7 @@
           <p class="empty-text">
             {{ selectedMaterials.length > 0 ? '呜呜，在这个筛选条件下没有找到数据呢~' : '背包空空如也，还没有任何统计数据哦~' }}
           </p>
-          <button v-if="selectedMaterials.length > 0" @click="cancelSelection" class="kawaii-btn primary">
+          <button v-if="selectedMaterials.length > 0" class="kawaii-btn primary" @click="cancelSelection">
             ✨ 清除筛选条件
           </button>
         </div>
@@ -117,11 +116,10 @@
                 </tr>
               </thead>
               <tbody>
-                <tr 
-                  v-for="(item, index) in filteredItems" 
-                  :key="index" 
-                  :class="item.type === 'spacer' ? 'spacer-row' : 'data-row'"
-                >
+                <tr
+                  v-for="(item, index) in filteredItems"
+                  :key="index"
+                  :class="item.type === 'spacer' ? 'spacer-row' : 'data-row'">
                   <template v-if="item.type !== 'spacer'">
                     <td class="date-cell">{{ item.date }}</td>
                     <td>
@@ -135,7 +133,7 @@
                   </template>
                   <template v-else>
                     <td colspan="3" class="spacer-td">
-                      <div class="spacer-line"></div>
+                      <div class="spacer-line" />
                     </td>
                   </template>
                 </tr>
@@ -177,7 +175,7 @@
               <div class="detail-right">
                 <span class="detail-value">{{ value }}</span>
                 <span v-if="blackList.includes(key)" class="status-tag blocked">🚫 已屏蔽</span>
-                <button v-else @click="addToBlackList(key)" class="kawaii-btn small outline danger-btn">加入黑名单</button>
+                <button v-else class="kawaii-btn small outline danger-btn" @click="addToBlackList(key)">加入黑名单</button>
               </div>
             </li>
           </ul>
@@ -196,7 +194,7 @@
         </div>
         <div class="modal-body">
           <div class="modal-tip">✦ 提示：不想看见的材料，可以在上一个窗口直接“加入黑名单”哦。</div>
-          
+
           <div v-if="blackList.length === 0" class="empty-mini-state">
             (｡•́︿•̀｡) 暂时还没有黑名单材料呢
           </div>
@@ -220,14 +218,13 @@
         <div class="modal-body">
           <div class="add-material-form">
             <label class="form-label">📝 材料名称：</label>
-            <input 
-              v-model="newMaterialName" 
-              type="text" 
-              class="kawaii-input" 
+            <input
+              v-model="newMaterialName"
+              type="text"
+              class="kawaii-input"
               placeholder="请输入材料名称"
-              @keyup.enter="addMaterial"
-            >
-            <button @click="addMaterial" class="kawaii-btn primary" style="margin-top: 15px; width: 100%;">
+              @keyup.enter="addMaterial">
+            <button class="kawaii-btn primary" style="margin-top: 15px; width: 100%;" @click="addMaterial">
               ✨ 确认添加
             </button>
           </div>
@@ -287,20 +284,19 @@
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
 <script>
-import { apiMethods } from '@/utils/api'
-import api from '@/utils/api'
-import { Modal, message } from 'ant-design-vue'
+import { Modal, message } from "ant-design-vue"
+import { apiMethods } from "@/utils/api"
+import api from "@/utils/api"
 
 export default {
-  name: 'BagStatistics',
+  name: "BagStatistics",
   data() {
     return {
-      title: '背包统计',
+      title: "背包统计",
       items: [],
       selectedMaterials: [],
       allOre: ["萃凝晶", "水晶块", "星银矿石", "紫晶块", "白铁块", "铁块", "魔晶块", "石珀", "虹滴晶"],
@@ -312,9 +308,9 @@ export default {
       blackList: [],
       showEatStatisticsModal: false,
       eatStatisticsData: {},
-      selectedDate: '',
+      selectedDate: "",
       showAddMaterialModal: false,
-      newMaterialName: ''
+      newMaterialName: "",
     }
   },
   computed: {
@@ -323,68 +319,66 @@ export default {
       const processed = this.items.map(item => ({
         date: item.Data || item.date,
         cl: item.Cl || item.cl,
-        num: parseInt(item.Num || item.num || 0)
-      }));
-      
+        num: parseInt(item.Num || item.num || 0),
+      }))
+
       return processed.sort((a, b) => {
-        if (a.cl === '原石' && b.cl !== '原石') return -1;
-        if (a.cl !== '原石' && b.cl === '原石') return 1;
-        if (a.cl === '摩拉数值' && b.cl !== '摩拉数值') return -1;
-        if (a.cl !== '摩拉数值' && b.cl === '摩拉数值') return 1;
-        return a.cl.localeCompare(b.cl);
-      });
+        if (a.cl === "原石" && b.cl !== "原石") return -1
+        if (a.cl !== "原石" && b.cl === "原石") return 1
+        if (a.cl === "摩拉数值" && b.cl !== "摩拉数值") return -1
+        if (a.cl !== "摩拉数值" && b.cl === "摩拉数值") return 1
+        return a.cl.localeCompare(b.cl)
+      })
     },
 
-    
 
     uniqueMaterials() {
-      return [...new Set(this.sortedItems.map(item => item.cl))].sort();
+      return [...new Set(this.sortedItems.map(item => item.cl))].sort()
     },
 
-    
 
     filteredDataRaw() {
       return this.selectedMaterials.length === 0
         ? this.sortedItems
-        : this.sortedItems.filter(item => this.selectedMaterials.includes(item.cl));
+        : this.sortedItems.filter(item => this.selectedMaterials.includes(item.cl))
     },
 
     // 处理显示逻辑：插入间隔行 (Spacer) 以区分不同材料
     filteredItems() {
-      const result = [];
-      let lastCl = null;
-      let materialMap = {}; // 用于计算变化量
+      const result = []
+      let lastCl = null
+      const materialMap = {} // 用于计算变化量
 
-      const rawData = this.filteredDataRaw;
+      const rawData = this.filteredDataRaw
 
       for (let i = 0; i < rawData.length; i++) {
-        const { date, cl, num } = rawData[i];
+        const { date, cl, num } = rawData[i]
 
         // 如果不是第一行，且材料名变了，插入间隔行
         if (lastCl !== null && cl !== lastCl) {
-          result.push({ type: 'spacer' });
+          result.push({ type: "spacer" })
         }
-        lastCl = cl;
+        lastCl = cl
 
         // 显示文本处理
-        let materialDisplay = cl;
-        let numDisplay = num.toString();
+        let materialDisplay = cl
+        let numDisplay = num.toString()
 
         if (cl === "原石") {
-          const pulls = Math.floor(num / 160);
-          if (pulls > 0) materialDisplay = `${cl} (${pulls}抽)`;
+          const pulls = Math.floor(num / 160)
+          if (pulls > 0) materialDisplay = `${cl} (${pulls}抽)`
         }
 
         // 计算差值
         if (materialMap[cl] !== undefined) {
-          const prev = materialMap[cl];
-          const diff = num - prev.num;
+          const prev = materialMap[cl]
+          const diff = num - prev.num
           if (diff !== 0) {
-            const sign = diff > 0 ? '+' : '';
-            numDisplay = `${num} (${sign}${diff})`;
+            const sign = diff > 0 ? "+" : ""
+            numDisplay = `${num} (${sign}${diff})`
           }
         }
-        materialMap[cl] = { date, num }; // 记录上一条数据
+        materialMap[cl] = { date, num } // 记录上一条数据
 
         result.push({
           date,
@@ -392,360 +386,359 @@ export default {
           num,
           materialDisplay,
           numDisplay,
-          type: 'data'
-        });
+          type: "data",
+        })
       }
 
-      return result;
+      return result
     },
 
-    
 
     // 移动端分组数据
     groupedMobileMaterials() {
-      const groups = {};
-      const materialMap = {}; // 用于计算变化量
-      
+      const groups = {}
+      const materialMap = {} // 用于计算变化量
+
       // 使用 raw 数据避免包含 spacer
       this.filteredDataRaw.forEach(item => {
-        if (!groups[item.cl]) groups[item.cl] = [];
-        
+        if (!groups[item.cl]) groups[item.cl] = []
+
         // 重新计算移动端的显示文本
-        let numDisplay = item.num.toString();
-        
+        let numDisplay = item.num.toString()
+
         // 计算差值
         if (materialMap[item.cl] !== undefined) {
-          const prev = materialMap[item.cl];
-          const diff = item.num - prev.num;
+          const prev = materialMap[item.cl]
+          const diff = item.num - prev.num
           if (diff !== 0) {
-            const sign = diff > 0 ? '+' : '';
-            numDisplay = `${item.num} (${sign}${diff})`;
+            const sign = diff > 0 ? "+" : ""
+            numDisplay = `${item.num} (${sign}${diff})`
           }
         }
-        materialMap[item.cl] = { date: item.date, num: item.num };
-        
+        materialMap[item.cl] = { date: item.date, num: item.num }
+
         // 原石特殊显示（追加抽数信息）
-        if (item.cl === '原石') {
-          const pulls = Math.floor(item.num / 160);
+        if (item.cl === "原石") {
+          const pulls = Math.floor(item.num / 160)
           if (pulls > 0) {
             // 如果已有差值显示，则在差值后追加抽数
-            if (numDisplay.includes('(') && !numDisplay.includes('抽')) {
-              numDisplay = numDisplay.replace(')', ` | ${pulls}抽)`);
-            } else if (!numDisplay.includes('(')) {
-              numDisplay = `${item.num} (${pulls}抽)`;
+            if (numDisplay.includes("(") && !numDisplay.includes("抽")) {
+              numDisplay = numDisplay.replace(")", ` | ${pulls}抽)`)
+            } else if (!numDisplay.includes("(")) {
+              numDisplay = `${item.num} (${pulls}抽)`
             }
           }
         }
-        
+
         groups[item.cl].push({
-            ...item,
-            numDisplay
-        });
-      });
+          ...item,
+          numDisplay,
+        })
+      })
 
       return Object.keys(groups).map(cl => ({
         cl,
-        items: groups[cl]
-      }));
+        items: groups[cl],
+      }))
     },
 
     // 吃药统计相关计算属性
     availableDates() {
-      return Object.keys(this.eatStatisticsData).sort().reverse();
+      return Object.keys(this.eatStatisticsData).sort().reverse()
     },
 
     dailyConsumptionSummary() {
-      return this.getDailyConsumption();
-    }
+      return this.getDailyConsumption()
+    },
   },
 
   async mounted() {
-    await this.loadData();
-    await this.loadBlackList();
+    await this.loadData()
+    await this.loadBlackList()
   },
 
   methods: {
     async loadData() {
       try {
-        this.isLoading = true;
-        this.items = await apiMethods.getBagStatistics();
+        this.isLoading = true
+        this.items = await apiMethods.getBagStatistics()
       } catch (error) {
-        console.error('加载数据失败:', error);
-        message.error('加载背包统计数据失败，请稍后重试');
+        console.error("加载数据失败:", error)
+        message.error("加载背包统计数据失败，请稍后重试")
       } finally {
-        this.isLoading = false;
+        this.isLoading = false
       }
     },
 
-    goHome() { this.$router.push('/'); },
-    goBagStatisticsTrend() { this.$router.push('/MaterialTrend'); },
-    goMoralePage() { this.$router.push('/Morale'); },
+    goHome() { this.$router.push("/") },
+    goBagStatisticsTrend() { this.$router.push("/MaterialTrend") },
+    goMoralePage() { this.$router.push("/Morale") },
 
     // 修改：item 变为可选参数，支持按钮直接点击
     async checkBag(item) {
-      this.showDetailModal = true;
+      this.showDetailModal = true
       try {
-          // 这里原逻辑是获取所有 overflow 数据，不需要 item 参数也能查
-          const data = await api.get('/api/checkBag');
-          this.checkBagData = data;
+        // 这里原逻辑是获取所有 overflow 数据，不需要 item 参数也能查
+        const data = await api.get("/api/checkBag")
+        this.checkBagData = data
       } catch (e) {
-          console.error(e);
-          message.error('获取溢出数据失败，请稍后重试');
+        console.error(e)
+        message.error("获取溢出数据失败，请稍后重试")
       }
     },
 
-    closeDetailModal() { this.showDetailModal = false; },
+    closeDetailModal() { this.showDetailModal = false },
 
     async loadBlackList() {
       try {
-        const response = await apiMethods.getBlackList();
-        this.blackList = response.data.BlackLists || [];
+        const response = await apiMethods.getBlackList()
+        this.blackList = response.data.BlackLists || []
       } catch (error) {
-        console.error('加载黑名单失败:', error);
+        console.error("加载黑名单失败:", error)
       }
     },
 
     async addToBlackList(materialName) {
-      if (this.blackList.includes(materialName)) return;
+      if (this.blackList.includes(materialName)) return
       try {
-        await apiMethods.addBlackList([materialName]);
-        this.blackList.push(materialName);
-        message.success('已添加到黑名单');
+        await apiMethods.addBlackList([materialName])
+        this.blackList.push(materialName)
+        message.success("已添加到黑名单")
       } catch (error) {
-        message.error('添加黑名单失败: ' + (error.message || error));
+        message.error(`添加黑名单失败: ${error.message || error}`)
       }
     },
 
     async removeFromBlackList(materialName) {
       Modal.confirm({
-        title: '确认移除',
+        title: "确认移除",
         content: `确定要从黑名单中移除 ${materialName} 吗？`,
-        okText: '确定',
-        cancelText: '取消',
+        okText: "确定",
+        cancelText: "取消",
         onOk: async () => {
           try {
-            await apiMethods.deleteBlackList(materialName);
-            this.blackList = this.blackList.filter(item => item !== materialName);
-            message.success('已从黑名单中移除');
+            await apiMethods.deleteBlackList(materialName)
+            this.blackList = this.blackList.filter(item => item !== materialName)
+            message.success("已从黑名单中移除")
           } catch (error) {
-            message.error('移除黑名单失败: ' + (error.message || error));
+            message.error(`移除黑名单失败: ${error.message || error}`)
           }
-        }
-      });
+        },
+      })
     },
 
-    openBlackListModal() { this.showBlackListModal = true; },
-    closeBlackListModal() { this.showBlackListModal = false; },
+    openBlackListModal() { this.showBlackListModal = true },
+    closeBlackListModal() { this.showBlackListModal = false },
 
     async deleteBag() {
       Modal.confirm({
-        title: '确认清理',
-        content: '确定要清理统计数据吗？只保留最近一天。',
-        okText: '确定',
-        cancelText: '取消',
-        okType: 'danger',
+        title: "确认清理",
+        content: "确定要清理统计数据吗？只保留最近一天。",
+        okText: "确定",
+        cancelText: "取消",
+        okType: "danger",
         onOk: async () => {
           try {
-            const data = await api.post('/api/deleteBag');
-            message.success(data.message || '操作成功！');
-            await this.loadData();
+            const data = await api.post("/api/deleteBag")
+            message.success(data.message || "操作成功！")
+            await this.loadData()
           } catch (error) {
-            message.error("请求出错：" + (error.message || error));
+            message.error(`请求出错：${error.message || error}`)
           }
-        }
-      });
+        },
+      })
     },
 
-    cancelSelection() { this.selectedMaterials = []; },
-    selectAllOre() { this.selectedMaterials = [...this.allOre]; },
-    toggleFilter() { this.filterCollapsed = !this.filterCollapsed; },
+    cancelSelection() { this.selectedMaterials = [] },
+    selectAllOre() { this.selectedMaterials = [...this.allOre] },
+    toggleFilter() { this.filterCollapsed = !this.filterCollapsed },
 
     async openEatStatisticsModal() {
-      this.showEatStatisticsModal = true;
-      await this.loadEatStatistics();
+      this.showEatStatisticsModal = true
+      await this.loadEatStatistics()
     },
 
     async loadEatStatistics() {
       try {
-        const data = await api.get('/api/EatStatistics');
-        this.eatStatisticsData = data;
+        const data = await api.get("/api/EatStatistics")
+        this.eatStatisticsData = data
         // 默认选择最新日期
-        const dates = Object.keys(data).sort().reverse();
+        const dates = Object.keys(data).sort().reverse()
         if (dates.length > 0) {
-          this.selectedDate = dates[0];
+          this.selectedDate = dates[0]
         }
       } catch (error) {
-        console.error('加载吃药统计失败:', error);
-        message.error('加载吃药统计数据失败，请稍后重试');
+        console.error("加载吃药统计失败:", error)
+        message.error("加载吃药统计数据失败，请稍后重试")
       }
     },
 
     closeEatStatisticsModal() {
-      this.showEatStatisticsModal = false;
-      this.selectedDate = '';
+      this.showEatStatisticsModal = false
+      this.selectedDate = ""
     },
 
     // 计算选中日期的消耗统计（通过差值计算真实消耗）
     getDailyConsumption() {
       if (!this.selectedDate || !this.eatStatisticsData[this.selectedDate]) {
-        return {};
+        return {}
       }
-      
-      const records = [...this.eatStatisticsData[this.selectedDate]];
+
+      const records = [...this.eatStatisticsData[this.selectedDate]]
       // 按时间排序（从旧到新）
       records.sort((a, b) => {
-        const timeA = a.Time.replace('时间:', '');
-        const timeB = b.Time.replace('时间:', '');
-        return new Date(timeA) - new Date(timeB);
-      });
+        const timeA = a.Time.replace("时间:", "")
+        const timeB = b.Time.replace("时间:", "")
+        return new Date(timeA) - new Date(timeB)
+      })
 
       // 按物品名称分组
-      const groupedByName = {};
+      const groupedByName = {}
       records.forEach(item => {
         if (!groupedByName[item.Name]) {
-          groupedByName[item.Name] = [];
+          groupedByName[item.Name] = []
         }
-        groupedByName[item.Name].push(item);
-      });
+        groupedByName[item.Name].push(item)
+      })
 
       // 计算每种物品的总消耗（累加所有差值）
-      const consumption = {};
+      const consumption = {}
       Object.keys(groupedByName).forEach(name => {
-        const group = groupedByName[name];
-        let totalConsumption = 0;
-        let previousCount = null;
-        
+        const group = groupedByName[name]
+        let totalConsumption = 0
+        let previousCount = null
+
         group.forEach(item => {
           if (previousCount !== null) {
             // 差值 = 当前数量 - 上一次数量
-            const diff = item.Count - previousCount;
-            totalConsumption += diff;
+            const diff = item.Count - previousCount
+            totalConsumption += diff
           }
-          previousCount = item.Count;
-        });
-        
-        consumption[name] = totalConsumption;
-      });
-      
-      return consumption;
+          previousCount = item.Count
+        })
+
+        consumption[name] = totalConsumption
+      })
+
+      return consumption
     },
 
     // 获取带差值的详细记录（按物品名称分组，每组内按时间排序）
     getDetailRecordsWithDiff(date) {
       if (!date || !this.eatStatisticsData[date]) {
-        return [];
+        return []
       }
 
-      const records = [...this.eatStatisticsData[date]];
+      const records = [...this.eatStatisticsData[date]]
       // 先按时间排序（从旧到新）
       records.sort((a, b) => {
-        const timeA = a.Time.replace('时间:', '');
-        const timeB = b.Time.replace('时间:', '');
-        return new Date(timeA) - new Date(timeB);
-      });
+        const timeA = a.Time.replace("时间:", "")
+        const timeB = b.Time.replace("时间:", "")
+        return new Date(timeA) - new Date(timeB)
+      })
 
       // 按物品名称分组
-      const groupedByName = {};
+      const groupedByName = {}
       records.forEach(item => {
         if (!groupedByName[item.Name]) {
-          groupedByName[item.Name] = [];
+          groupedByName[item.Name] = []
         }
-        groupedByName[item.Name].push(item);
-      });
+        groupedByName[item.Name].push(item)
+      })
 
       // 为每组计算差值，并合并所有组
-      const result = [];
+      const result = []
       Object.keys(groupedByName).sort().forEach(name => {
-        const group = groupedByName[name];
-        let previousCount = null;
-        
+        const group = groupedByName[name]
+        let previousCount = null
+
         group.forEach(item => {
-          let diff = null;
-          
+          let diff = null
+
           if (previousCount !== null) {
             // 计算变化量：当前数量 - 上一次数量
-            diff = item.Count - previousCount;
+            diff = item.Count - previousCount
           }
-          
-          previousCount = item.Count;
-          
+
+          previousCount = item.Count
+
           result.push({
             ...item,
-            diff
-          });
-        });
-      });
-      
-      return result;
+            diff,
+          })
+        })
+      })
+
+      return result
     },
 
     async deleteMaterial(materialName) {
       Modal.confirm({
-        title: '确认删除',
+        title: "确认删除",
         content: `确定要删除材料 "${materialName}" 的所有统计记录吗？此操作无法撤销！`,
-        okText: '确定删除',
-        cancelText: '取消',
-        okType: 'danger',
+        okText: "确定删除",
+        cancelText: "取消",
+        okType: "danger",
         onOk: async () => {
           try {
-            await api.delete(`/api/BagStatistics/DELETE?name=${encodeURIComponent(materialName)}`);
-            message.success('材料删除成功！');
-            await this.loadData();
+            await api.delete(`/api/BagStatistics/DELETE?name=${encodeURIComponent(materialName)}`)
+            message.success("材料删除成功！")
+            await this.loadData()
           } catch (error) {
-            console.error('删除材料失败:', error);
-            message.error('删除材料失败: ' + (error.message || error));
+            console.error("删除材料失败:", error)
+            message.error(`删除材料失败: ${error.message || error}`)
           }
-        }
-      });
+        },
+      })
     },
 
     openAddMaterialModal() {
-      this.showAddMaterialModal = true;
-      this.newMaterialName = '';
+      this.showAddMaterialModal = true
+      this.newMaterialName = ""
     },
 
     closeAddMaterialModal() {
-      this.showAddMaterialModal = false;
-      this.newMaterialName = '';
+      this.showAddMaterialModal = false
+      this.newMaterialName = ""
     },
 
     async addMaterial() {
       if (!this.newMaterialName.trim()) {
-        message.warning('请输入材料名称');
-        return;
+        message.warning("请输入材料名称")
+        return
       }
-      
+
       try {
-        await api.post(`/api/BagStatistics/ADD?name=${encodeURIComponent(this.newMaterialName.trim())}`);
-        message.success('材料添加成功！');
-        this.closeAddMaterialModal();
-        await this.loadData();
+        await api.post(`/api/BagStatistics/ADD?name=${encodeURIComponent(this.newMaterialName.trim())}`)
+        message.success("材料添加成功！")
+        this.closeAddMaterialModal()
+        await this.loadData()
       } catch (error) {
-        console.error('添加材料失败:', error);
-        message.error('添加材料失败: ' + (error.message || error));
+        console.error("添加材料失败:", error)
+        message.error(`添加材料失败: ${error.message || error}`)
       }
     },
 
     async clearAllStatistics() {
       Modal.confirm({
-        title: '⚠️ 危险操作',
-        content: '确定要清空所有背包统计数据吗？此操作将删除所有材料的统计记录，且无法撤销！',
-        okText: '确定清空',
-        cancelText: '取消',
-        okType: 'danger',
+        title: "⚠️ 危险操作",
+        content: "确定要清空所有背包统计数据吗？此操作将删除所有材料的统计记录，且无法撤销！",
+        okText: "确定清空",
+        cancelText: "取消",
+        okType: "danger",
         onOk: async () => {
           try {
-            await api.post('/api/BagStatistics/CLEAR');
-            message.success('所有统计数据已清空！');
-            await this.loadData();
+            await api.post("/api/BagStatistics/CLEAR")
+            message.success("所有统计数据已清空！")
+            await this.loadData()
           } catch (error) {
-            console.error('清空数据失败:', error);
-            message.error('清空数据失败: ' + (error.message || error));
+            console.error("清空数据失败:", error)
+            message.error(`清空数据失败: ${error.message || error}`)
           }
-        }
-      });
-    }
-  }
+        },
+      })
+    },
+  },
 }
 </script>
 
@@ -1024,8 +1017,8 @@ export default {
   flex-wrap: wrap;
 }
 .bar-info { font-weight: bold; color: var(--k-blue-main); display: flex; align-items: center; gap: 5px; }
-.highlight-num { 
-  background: var(--k-white); color: var(--k-pink-dark); padding: 2px 10px; border-radius: 20px; font-size: 1.1rem; 
+.highlight-num {
+  background: var(--k-white); color: var(--k-pink-dark); padding: 2px 10px; border-radius: 20px; font-size: 1.1rem;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
@@ -1042,8 +1035,8 @@ export default {
 
 /* 加载和空状态 */
 .loading-state, .empty-state {
-  text-align: center; 
-  padding: 60px 0; 
+  text-align: center;
+  padding: 60px 0;
   color: var(--k-text-light);
 }
 .loading-spinner { font-size: 4rem; animation: spin 2s linear infinite; display: inline-block; margin-bottom: 20px; }
@@ -1052,9 +1045,9 @@ export default {
 .empty-text { margin-bottom: 25px; font-size: 1.1rem; }
 
 /* PC 表格视图 */
-.desktop-table-view { 
-  display: block; 
-  overflow-x: auto; 
+.desktop-table-view {
+  display: block;
+  overflow-x: auto;
 }
 .mobile-card-view { display: none; }
 
@@ -1079,7 +1072,7 @@ export default {
   padding: 12px 20px;
   background: var(--k-white);
   /* 移除边框，实现相同材料一体化 */
-  border: none; 
+  border: none;
 }
 
 .data-row:hover td {
@@ -1102,10 +1095,10 @@ export default {
   border-color: var(--k-pink-dark);
   box-shadow: 0 2px 5px rgba(255, 105, 180, 0.4);
 }
-.num-cell { 
-    font-family: "Comic Sans MS", cursive, sans-serif; 
-    font-size: 1.1rem; font-weight: bold; 
-    color: var(--k-pink-dark); 
+.num-cell {
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    font-size: 1.1rem; font-weight: bold;
+    color: var(--k-pink-dark);
     display: flex; align-items: center; gap: 10px;
 }
 /* Removed alert-badge-btn styles as they are no longer used */
@@ -1200,12 +1193,12 @@ export default {
 .modal-tip { background: var(--k-yellow); padding: 10px; border-radius: var(--k-radius-sm); border: 2px dashed orange; color: #d97706; font-size: 0.9rem; margin-bottom: 20px;}
 .empty-mini-state { text-align: center; color: var(--k-text-light); padding: 20px; border: 2px dashed var(--k-pink-light); border-radius: var(--k-radius-sm); }
 .blacklist-tags { display: flex; flex-wrap: wrap; gap: 10px; }
-.blacklist-tag { 
+.blacklist-tag {
   background: var(--k-pink-light); border: 2px solid var(--k-pink-main);
   padding: 8px 15px; border-radius: 30px; display: flex; align-items: center; gap: 8px;
   font-weight: bold; color: var(--k-text-dark); box-shadow: 0 3px 0 var(--k-pink-main);
 }
-.tag-remove-btn { 
+.tag-remove-btn {
   background: transparent; color: #FF4B5E; border: none; font-weight: bold; cursor: pointer;
 }
 
@@ -1317,14 +1310,14 @@ export default {
 @media (max-width: 768px) {
   .kawaii-header { flex-direction: column; text-align: center; padding: 15px; }
   .header-actions, .title-box { width: 100%; }
-  .header-actions { 
-    flex-wrap: wrap; 
+  .header-actions {
+    flex-wrap: wrap;
     justify-content: center;
   }
   .header-actions.left { order: 1; }
   .header-actions.right { order: 2; }
   .title-box { order: -1; margin-bottom: 10px; }
-  
+
   .kawaii-btn.icon-btn {
     padding: 10px 14px;
     min-width: 44px;
@@ -1342,32 +1335,32 @@ export default {
   /* 吃药统计移动端适配 */
   .kawaii-modal-large { max-width: 100%; margin: 10px; }
   .modal-body { padding: 15px; }
-  
-  .date-selector { 
+
+  .date-selector {
     flex-direction: column; align-items: stretch; gap: 10px; padding: 12px;
   }
   .kawaii-select { width: 100%; min-width: auto; }
-  
-  .summary-cards { 
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
+
+  .summary-cards {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 10px;
   }
   .summary-card { padding: 12px; }
   .card-count { font-size: 1.5rem; }
-  
+
   .summary-title, .detail-title { font-size: 1rem; }
-  
-  .record-item { 
+
+  .record-item {
     flex-direction: column; align-items: flex-start; padding: 10px; gap: 6px;
   }
-  .record-time { 
+  .record-time {
     flex: none; font-size: 0.75rem; width: 100%;
     padding-bottom: 4px; border-bottom: 1px dashed var(--k-pink-main);
   }
-  .record-name { 
+  .record-name {
     flex: none; font-size: 0.95rem; padding: 0; width: 100%;
   }
-  .record-count { 
+  .record-count {
     font-size: 1rem; align-self: flex-end;
   }
   .diff-badge { font-size: 0.85rem; }

@@ -10,13 +10,12 @@
       </div>
       <div class="toolbar-right">
         <a-space :size="12" wrap>
-          <a-select 
-            v-model:value="selectedAccount" 
-            @change="onAccountChange" 
+          <a-select
+            v-model:value="selectedAccount"
             class="account-select"
             placeholder="选择账户"
             :loading="accountLoading"
-          >
+            @change="onAccountChange">
             <template #suffixIcon>
               <span>👤</span>
             </template>
@@ -24,14 +23,13 @@
               {{ account }}
             </a-select-option>
           </a-select>
-          
-          
-          <a-button 
-            @click="refreshData" 
+
+
+          <a-button
             :loading="loading"
             type="primary"
             class="refresh-btn"
-          >
+            @click="refreshData">
             <template #icon><span v-if="!loading">🔄</span></template>
             {{ loading ? '刷新数据' : '刷新' }}
           </a-button>
@@ -46,8 +44,7 @@
         <div
           class="stat-card stat-card-total"
           :class="{ 'stat-card-active': selectedStatus === '' }"
-          @click="onCardClick('')"
-        >
+          @click="onCardClick('')">
           <div class="stat-icon">📁</div>
           <div class="stat-info">
             <div class="stat-label">采集路径</div>
@@ -59,8 +56,7 @@
         <div
           class="stat-card stat-card-available"
           :class="{ 'stat-card-active': selectedStatus === '可采集' }"
-          @click="onCardClick('可采集')"
-        >
+          @click="onCardClick('可采集')">
           <div class="stat-icon">✅</div>
           <div class="stat-info">
             <div class="stat-label">可采集</div>
@@ -72,8 +68,7 @@
         <div
           class="stat-card stat-card-cooling"
           :class="{ 'stat-card-active': selectedStatus === '冷却中' }"
-          @click="onCardClick('冷却中')"
-        >
+          @click="onCardClick('冷却中')">
           <div class="stat-icon">⏳</div>
           <div class="stat-info">
             <div class="stat-label">冷却中</div>
@@ -85,8 +80,7 @@
         <div
           class="stat-card stat-card-material"
           :class="{ 'stat-card-active': selectedStatus === 'material' }"
-          @click="onCardClick('material')"
-        >
+          @click="onCardClick('material')">
           <div class="stat-icon">🎯</div>
           <div class="stat-info">
             <div class="stat-label">材料种类</div>
@@ -99,7 +93,7 @@
 
       <!-- 标签页切换 -->
       <a-card class="tabs-container" style="margin-top: 20px">
-        <a-tabs v-model:activeKey="activeTab" type="card" size="large">
+        <a-tabs v-model:active-key="activeTab" type="card" size="large">
           <!-- 拾取记录标签页 -->
           <a-tab-pane key="pickup" tab="📅 拾取记录">
             <template #tab>
@@ -108,9 +102,9 @@
                 <span>拾取记录</span>
               </span>
             </template>
-            
+
             <div class="tab-toolbar">
-              <a-button @click="refreshPickupData" :loading="pickupLoading" type="primary">
+              <a-button :loading="pickupLoading" type="primary" @click="refreshPickupData">
                 <template #icon><span v-if="!pickupLoading">🔄</span></template>
                 {{ pickupLoading ? '刷新中...' : '刷新数据' }}
               </a-button>
@@ -122,15 +116,14 @@
             </div>
 
             <a-timeline v-if="pickupData.length > 0" mode="left" class="pickup-timeline">
-              <a-timeline-item  
-                v-for="(record, index) in pickupData" 
+              <a-timeline-item
+                v-for="(record, index) in pickupData"
                 :key="index"
-                :color="index === 0 ? 'green' : 'blue'"
-              >
+                :color="index === 0 ? 'green' : 'blue'">
                 <template #dot>
                   <span class="timeline-dot">{{ index === 0 ? '🌟' : '📅' }}</span>
                 </template>
-                
+
                 <div class="pickup-record">
                   <div class="pickup-header">
                     <span class="pickup-date">
@@ -141,9 +134,9 @@
                       {{ index === 0 ? '最近' : formatDateDiff(record.Date) }}
                     </a-tag>
                   </div>
-                  
+
                   <a-divider style="margin: 12px 0" />
-                  
+
                   <div class="pickup-stats">
                     <div class="stat-item">
                       <span class="stat-label">采集种类：</span>
@@ -154,14 +147,13 @@
                       <span class="stat-value">{{ calculateDailyTotal(record.Item) }} 个</span>
                     </div>
                   </div>
-                  
+
                   <div class="pickup-items">
-                    <a-tag 
-                      v-for="(count, itemName) in sortedItems(record.Item)" 
+                    <a-tag
+                      v-for="(count, itemName) in sortedItems(record.Item)"
                       :key="itemName"
                       :color="getItemTagColor(itemName)"
-                      class="pickup-item-tag"
-                    >
+                      class="pickup-item-tag">
                       <span class="item-name">{{ itemName }}</span>
                       <span class="item-count">× {{ count }}</span>
                     </a-tag>
@@ -179,125 +171,117 @@
                 <span>CD记录</span>
               </span>
             </template>
-            
+
             <div class="tree-container">
-        <a-tree
-          v-if="treeData.length > 0"
-          :tree-data="treeData"
-          :show-line="{ showLeafIcon: false }"
-          :show-icon="true"
-          :default-expand-all="false"
-          :selectable="false"
-          class="collection-tree"
-        >
-          <template #title="{ title, key, dataRef, ...nodeData }">
-            <div class="tree-node-wrapper" :class="`node-type-${nodeData.is_dir ? 'folder' : 'file'}`">
-              <div class="node-main">
-                <div class="node-header">
-                  <span class="node-title">{{ title }}</span>
-                  
-                  <!-- 文件夹节点：显示子节点数量 -->
-                  <template v-if="nodeData.is_dir">
-                    <!-- <span class="children-count-badge">
+              <a-tree
+                v-if="treeData.length > 0"
+                :tree-data="treeData"
+                :show-line="{ showLeafIcon: false }"
+                :show-icon="true"
+                :default-expand-all="false"
+                :selectable="false"
+                class="collection-tree">
+                <template #title="{ title, key, dataRef, ...nodeData }">
+                  <div class="tree-node-wrapper" :class="`node-type-${nodeData.is_dir ? 'folder' : 'file'}`">
+                    <div class="node-main">
+                      <div class="node-header">
+                        <span class="node-title">{{ title }}</span>
+
+                        <!-- 文件夹节点：显示子节点数量 -->
+                        <template v-if="nodeData.is_dir">
+                          <!-- <span class="children-count-badge">
                       📁 {{ nodeData.children ? nodeData.children.length : 0 }} 项
                     </span> -->
-                    <span 
-                      class="children-count-badge" 
-                      style="margin-left: 8px; background: linear-gradient(135deg, #1890ff 0%, #36cfc9 100%);"
-                    >
-                      📊 {{ (nodeData.nodeStats || (dataRef && dataRef.nodeStats) || {available: 0, total: 0}).available }}/{{ (nodeData.nodeStats || (dataRef && dataRef.nodeStats) || {available: 0, total: 0}).total }}
-                    </span>
-                  </template>
-                  
-                  <!-- 文件节点：显示冷却倒计时 -->
-                  <template v-else-if="nodeData.record && nodeData.record.FileName">
-                    <span v-if="nodeData.countdown !== undefined" class="countdown-badge" :class="getCountdownClass(nodeData.countdown)">
-                      {{ formatCountdown(nodeData.countdown) }}
-                    </span>
-                  </template>
-                </div>
-                
-                <!-- 文件节点：显示record信息 -->
-                <div v-if="!nodeData.is_dir && nodeData.record" class="file-info-row" style="display: flex; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0;">
-                  <div class="file-info-left">
+                          <span
+                            class="children-count-badge"
+                            style="margin-left: 8px; background: linear-gradient(135deg, #1890ff 0%, #36cfc9 100%);">
+                            📊 {{ (nodeData.nodeStats || (dataRef && dataRef.nodeStats) || {available: 0, total: 0}).available }}/{{ (nodeData.nodeStats || (dataRef && dataRef.nodeStats) || {available: 0, total: 0}).total }}
+                          </span>
+                        </template>
 
-                      <!-- 显示 CD 时间 -->
-                      <div v-if="nodeData.record.CdTime" class="cd-time-info">
-                        <span class="cd-time-label">⏰ CD时间：</span>
-                        <span class="cd-time-value">
-                          {{ nodeData.record.CdTime }}
-                        </span>
+                        <!-- 文件节点：显示冷却倒计时 -->
+                        <template v-else-if="nodeData.record && nodeData.record.FileName">
+                          <span v-if="nodeData.countdown !== undefined" class="countdown-badge" :class="getCountdownClass(nodeData.countdown)">
+                            {{ formatCountdown(nodeData.countdown) }}
+                          </span>
+                        </template>
                       </div>
-                      <!-- 显示最近一次采集历史 -->
-                      <div v-if="nodeData.record?.History && Array.isArray(nodeData.record.History) && nodeData.record.History.length > 0" class="latest-collect">
-                        <span class="latest-label">📌 最近采集（{{ nodeData.record.History.length }}次记录）：</span>
-                        <a-tag 
-                          v-for="(count, itemName) in nodeData.record.History[0].Item" 
-                          :key="itemName"
-                          :color="getItemTagColor(itemName)"
-                          size="small"
-                          class="item-mini-tag"
-                        >
-                          {{ itemName }} ×{{ count }}
-                        </a-tag>
+
+                      <!-- 文件节点：显示record信息 -->
+                      <div v-if="!nodeData.is_dir && nodeData.record" class="file-info-row" style="display: flex; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0;">
+                        <div class="file-info-left">
+                          <!-- 显示 CD 时间 -->
+                          <div v-if="nodeData.record.CdTime" class="cd-time-info">
+                            <span class="cd-time-label">⏰ CD时间：</span>
+                            <span class="cd-time-value">
+                              {{ nodeData.record.CdTime }}
+                            </span>
+                          </div>
+                          <!-- 显示最近一次采集历史 -->
+                          <div v-if="nodeData.record?.History && Array.isArray(nodeData.record.History) && nodeData.record.History.length > 0" class="latest-collect">
+                            <span class="latest-label">📌 最近采集（{{ nodeData.record.History.length }}次记录）：</span>
+                            <a-tag
+                              v-for="(count, itemName) in nodeData.record.History[0].Item"
+                              :key="itemName"
+                              :color="getItemTagColor(itemName)"
+                              size="small"
+                              class="item-mini-tag">
+                              {{ itemName }} ×{{ count }}
+                            </a-tag>
+                          </div>
+                          <div v-else class="latest-collect">
+                            <span class="latest-label">📌 采集历史：</span>
+                            <span class="no-history-hint">暂无历史记录</span>
+                          </div>
+                        </div>
+                        <div class="file-info-right">
+                          <!-- 显示状态 -->
+                          <a-tag
+                            v-if="nodeData.record.Status"
+                            :color="getStatusColor(nodeData.record.Status)"
+                            class="status-tag">
+                            <span v-if="nodeData.record.Status === '可采集'">✅</span>
+                            <span v-else-if="nodeData.record.Status === '冷却中'">⏳</span>
+                            <span v-else>❓</span>
+                            {{ nodeData.record.Status }}
+                          </a-tag>
+                          <a-button
+                            v-if="nodeData.record.History && nodeData.record.History.length > 0"
+                            type="primary"
+                            size="small"
+                            class="history-btn"
+                            @click="showHistory(nodeData.record)">
+                            📊 查看完整历史
+                          </a-button>
+                        </div>
                       </div>
-                      <div v-else class="latest-collect">
-                        <span class="latest-label">📌 采集历史：</span>
-                        <span class="no-history-hint">暂无历史记录</span>
-                      </div>
-                    </div>
-                    <div class="file-info-right">
-                      <!-- 显示状态 -->
-                      <a-tag 
-                        v-if="nodeData.record.Status"
-                        :color="getStatusColor(nodeData.record.Status)" 
-                        class="status-tag"
-                      >
-                        <span v-if="nodeData.record.Status === '可采集'">✅</span>
-                        <span v-else-if="nodeData.record.Status === '冷却中'">⏳</span>
-                        <span v-else>❓</span>
-                        {{ nodeData.record.Status }}
-                      </a-tag>
-                      <a-button 
-                        v-if="nodeData.record.History && nodeData.record.History.length > 0"
-                        type="primary"
-                        size="small"
-                        @click="showHistory(nodeData.record)"
-                        class="history-btn"
-                      >
-                        📊 查看完整历史
-                      </a-button>
                     </div>
                   </div>
+                </template>
+
+                <template #icon="{ dataRef, ...nodeData }">
+                  <span class="tree-node-icon" :class="`icon-${nodeData.is_dir ? 'folder' : 'file'}`">
+                    <template v-if="nodeData.is_dir">📁</template>
+                    <template v-else-if="!nodeData.is_dir && nodeData.record && nodeData.record.FileName">
+                      <span
+                        v-if="nodeData.record.Status === '可采集'"
+                        class="file-icon-available">✅</span>
+                      <span
+                        v-else-if="nodeData.record.Status === '冷却中'"
+                        class="file-icon-cd">⏳</span>
+                      <span v-else>❓</span>
+                    </template>
+                    <template v-else>📄</template>
+                  </span>
+                </template>
+              </a-tree>
+
+              <!-- 空状态 -->
+              <div v-else class="empty-state">
+                <div class="empty-icon">📭</div>
+                <div class="empty-text">暂无采集数据</div>
+                <div class="empty-hint">请选择账户后刷新数据</div>
               </div>
-            </div>
-          </template>
-          
-          <template #icon="{ dataRef, ...nodeData }">
-            <span class="tree-node-icon" :class="`icon-${nodeData.is_dir ? 'folder' : 'file'}`">
-              <template v-if="nodeData.is_dir">📁</template>
-              <template v-else-if="!nodeData.is_dir && nodeData.record && nodeData.record.FileName">
-                <span 
-                  v-if="nodeData.record.Status === '可采集'" 
-                  class="file-icon-available"
-                >✅</span>
-                <span 
-                  v-else-if="nodeData.record.Status === '冷却中'" 
-                  class="file-icon-cd"
-                >⏳</span>
-                <span v-else>❓</span>
-              </template>
-              <template v-else>📄</template>
-            </span>
-          </template>
-        </a-tree>
-        
-        <!-- 空状态 -->
-        <div v-else class="empty-state">
-          <div class="empty-icon">📭</div>
-          <div class="empty-text">暂无采集数据</div>
-          <div class="empty-hint">请选择账户后刷新数据</div>
-        </div>
             </div>
           </a-tab-pane>
         </a-tabs>
@@ -305,19 +289,18 @@
     </div>
 
     <!-- 历史记录弹窗 -->
-    <a-modal 
-      v-model:open="historyVisible" 
+    <a-modal
+      v-model:open="historyVisible"
       :width="900"
       :footer="null"
-      class="history-modal"
-    >
+      class="history-modal">
       <template #title>
         <div class="modal-title">
           <span class="title-icon">📊</span>
           <span class="title-text">采集历史记录</span>
         </div>
       </template>
-      
+
       <div v-if="currentHistory" class="history-content">
         <div class="file-info-header">
           <div class="file-info-item">
@@ -333,9 +316,9 @@
             <span class="info-value">{{ currentHistory.CdTime }}</span>
           </div>
         </div>
-        
+
         <a-divider style="margin: 16px 0" />
-        
+
         <div class="stats-summary">
           <div class="stat-card">
             <div class="stat-label">历史记录</div>
@@ -350,15 +333,14 @@
             <div class="stat-value">{{ calculateTotalItems(currentHistory.History) }} 个</div>
           </div>
         </div>
-        
+
         <a-divider style="margin: 16px 0">详细记录</a-divider>
-        
+
         <div v-if="currentHistory.History && Array.isArray(currentHistory.History) && currentHistory.History.length > 0" class="history-list">
-          <div 
-            v-for="(record, index) in currentHistory.History" 
-            :key="index" 
-            class="history-item"
-          >
+          <div
+            v-for="(record, index) in currentHistory.History"
+            :key="index"
+            class="history-item">
             <div class="history-item-header">
               <span class="history-index">第 {{ index + 1 }} 次</span>
               <span class="history-duration">
@@ -369,12 +351,11 @@
             <div class="history-item-body">
               <div class="items-label">采集物品：</div>
               <div class="items-tags">
-                <a-tag 
-                  v-for="(count, itemName) in record.Item" 
-                  :key="itemName" 
+                <a-tag
+                  v-for="(count, itemName) in record.Item"
+                  :key="itemName"
                   :color="getItemTagColor(itemName)"
-                  class="item-tag"
-                >
+                  class="item-tag">
                   <span class="item-name">{{ itemName }}</span>
                   <span class="item-count">× {{ count }}</span>
                 </a-tag>
@@ -392,37 +373,35 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, onUnmounted } from 'vue'
-import { message } from 'ant-design-vue'
-import { apiMethods } from '@/utils/api'
-import dayjs from 'dayjs'
+import { ref, onMounted, computed, onUnmounted } from "vue"
+import { message } from "ant-design-vue"
+import dayjs from "dayjs"
+import { apiMethods } from "@/utils/api"
 
 const loading = ref(false)
 const accountLoading = ref(false)
-const selectedStatus = ref('')
-const selectedAccount = ref('') // 当前选中的账户
+const selectedStatus = ref("")
+const selectedAccount = ref("") // 当前选中的账户
 const accountList = ref([]) // 账户列表
 const rawTreeData = ref(null) // 原始树形数据
 const historyVisible = ref(false)
 const currentHistory = ref(null)
 const pickupLoading = ref(false) // 采集历史加载状态
 const pickupData = ref([]) // 采集历史数据
-const activeTab = ref('cd') // 当前激活的标签页，默认显示CD记录
+const activeTab = ref("cd") // 当前激活的标签页，默认显示CD记录
 const currentTime = ref(dayjs()) // 当前时间，用于倒计时
 let countdownTimer = null // 倒计时定时器
 
 
-
-
 // 倒计时格式化
 const formatCountdown = (countdown) => {
-  if (countdown <= 0) return '已可采集'
-  
+  if (countdown <= 0) return "已可采集"
+
   const days = Math.floor(countdown / (24 * 60 * 60))
   const hours = Math.floor((countdown % (24 * 60 * 60)) / (60 * 60))
   const minutes = Math.floor((countdown % (60 * 60)) / 60)
   const seconds = countdown % 60
-  
+
   if (days > 0) return `${days}天${hours}小时`
   if (hours > 0) return `${hours}小时${minutes}分钟`
   if (minutes > 0) return `${minutes}分${seconds}秒`
@@ -431,10 +410,10 @@ const formatCountdown = (countdown) => {
 
 // 获取倒计时样式类
 const getCountdownClass = (countdown) => {
-  if (countdown <= 0) return 'countdown-available'
-  if (countdown < 60 * 60) return 'countdown-soon' // 1小时内
-  if (countdown < 24 * 60 * 60) return 'countdown-today' // 24小时内
-  return 'countdown-long'
+  if (countdown <= 0) return "countdown-available"
+  if (countdown < 60 * 60) return "countdown-soon" // 1小时内
+  if (countdown < 24 * 60 * 60) return "countdown-today" // 24小时内
+  return "countdown-long"
 }
 
 // 启动倒计时定时器
@@ -465,7 +444,7 @@ const calculateTotalItems = (history) => {
   if (!history || !Array.isArray(history) || history.length === 0) return 0
   let total = 0
   history.forEach(record => {
-    if (record.Item && typeof record.Item === 'object') {
+    if (record.Item && typeof record.Item === "object") {
       Object.values(record.Item).forEach(count => {
         total += (count || 0)
       })
@@ -477,26 +456,26 @@ const calculateTotalItems = (history) => {
 // 物品标签颜色
 const getItemTagColor = (itemName) => {
   const colorMap = {
-    '琉鳞石': 'red',
-    '绯樱绣球': 'pink',
-    '云岩裂叶': 'green',
-    '薄荷': 'cyan',
-    '甘甘花': 'lime',
-    '铁块': 'default',
-    '月莔虫': 'orange',
-    '夏槲果': 'green',
-    '宿影花': 'purple',
-    '树莓': 'red',
-    '青蛙': 'blue',
-    '海蓝蟹': 'geekblue',
-    '薄红蟹': 'volcano',
-    '白灵果': 'lime',
-    '鸟蛋': 'gold',
-    '蜜桃': 'magenta',
-    '蝶蝶': 'blue',
-    '蜜蟹': 'orange'
+    "琉鳞石": "red",
+    "绯樱绣球": "pink",
+    "云岩裂叶": "green",
+    "薄荷": "cyan",
+    "甘甘花": "lime",
+    "铁块": "default",
+    "月莔虫": "orange",
+    "夏槲果": "green",
+    "宿影花": "purple",
+    "树莓": "red",
+    "青蛙": "blue",
+    "海蓝蟹": "geekblue",
+    "薄红蟹": "volcano",
+    "白灵果": "lime",
+    "鸟蛋": "gold",
+    "蜜桃": "magenta",
+    "蝶蝶": "blue",
+    "蜜蟹": "orange",
   }
-  return colorMap[itemName] || 'blue'
+  return colorMap[itemName] || "blue"
 }
 
 // 计算每日总采集量
@@ -507,7 +486,7 @@ const calculateDailyTotal = (items) => {
 // 按数量排序物品
 const sortedItems = (items) => {
   return Object.fromEntries(
-    Object.entries(items).sort((a, b) => b[1] - a[1])
+    Object.entries(items).sort((a, b) => b[1] - a[1]),
   )
 }
 
@@ -515,14 +494,13 @@ const sortedItems = (items) => {
 const formatDateDiff = (dateStr) => {
   const date = dayjs(dateStr)
   const today = dayjs()
-  const diff = today.diff(date, 'day')
-  
-  if (diff === 0) return '今天'
-  if (diff === 1) return '昨天'
-  if (diff === 2) return '前天'
+  const diff = today.diff(date, "day")
+
+  if (diff === 0) return "今天"
+  if (diff === 1) return "昨天"
+  if (diff === 2) return "前天"
   return `${diff} 天前`
 }
-
 
 
 // 获取所有账户列表
@@ -531,13 +509,13 @@ const fetchAccountList = async () => {
   try {
     const response = await apiMethods.getAllUserFiles()
     accountList.value = response || []
-    
+
     // 默认选中第一个账户
     if (accountList.value.length > 0 && !selectedAccount.value) {
       selectedAccount.value = accountList.value[0]
     }
   } catch (error) {
-    message.error('获取账户列表失败: ' + error.message)
+    message.error(`获取账户列表失败: ${error.message}`)
   } finally {
     accountLoading.value = false
   }
@@ -561,16 +539,16 @@ const statisticsData = computed(() => {
 
       // 如果有有效的record数据，统计状态
       if (node.record && node.record.FileName) {
-        if (node.record.Status === '可采集') {
+        if (node.record.Status === "可采集") {
           availableCount++
-        } else if (node.record.Status === '冷却中') {
+        } else if (node.record.Status === "冷却中") {
           coolingCount++
         }
 
         // 从历史记录中提取材料种类
         if (node.record.History && Array.isArray(node.record.History)) {
           node.record.History.forEach(history => {
-            if (history.Item && typeof history.Item === 'object') {
+            if (history.Item && typeof history.Item === "object") {
               Object.keys(history.Item).forEach(itemName => {
                 if (itemName && itemName.trim()) {
                   materialSet.add(itemName.trim())
@@ -594,16 +572,16 @@ const statisticsData = computed(() => {
     totalFiles,
     availableCount,
     coolingCount,
-    materialTypes: materialSet.size
+    materialTypes: materialSet.size,
   }
 })
 
-  // 转换树形数据为 Ant Design Tree 组件所需格式
-const convertToTreeData = (node, parentKey = '0') => {
+// 转换树形数据为 Ant Design Tree 组件所需格式
+const convertToTreeData = (node, parentKey = "0") => {
   if (!node) return []
-  
+
   // 如果是根目录 pathing，直接处理其子节点，不显示根节点本身
-  if (node.name === 'pathing' && node.children && Array.isArray(node.children)) {
+  if (node.name === "pathing" && node.children && Array.isArray(node.children)) {
     const children = []
     node.children.forEach((child, index) => {
       const childNodes = convertToTreeData(child, `0-${index}`)
@@ -611,30 +589,30 @@ const convertToTreeData = (node, parentKey = '0') => {
     })
     return children
   }
-  
+
   const key = `${parentKey}-${node.name}`
-  
+
   const treeNode = {
     title: node.name,
     key: key,
     // 直接将 node 的所有属性展开到树节点中
     ...node,
     // 保留 dataRef 以保证兼容性
-    dataRef: { 
-      ...node
-    }
+    dataRef: {
+      ...node,
+    },
   }
-  
+
   // 如果是文件节点且有有效的 record 数据，计算倒计时
   if (!node.is_dir && node.record && node.record.FileName) {
     if (node.record.CdTime) {
       const cdTime = dayjs(node.record.CdTime)
       const now = currentTime.value
-      const countdown = cdTime.diff(now, 'second')
+      const countdown = cdTime.diff(now, "second")
       treeNode.dataRef.countdown = countdown > 0 ? countdown : 0
     }
   }
-  
+
   // 递归处理子节点
   if (node.children && Array.isArray(node.children) && node.children.length > 0) {
     const children = []
@@ -646,7 +624,7 @@ const convertToTreeData = (node, parentKey = '0') => {
       treeNode.children = children
     }
   }
-  
+
   return [treeNode]
 }
 
@@ -657,7 +635,7 @@ const hasMaterial = (node, materialName) => {
   }
 
   for (const history of node.dataRef.record.History) {
-    if (history.Item && typeof history.Item === 'object') {
+    if (history.Item && typeof history.Item === "object") {
       if (Object.keys(history.Item).some(item => item.trim() === materialName)) {
         return true
       }
@@ -682,12 +660,12 @@ const treeData = computed(() => {
     return nodes.map(node => {
       // 如果是文件节点，应用状态过滤
       if (!node.dataRef?.is_dir && node.dataRef?.record && node.dataRef.record.FileName) {
-        if (selectedStatus.value === '可采集' || selectedStatus.value === '冷却中') {
+        if (selectedStatus.value === "可采集" || selectedStatus.value === "冷却中") {
           // 状态筛选
           if (node.dataRef.record.Status !== selectedStatus.value) {
             return null
           }
-        } else if (selectedStatus.value === 'material') {
+        } else if (selectedStatus.value === "material") {
           // 材料种类筛选 - 显示所有有历史记录的文件
           if (!node.dataRef.record.History || !Array.isArray(node.dataRef.record.History) || node.dataRef.record.History.length === 0) {
             return null
@@ -716,9 +694,9 @@ const treeData = computed(() => {
 
 const getStatusColor = (status) => {
   switch (status) {
-    case '可采集': return 'green'
-    case '冷却中': return 'orange'
-    default: return 'default'
+    case "可采集": return "green"
+    case "冷却中": return "orange"
+    default: return "default"
   }
 }
 
@@ -741,7 +719,7 @@ const calculateNodeStats = (node) => {
   if (!node.is_dir) {
     // It's a file
     total = 1
-    if (node.record && node.record.Status === '可采集') {
+    if (node.record && node.record.Status === "可采集") {
       available = 1
     }
   } else if (node.children && Array.isArray(node.children)) {
@@ -755,31 +733,31 @@ const calculateNodeStats = (node) => {
 
   // Attach stats to the node
   node.nodeStats = { total, available }
-  
+
   return { total, available }
 }
 
 const refreshData = async () => {
   if (!selectedAccount.value) {
-    message.warning('请先选择账户')
+    message.warning("请先选择账户")
     return
   }
-  
+
   loading.value = true
   try {
     const response = await apiMethods.getCollectionManagement(selectedAccount.value)
-    
+
     // 如果返回的是树形结构
-    if (response && typeof response === 'object') {
+    if (response && typeof response === "object") {
       calculateNodeStats(response)
       rawTreeData.value = response
     } else {
       rawTreeData.value = null
     }
-    
-    message.success('刷新成功')
+
+    message.success("刷新成功")
   } catch (error) {
-    message.error('获取采集数据失败: ' + error.message)
+    message.error(`获取采集数据失败: ${error.message}`)
   } finally {
     loading.value = false
   }
@@ -788,16 +766,16 @@ const refreshData = async () => {
 // 获取拾取记录
 const refreshPickupData = async () => {
   if (!selectedAccount.value) {
-    message.warning('请先选择账户')
+    message.warning("请先选择账户")
     return
   }
-  
+
   pickupLoading.value = true
   try {
     const response = await apiMethods.getPickupHistory(selectedAccount.value)
     pickupData.value = response || []
   } catch (error) {
-    message.error('获取采集历史失败: ' + error.message)
+    message.error(`获取采集历史失败: ${error.message}`)
   } finally {
     pickupLoading.value = false
   }
@@ -806,7 +784,7 @@ const refreshPickupData = async () => {
 const onCardClick = (status) => {
   if (selectedStatus.value === status) {
     // 如果点击的是当前已选中的卡片，则取消筛选
-    selectedStatus.value = ''
+    selectedStatus.value = ""
   } else {
     selectedStatus.value = status
   }
@@ -888,7 +866,7 @@ onUnmounted(() => {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
-  margin-bottom: 20px;  
+  margin-bottom: 20px;
 }
 
 .stat-card {
@@ -1490,13 +1468,12 @@ onUnmounted(() => {
 }
 
 
-
 /* 移动端适配 */
 @media (max-width: 768px) {
   .collection-management {
     padding: 8px;
   }
-  
+
   /* 工具栏移动端适配 */
   .toolbar-container {
     flex-direction: column;
@@ -1504,117 +1481,117 @@ onUnmounted(() => {
     padding: 12px;
     margin-bottom: 12px;
   }
-  
+
   .toolbar-left,
   .toolbar-right {
     width: 100%;
   }
-  
+
   .page-title {
     justify-content: center;
   }
-  
+
   .title-icon {
     font-size: 20px;
   }
-  
+
   .title-text {
     font-size: 16px;
   }
-  
+
   :deep(.ant-space) {
     width: 100%;
   }
-  
+
   :deep(.ant-space-item) {
     width: 100%;
   }
-  
+
   .account-select,
   .status-select,
   .refresh-btn {
     width: 100% !important;
   }
-  
+
   /* 统计卡片移动端适配 */
   .stats-cards {
     grid-template-columns: 1fr;
     gap: 8px;
     margin-bottom: 12px;
   }
-  
+
   .stat-card {
     padding: 12px;
   }
-  
+
   .stat-icon {
     font-size: 28px;
   }
-  
+
   .stat-value {
     font-size: 20px;
   }
-  
+
   .stat-label {
     font-size: 13px !important;
   }
-  
+
   /* 树容器移动端适配 - 关键优化 */
   .tree-container {
     padding: 0;
     overflow-x: visible; /* 移动端不使用横向滚动 */
   }
-  
+
   /* 标签页移动端适配 */
   .tabs-container :deep(.ant-tabs-nav) {
     padding: 8px 8px 0 8px;
   }
-  
+
   .tabs-container :deep(.ant-tabs-tab) {
     padding: 6px 10px;
     margin-right: 4px;
   }
-  
+
   .tab-title {
     font-size: 12px;
     gap: 4px;
   }
-  
+
   .tab-icon {
     font-size: 14px;
   }
-  
+
   .tabs-container :deep(.ant-tabs-content) {
     padding: 12px;
     min-height: 250px;
   }
-  
+
   .tab-toolbar {
     margin-bottom: 12px;
   }
-  
+
   .collection-tree {
     width: 100%;
   }
-  
+
   /* 树节点移动端适配 - 关键优化 */
   .node-main {
     padding: 8px 10px;
     max-width: 100%;
   }
-  
+
   .node-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 6px;
   }
-  
+
   .node-title {
     font-size: 13px;
     width: 100%;
     white-space: normal; /* 允许标题换行 */
   }
-  
+
   /* 倒计时和子节点徽章移动端适配 */
   .countdown-badge,
   .children-count-badge {
@@ -1622,7 +1599,7 @@ onUnmounted(() => {
     padding: 2px 6px;
     width: fit-content;
   }
-  
+
   /* 文件信息行移动端适配 - 垂直布局 */
   .file-info-row {
     flex-direction: column;
@@ -1630,100 +1607,100 @@ onUnmounted(() => {
     gap: 8px;
     width: 100%;
   }
-  
+
   .file-info-left {
     width: 100%;
   }
-  
+
   .file-name-info {
     flex-direction: column;
     align-items: flex-start;
     width: 100%;
   }
-  
+
   .file-name-value {
     max-width: 100%;
     font-size: 11px;
     white-space: normal; /* 移动端允许文件名换行 */
     word-break: break-all;
   }
-  
+
   .cd-time-info {
     width: 100%;
   }
-  
+
   .cd-time-label {
     font-size: 11px;
   }
-  
+
   .cd-time-value {
     font-size: 11px;
     padding: 2px 6px;
   }
-  
+
   .latest-collect {
     width: 100%;
   }
-  
+
   .file-info-right {
     width: 100%;
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 8px;
   }
-  
+
   .status-tag {
     font-size: 11px;
     padding: 2px 8px;
   }
-  
+
   .history-btn {
     flex: 1;
     min-width: 120px;
   }
-  
+
   /* Tree 组件深度样式覆盖 */
   :deep(.ant-tree-treenode) {
     width: 100% !important;
   }
-  
+
   :deep(.ant-tree-node-content-wrapper) {
     width: 100% !important;
     min-width: 0 !important;
   }
-  
+
   :deep(.ant-tree-title) {
     width: 100% !important;
   }
-  
+
   :deep(.ant-tree-indent-unit) {
     width: 12px !important; /* 减少缩进以节省空间 */
   }
-  
+
   /* 材料统计移动端适配 */
   .material-stats {
     flex-wrap: wrap;
   }
-  
+
   .tree-node-icon {
     font-size: 16px;
     width: 24px;
     height: 24px;
   }
-  
+
   /* 空状态移动端适配 */
   .empty-state {
     padding: 40px 16px;
   }
-  
+
   .empty-icon {
     font-size: 48px;
   }
-  
+
   .empty-text {
     font-size: 14px;
   }
-  
+
   .empty-hint {
     font-size: 12px;
   }
@@ -1733,79 +1710,79 @@ onUnmounted(() => {
   .collection-management {
     padding: 6px;
   }
-  
+
   .toolbar-container {
     padding: 10px;
     gap: 10px;
     margin-bottom: 10px;
   }
-  
+
   .title-icon {
     font-size: 18px;
   }
-  
+
   .title-text {
     font-size: 15px;
   }
-  
+
   .stats-cards {
     gap: 6px;
   }
-  
+
   .stat-card {
     padding: 10px 12px;
   }
-  
+
   .stat-icon {
     font-size: 24px;
   }
-  
+
   .stat-label {
     font-size: 11px !important;
   }
-  
+
   .stat-value {
     font-size: 18px;
   }
-  
+
   .tree-container {
     padding: 0;
   }
-  
+
   .tree-node-wrapper {
     padding: 6px 8px;
   }
-  
+
   .node-title {
     font-size: 12px;
   }
-  
+
   .cd-time {
     font-size: 10px;
   }
-  
+
   .btn-text {
     font-size: 10px;
   }
-  
+
   .custom-tree-icon {
     font-size: 14px;
     width: 20px;
     height: 20px;
   }
-  
+
   .empty-state {
     padding: 30px 12px;
   }
-  
+
   .empty-icon {
     font-size: 40px;
   }
-  
+
   .empty-text {
     font-size: 13px;
   }
-  
+
   .empty-hint {
     font-size: 11px;
   }
@@ -1997,38 +1974,38 @@ onUnmounted(() => {
     max-width: 95vw;
     margin: 10px auto;
   }
-  
+
   .file-info-header {
     flex-direction: column;
     gap: 12px;
   }
-  
+
   .stats-summary {
     grid-template-columns: 1fr;
   }
-  
+
   .stat-card {
     padding: 16px;
   }
-  
+
   .stat-value {
     font-size: 20px;
   }
-  
+
   .history-item {
     padding: 12px;
   }
-  
+
   .history-item-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-  
+
   .items-tags {
     gap: 6px;
   }
-  
+
   .item-tag {
     font-size: 12px;
     padding: 3px 10px;
@@ -2165,39 +2142,39 @@ onUnmounted(() => {
     margin-left: 8px;
     padding: 10px;
   }
-  
+
   .pickup-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 6px;
   }
-  
+
   .pickup-date {
     font-size: 13px;
   }
-  
+
   .pickup-stats {
     grid-template-columns: 1fr;
     gap: 6px;
     padding: 8px;
   }
-  
+
   .stat-item {
     font-size: 11px;
   }
-  
+
   .stat-label {
     font-size: 11px;
   }
-  
+
   .stat-value {
     font-size: 13px;
   }
-  
+
   .pickup-items {
     gap: 5px;
   }
-  
+
   .pickup-item-tag {
     font-size: 11px;
     padding: 3px 8px;
@@ -2208,53 +2185,53 @@ onUnmounted(() => {
   .empty-state {
     padding: 30px 8px;
   }
-  
+
   .empty-icon {
     font-size: 40px;
   }
-  
+
   .empty-text {
     font-size: 13px;
   }
-  
+
   .pickup-record {
     margin-left: 4px;
     padding: 8px;
   }
-  
+
   .pickup-date {
     font-size: 12px;
   }
-  
+
   .date-icon {
     font-size: 14px;
   }
-  
+
   .pickup-stats {
     padding: 6px;
   }
-  
+
   .stat-item {
     font-size: 10px;
   }
-  
+
   .stat-label {
     font-size: 10px;
   }
-  
+
   .stat-value {
     font-size: 12px;
   }
-  
+
   .pickup-items {
     gap: 3px;
   }
-  
+
   .pickup-item-tag {
     font-size: 10px;
     padding: 2px 6px;
   }
-  
+
   .timeline-dot {
     font-size: 14px;
   }

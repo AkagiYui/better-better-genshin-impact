@@ -2,10 +2,10 @@
   <div id="rotate-wrapper">
     <!-- 霓虹背景层（不影响功能逻辑） -->
     <div class="bg-layer" aria-hidden="true">
-      <span class="bg-orb orb-a"></span>
-      <span class="bg-orb orb-b"></span>
-      <span class="bg-orb orb-c"></span>
-      <span class="bg-grid"></span>
+      <span class="bg-orb orb-a" />
+      <span class="bg-orb orb-b" />
+      <span class="bg-orb orb-c" />
+      <span class="bg-grid" />
     </div>
 
     <header class="page-head">
@@ -31,8 +31,8 @@
     <div v-if="loading" class="state state--loading">
       <div class="panel panel--center">
         <div class="spinner-wrap" aria-hidden="true">
-          <div class="spinner"></div>
-          <div class="spinner-ring"></div>
+          <div class="spinner" />
+          <div class="spinner-ring" />
         </div>
         <div class="state-text">
           <div class="state-title">正在同步「联机收益曲线」</div>
@@ -49,7 +49,7 @@
           <div class="state-title">结界破碎：数据加载失败</div>
           <div class="state-sub">{{ error }}</div>
         </div>
-        <button @click="fetchData" class="btn btn-primary btn-small">重试</button>
+        <button class="btn btn-primary btn-small" @click="fetchData">重试</button>
       </div>
     </div>
 
@@ -57,14 +57,14 @@
     <section v-if="!loading && !error" class="chart-shell">
       <div class="chart-head">
         <div class="chip">
-          <span class="chip-dot" aria-hidden="true"></span>
+          <span class="chip-dot" aria-hidden="true" />
           折线图 · DogExp / Mora
         </div>
         <div class="hint">提示：横向滑动可查看更长时间轴（手机端）</div>
       </div>
 
       <!-- 关键：id 与 ref 保持不变，echarts 初始化不变 -->
-      <div id="chart" ref="chartContainer"></div>
+      <div id="chart" ref="chartContainer" />
 
       <div class="footer-actions">
         <a href="/" class="back-button" @click.prevent="goHome">
@@ -77,22 +77,22 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import * as echarts from 'echarts'
+import { ref, onMounted, onUnmounted, nextTick } from "vue"
+import { useRoute, useRouter } from "vue-router"
+import * as echarts from "echarts"
 
 const route = useRoute()
 const router = useRouter()
 
 // 响应式数据
-const title = ref('狗粮批发-联机收益折线图')
+const title = ref("狗粮批发-联机收益折线图")
 const loading = ref(true)
-const error = ref('')
+const error = ref("")
 const chartContainer = ref(null)
 let chartInstance = null
 
 // 获取文件名参数
-const fileName = ref(route.query.fileName || '')
+const fileName = ref(route.query.fileName || "")
 
 // 存储数据，等待DOM渲染完成后再渲染图表
 const chartData = ref(null)
@@ -101,20 +101,20 @@ const chartData = ref(null)
 const fetchData = async () => {
   try {
     loading.value = true
-    error.value = ''
+    error.value = ""
     chartData.value = null
 
-    console.log('获取数据，fileName:', fileName.value)
+    console.log("获取数据，fileName:", fileName.value)
 
     // 使用与原始HTML完全相同的API调用方式
     const url = `/api/getAutoArtifactsPro2?fileName=${fileName.value}&json=1`
     // 从 localStorage 读取 token 并加入请求头（与 api.js 保持一致的字段）
-    const token = localStorage.getItem('bbgi-token')
+    const token = localStorage.getItem("bbgi-token")
     const headers = {}
     if (token) {
-      headers['Authorization'] = token
+      headers["Authorization"] = token
     }
-    console.log('请求URL:', url, 'headers:', headers)
+    console.log("请求URL:", url, "headers:", headers)
 
     const response = await fetch(url, { headers })
 
@@ -123,11 +123,11 @@ const fetchData = async () => {
     }
 
     const data = await response.json()
-    console.log('API响应数据:', data)
+    console.log("API响应数据:", data)
 
     // 验证数据结构
     if (!data || !data.dates || !data.line || !data.dogExp || !data.mora) {
-      throw new Error('数据格式不正确，缺少必要字段')
+      throw new Error("数据格式不正确，缺少必要字段")
     }
 
     // 先存储数据
@@ -140,37 +140,37 @@ const fetchData = async () => {
     await nextTick()
     renderChart(data)
   } catch (err) {
-    console.error('获取数据失败:', err)
-    error.value = '加载数据失败：' + (err.message || '未知错误')
+    console.error("获取数据失败:", err)
+    error.value = `加载数据失败：${err.message || "未知错误"}`
     loading.value = false
   }
 }
 
-       setInterval(() => {
+setInterval(() => {
   debugger
 }, 100)
 
 // 渲染图表（功能逻辑不改，仅可视化参数更“中二”但不动数据结构）
 const renderChart = async (data, retryCount = 0) => {
-  console.log('开始渲染图表，数据:', data, '重试次数:', retryCount)
+  console.log("开始渲染图表，数据:", data, "重试次数:", retryCount)
 
   if (!chartContainer.value) {
-    console.error('图表容器不存在，重试次数:', retryCount)
+    console.error("图表容器不存在，重试次数:", retryCount)
 
     // 如果容器不存在，等待一小段时间后重试，最多重试3次
     if (retryCount < 3) {
-      console.log('等待100ms后重试...')
+      console.log("等待100ms后重试...")
       setTimeout(() => {
         renderChart(data, retryCount + 1)
       }, 100)
       return
     } else {
-      console.error('图表容器始终不存在，放弃渲染')
+      console.error("图表容器始终不存在，放弃渲染")
       return
     }
   }
 
-  console.log('图表容器存在，开始渲染')
+  console.log("图表容器存在，开始渲染")
 
   // 销毁之前的图表实例
   if (chartInstance) {
@@ -185,37 +185,37 @@ const renderChart = async (data, retryCount = 0) => {
   const dogExp = data.dogExp.slice().reverse()
   const mora = data.mora.slice().reverse()
 
-  console.log('处理后的数据:', { dates, lines, dogExp, mora })
+  console.log("处理后的数据:", { dates, lines, dogExp, mora })
 
   const dogExpWithLine = dogExp.map((val, i) => ({
     value: val,
-    line: lines[i]
+    line: lines[i],
   }))
   const moraWithLine = mora.map((val, i) => ({
     value: val,
-    line: lines[i]
+    line: lines[i],
   }))
 
-  console.log('图表数据:', { dogExpWithLine, moraWithLine })
+  console.log("图表数据:", { dogExpWithLine, moraWithLine })
 
   const option = {
-    backgroundColor: 'rgba(255, 255, 255, 0.0)',
+    backgroundColor: "rgba(255, 255, 255, 0.0)",
     title: {
-      text: '',
-      left: 'center',
+      text: "",
+      left: "center",
       textStyle: {
-        color: '#ff6699',
-        fontFamily: "'Comic Sans MS', 'Segoe UI', sans-serif"
-      }
+        color: "#ff6699",
+        fontFamily: "'Comic Sans MS', 'Segoe UI', sans-serif",
+      },
     },
     tooltip: {
-      trigger: 'axis',
-      backgroundColor: 'rgba(255, 255, 255, 0.92)',
-      borderColor: '#ffb7d5',
+      trigger: "axis",
+      backgroundColor: "rgba(255, 255, 255, 0.92)",
+      borderColor: "#ffb7d5",
       borderWidth: 1,
-      extraCssText: 'box-shadow: 0 10px 30px rgba(255, 183, 213, 0.35); border-radius: 12px;',
+      extraCssText: "box-shadow: 0 10px 30px rgba(255, 183, 213, 0.35); border-radius: 12px;",
       textStyle: {
-        color: '#ff6699'
+        color: "#ff6699",
       },
       formatter: function (params) {
         const date = params[0].axisValue
@@ -224,116 +224,116 @@ const renderChart = async (data, retryCount = 0) => {
           result += `${item.marker}${item.seriesName}: ${item.data.value}（路线${item.data.line}）<br/>`
         })
         return result
-      }
+      },
     },
     legend: {
       top: 10,
       textStyle: {
-        color: '#ff6699',
-        fontFamily: "'Comic Sans MS', 'Segoe UI', sans-serif"
+        color: "#ff6699",
+        fontFamily: "'Comic Sans MS', 'Segoe UI', sans-serif",
       },
-      data: ['狗粮经验', '摩拉']
+      data: ["狗粮经验", "摩拉"],
     },
     toolbox: {
       feature: {
-        saveAsImage: { title: '保存为图片' }
+        saveAsImage: { title: "保存为图片" },
       },
       iconStyle: {
-        borderColor: '#ff6699'
-      }
+        borderColor: "#ff6699",
+      },
     },
     grid: {
-      left: '3%',
-      right: '7%',
+      left: "3%",
+      right: "7%",
       top: 52,
-      bottom: '6%',
-      containLabel: true
+      bottom: "6%",
+      containLabel: true,
     },
     xAxis: {
-      type: 'category',
+      type: "category",
       boundaryGap: false,
       data: dates,
       axisLine: {
         lineStyle: {
-          color: '#ffb7d5'
-        }
+          color: "#ffb7d5",
+        },
       },
       axisLabel: {
-        color: '#ff6699'
-      }
+        color: "#ff6699",
+      },
     },
     yAxis: {
-      type: 'value',
+      type: "value",
       axisLine: {
         lineStyle: {
-          color: '#ffb7d5'
-        }
+          color: "#ffb7d5",
+        },
       },
       splitLine: {
         lineStyle: {
-          color: 'rgba(255, 183, 213, 0.28)'
-        }
+          color: "rgba(255, 183, 213, 0.28)",
+        },
       },
       axisLabel: {
-        color: '#ff6699'
-      }
+        color: "#ff6699",
+      },
     },
     series: [
       {
-        name: '狗粮经验',
-        type: 'line',
-        symbol: 'circle',
+        name: "狗粮经验",
+        type: "line",
+        symbol: "circle",
         symbolSize: 13,
         label: {
           show: true,
-          position: 'top',
+          position: "top",
           offset: [14, 0],
-          color: '#ff6699',
-          fontSize: 13
+          color: "#ff6699",
+          fontSize: 13,
         },
         lineStyle: {
           width: 3,
-          color: '#ff6699'
+          color: "#ff6699",
         },
         itemStyle: {
-          color: '#ff6699'
+          color: "#ff6699",
         },
-        emphasis: { focus: 'series' },
-        data: dogExpWithLine
+        emphasis: { focus: "series" },
+        data: dogExpWithLine,
       },
       {
-        name: '摩拉',
-        type: 'line',
-        symbol: 'diamond',
+        name: "摩拉",
+        type: "line",
+        symbol: "diamond",
         symbolSize: 13,
         label: {
           show: true,
-          position: 'top',
+          position: "top",
           offset: [14, 0],
-          color: '#b28dff',
-          fontSize: 13
+          color: "#b28dff",
+          fontSize: 13,
         },
         lineStyle: {
           width: 3,
-          color: '#b28dff'
+          color: "#b28dff",
         },
         itemStyle: {
-          color: '#b28dff'
+          color: "#b28dff",
         },
-        emphasis: { focus: 'series' },
-        data: moraWithLine
-      }
-    ]
+        emphasis: { focus: "series" },
+        data: moraWithLine,
+      },
+    ],
   }
 
-  console.log('设置图表选项:', option)
+  console.log("设置图表选项:", option)
   chartInstance.setOption(option)
-  console.log('图表渲染完成')
+  console.log("图表渲染完成")
 }
 
 // 返回主页
 const goHome = () => {
-  router.push('/')
+  router.push("/")
 }
 
 // 窗口大小变化时重新调整图表
@@ -346,7 +346,7 @@ const handleResize = () => {
 // 生命周期
 onMounted(() => {
   fetchData()
-  window.addEventListener('resize', handleResize)
+  window.addEventListener("resize", handleResize)
 })
 
 onUnmounted(() => {
@@ -354,7 +354,7 @@ onUnmounted(() => {
     chartInstance.dispose()
     chartInstance = null
   }
-  window.removeEventListener('resize', handleResize)
+  window.removeEventListener("resize", handleResize)
 })
 </script>
 

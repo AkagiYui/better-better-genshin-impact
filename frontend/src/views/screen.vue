@@ -3,28 +3,27 @@
     <header class="header">
       <h1 @click="$router.go(-1)">屏幕共享----<span>返回</span></h1>
 
-    
+
       <div class="status">
-        <span :class="['status-indicator', connectionStatus]"></span>
+        <span :class="['status-indicator', connectionStatus]" />
         {{ statusText }}
       </div>
     </header>
 
-    
+
     <main class="main">
       <div class="video-container">
-        <img 
+        <img
           ref="videoElement"
-          :src="currentFrame" 
+          :src="currentFrame"
           alt="屏幕画面"
-          class="video-frame"
-        />
+          class="video-frame" />
         <div v-if="!isConnected" class="loading">
-          <div class="spinner"></div>
+          <div class="spinner" />
           <p>正在连接...</p>
         </div>
       </div>
-      
+
       <div class="info">
         <div class="stats">
           <div class="stat">
@@ -47,16 +46,16 @@
 </template>
 
 <script>
-import  { apiMethods } from '@/utils/api'
+import { apiMethods } from "@/utils/api"
 export default {
-  name: 'App',
+  name: "App",
   data() {
     return {
       ws: null,
       isConnected: false,
-      currentFrame: '',
+      currentFrame: "",
       fps: 0,
-      resolution: '1280x720',
+      resolution: "1280x720",
       frameCount: 0,
       lastFpsTime: Date.now(),
 
@@ -64,11 +63,11 @@ export default {
   },
   computed: {
     connectionStatus() {
-      return this.isConnected ? 'connected' : 'disconnected'
+      return this.isConnected ? "connected" : "disconnected"
     },
     statusText() {
-      return this.isConnected ? '已连接' : '未连接'
-    }
+      return this.isConnected ? "已连接" : "未连接"
+    },
   },
   mounted() {
     this.connectWebSocket()
@@ -80,14 +79,14 @@ export default {
   },
   methods: {
     connectWebSocket() {
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
       const wsUrl = `${protocol}//${window.location.host}/api/abgiScreen/ws`
-      
+
       this.ws = new WebSocket(wsUrl)
       this.ws.binaryType = "blob" // 接收二进制流
 
       this.ws.onopen = () => {
-        console.log('WebSocket连接已建立')
+        console.log("WebSocket连接已建立")
         this.isConnected = true
       }
 
@@ -108,13 +107,13 @@ export default {
       }
 
       this.ws.onclose = () => {
-        console.log('WebSocket连接已关闭')
+        console.log("WebSocket连接已关闭")
         this.isConnected = false
         setTimeout(() => this.connectWebSocket(), 3000)
       }
 
       this.ws.onerror = (error) => {
-        console.error('WebSocket错误:', error)
+        console.error("WebSocket错误:", error)
         this.isConnected = false
       }
     },
@@ -124,11 +123,11 @@ export default {
         const response = await apiMethods.getStatus()
         this.statusData = response.data || {}
       } catch (error) {
-        console.error('获取状态信息失败:', error)
+        console.error("获取状态信息失败:", error)
       }
-    }
-  }
-  
+    },
+  },
+
 }
 </script>
 

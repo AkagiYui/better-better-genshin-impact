@@ -1,42 +1,41 @@
 <template>
   <div class="app-container anime-theme">
-    <div class="bg-pattern"></div>
-    
+    <div class="bg-pattern" />
+
     <header class="navbar">
       <div class="nav-content">
         <div class="nav-left">
           <span class="app-title">✨ 脚本屋 🌸</span>
-          <span class="badge-total" v-if="pluginData.length">{{ pluginData.length }}</span>
+          <span v-if="pluginData.length" class="badge-total">{{ pluginData.length }}</span>
         </div>
         <div class="nav-right">
-          <button class="icon-btn" @click="goHome" title="首页">🏰</button>
+          <button class="icon-btn" title="首页" @click="goHome">🏰</button>
         </div>
       </div>
-      
+
       <div class="filter-bar">
         <div class="search-box">
           <span class="search-icon">🔎</span>
-          <input 
-            v-model="searchText" 
-            type="text" 
-            placeholder="寻找神奇脚本..." 
-            class="search-input"
-          />
+          <input
+            v-model="searchText"
+            type="text"
+            placeholder="寻找神奇脚本..."
+            class="search-input" />
           <span v-if="searchText" class="clear-icon" @click="searchText=''">✖</span>
         </div>
         <div class="tabs">
-          <button 
-            class="tab-item" 
-            :class="{ active: filterTab === 'all' }" 
-            @click="filterTab = 'all'"
-          >全部</button>
-          <button 
-            class="tab-item" 
-            :class="{ active: filterTab === 'update' }" 
-            @click="filterTab = 'update'"
-          >
+          <button
+            class="tab-item"
+            :class="{ active: filterTab === 'all' }"
+            @click="filterTab = 'all'">
+            全部
+          </button>
+          <button
+            class="tab-item"
+            :class="{ active: filterTab === 'update' }"
+            @click="filterTab = 'update'">
             待升级
-            <span class="dot" v-if="updateCount > 0"></span>
+            <span v-if="updateCount > 0" class="dot" />
           </button>
         </div>
       </div>
@@ -62,19 +61,17 @@
     </section>
 
     <main class="main-list">
-      
       <div v-if="filteredList.length === 0" class="empty-state">
         <div class="empty-img">(｡•́︿•̀｡)</div>
         <p>这里空空如也...</p>
       </div>
 
       <div class="script-list">
-        <div 
-          v-for="item in filteredList" 
-          :key="item.Name" 
+        <div
+          v-for="item in filteredList"
+          :key="item.Name"
           class="script-card"
-          :class="{ 'needs-update': item.Mark === '有更新' }"
-        >
+          :class="{ 'needs-update': item.Mark === '有更新' }">
           <div class="card-main">
             <div class="card-icon">
               {{ item.Mark === '有更新' ? '⚡' : '📜' }}
@@ -87,23 +84,22 @@
               <div class="card-meta">
                 <div class="version-row">
                   <span class="ver-badge cur">v{{ item.NowVersion }}</span>
-                  <span class="arrow" v-if="item.Mark === '有更新'">➜</span>
-                  <span class="ver-badge new" v-if="item.Mark === '有更新'">v{{ item.NewVersion }}</span>
+                  <span v-if="item.Mark === '有更新'" class="arrow">➜</span>
+                  <span v-if="item.Mark === '有更新'" class="ver-badge new">v{{ item.NewVersion }}</span>
                 </div>
                 <div class="time-text">{{ item.LastUpdated }}</div>
               </div>
             </div>
           </div>
-          
-          <div class="card-action" v-if="item.Mark === '有更新' || isUpdating[item.Name]">
-              <button 
-                class="btn-update" 
-                :disabled="isUpdating[item.Name]"
-                @click="updatePlugin(item.Name)"
-              >
-                <span v-if="isUpdating[item.Name]" class="loading-spin">🍬</span>
-                {{ isUpdating[item.Name] ? '升级中...' : '✨ 立即升级' }}
-              </button>
+
+          <div v-if="item.Mark === '有更新' || isUpdating[item.Name]" class="card-action">
+            <button
+              class="btn-update"
+              :disabled="isUpdating[item.Name]"
+              @click="updatePlugin(item.Name)">
+              <span v-if="isUpdating[item.Name]" class="loading-spin">🍬</span>
+              {{ isUpdating[item.Name] ? '升级中...' : '✨ 立即升级' }}
+            </button>
           </div>
         </div>
       </div>
@@ -112,35 +108,33 @@
     <transition name="pop">
       <div v-if="showModal" class="modal-mask" @click.self="closeSubscribeModal">
         <div class="modal-panel">
-          <div class="modal-decorative-bg"></div>
+          <div class="modal-decorative-bg" />
           <div class="modal-header">
             <h3>📝 签订契约</h3>
             <button class="close-btn" @click="closeSubscribeModal">✕</button>
           </div>
           <div class="modal-body">
             <p class="input-label">神秘的脚本</p>
-            
+
             <div class="input-wrapper">
               <span class="input-icon">🔮</span>
-              <input 
-                v-model="subscribeInput" 
-                type="text" 
-                class="modal-input" 
-                placeholder="输入关键词搜索或填写脚本名"
+              <input
                 ref="subInputRef"
+                v-model="subscribeInput"
+                type="text"
+                class="modal-input"
+                placeholder="输入关键词搜索或填写脚本名"
                 @input="handleSearchInput"
-                @focus="showSearchResult = true"
-              />
-              
+                @focus="showSearchResult = true" />
+
               <transition name="fade">
-                <div class="search-dropdown" v-if="showSearchResult && searchList.length > 0">
+                <div v-if="showSearchResult && searchList.length > 0" class="search-dropdown">
                   <ul>
-                    <li 
-                      v-for="(script, idx) in searchList" 
-                      :key="idx" 
-                      @click="selectScript(script)"
+                    <li
+                      v-for="(script, idx) in searchList"
+                      :key="idx"
                       class="search-item"
-                    >
+                      @click="selectScript(script)">
                       <div class="item-name">{{ script.name }}</div>
                       <div class="item-desc">
                         {{ formatDesc(script.description) }}
@@ -149,8 +143,8 @@
                   </ul>
                 </div>
               </transition>
-              
-              <div class="loading-indicator" v-if="isSearchingScript">
+
+              <div v-if="isSearchingScript" class="loading-indicator">
                 <span class="loading-spin">🌸</span>
               </div>
             </div>
@@ -161,37 +155,36 @@
           </div>
           <div class="modal-footer">
             <button class="btn-cancel" @click="closeSubscribeModal">再想想</button>
-            <button class="btn-confirm" @click="confirmSubscribe" :disabled="!subscribeInput">
+            <button class="btn-confirm" :disabled="!subscribeInput" @click="confirmSubscribe">
               确认添加 ❤️
             </button>
           </div>
         </div>
       </div>
     </transition>
-
   </div>
 </template>
 
 <script>
-import { ref, computed, onMounted, onUnmounted, reactive, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
-import { apiMethods } from '@/utils/api'
+import { ref, computed, onMounted, onUnmounted, reactive, nextTick } from "vue"
+import { useRouter } from "vue-router"
+import { apiMethods } from "@/utils/api"
 
 export default {
-  name: 'JsNamesAnimeTheme',
+  name: "JsNamesAnimeTheme",
   setup() {
     const router = useRouter()
-    
+
     // 数据状态
     const pluginData = ref([])
     const isUpdating = reactive({})
-    let carouselTimer = null
+    const carouselTimer = null
 
     // 交互状态
-    const searchText = ref('')
-    const filterTab = ref('all') // 'all' or 'update'
+    const searchText = ref("")
+    const filterTab = ref("all") // 'all' or 'update'
     const showModal = ref(false)
-    const subscribeInput = ref('')
+    const subscribeInput = ref("")
     const subInputRef = ref(null)
 
     // 搜索脚本相关状态
@@ -202,27 +195,27 @@ export default {
 
     // --- 计算属性 ---
     const updateCount = computed(() => {
-      return pluginData.value.filter(i => i.Mark === '有更新').length
+      return pluginData.value.filter(i => i.Mark === "有更新").length
     })
 
     const filteredList = computed(() => {
       let list = pluginData.value
 
-      if (filterTab.value === 'update') {
-        list = list.filter(item => item.Mark === '有更新')
+      if (filterTab.value === "update") {
+        list = list.filter(item => item.Mark === "有更新")
       }
 
       if (searchText.value) {
         const key = searchText.value.toLowerCase()
-        list = list.filter(item => 
+        list = list.filter(item =>
           (item.ChineseName && item.ChineseName.toLowerCase().includes(key)) ||
-          (item.Name && item.Name.toLowerCase().includes(key))
+          (item.Name && item.Name.toLowerCase().includes(key)),
         )
       }
 
       return list.sort((a, b) => {
-        if (a.Mark === '有更新' && b.Mark !== '有更新') return -1
-        if (a.Mark !== '有更新' && b.Mark === '有更新') return 1
+        if (a.Mark === "有更新" && b.Mark !== "有更新") return -1
+        if (a.Mark !== "有更新" && b.Mark === "有更新") return 1
         return 0
       })
     })
@@ -246,44 +239,44 @@ export default {
         await apiMethods.updateJs(name)
         await loadPluginList()
       } catch (e) {
-        alert('更新失败: ' + e.message)
+        alert(`更新失败: ${e.message}`)
       } finally {
         isUpdating[name] = false
       }
     }
 
     const batchUpdate = async () => {
-      if (updateCount.value === 0) return alert('当前没有需要更新的脚本哦~')
+      if (updateCount.value === 0) return alert("当前没有需要更新的脚本哦~")
       if (!confirm(`准备好批量更新 ${updateCount.value} 个脚本了吗？`)) return
-      
+
       try {
         await apiMethods.batchUpdate()
-        alert('请求已发送，正在努力更新中...')
+        alert("请求已发送，正在努力更新中...")
         loadPluginList()
       } catch (e) {
-        alert('操作失败')
+        alert("操作失败")
       }
     }
 
     const resetRepo = async () => {
-      if (!confirm('⚠️ 警告：重置仓库会覆盖本地修改，真的要重置吗？')) return
+      if (!confirm("⚠️ 警告：重置仓库会覆盖本地修改，真的要重置吗？")) return
       try {
         await apiMethods.resetRepo()
-        alert('仓库已重置完毕')
+        alert("仓库已重置完毕")
         loadPluginList()
       } catch (e) {
-        alert('重置失败')
+        alert("重置失败")
       }
     }
 
     // --- 订阅/搜索模态框逻辑 ---
     const openSubscribeModal = () => {
-      subscribeInput.value = ''
+      subscribeInput.value = ""
       searchList.value = []
       showSearchResult.value = false
       showModal.value = true
       nextTick(() => {
-        if(subInputRef.value) subInputRef.value.focus()
+        if (subInputRef.value) subInputRef.value.focus()
       })
     }
 
@@ -298,7 +291,7 @@ export default {
     // 处理输入，带防抖的搜索
     const handleSearchInput = () => {
       if (searchTimer) clearTimeout(searchTimer)
-      
+
       const query = subscribeInput.value.trim()
       if (!query) {
         searchList.value = []
@@ -331,8 +324,8 @@ export default {
 
     // 格式化描述信息 (AAA狗粮批发~|~直接利用...)
     const formatDesc = (desc) => {
-      if (!desc) return ''
-      const parts = desc.split('~|~')
+      if (!desc) return ""
+      const parts = desc.split("~|~")
       return parts.length > 1 ? parts[1] : parts[0]
     }
 
@@ -340,22 +333,22 @@ export default {
       if (!subscribeInput.value) return
       try {
         const res = await apiMethods.subscribeScript(subscribeInput.value.trim())
-        if (res.message && res.message.includes('成功')) {
-            alert('🎉 契约签订成功！')
-            closeSubscribeModal()
-            loadPluginList()
+        if (res.message && res.message.includes("成功")) {
+          alert("🎉 契约签订成功！")
+          closeSubscribeModal()
+          loadPluginList()
         } else {
-            throw new Error(res.error || '未知错误')
+          throw new Error(res.error || "未知错误")
         }
       } catch (e) {
-        alert('订阅失败: ' + e.message)
+        alert(`订阅失败: ${e.message}`)
       }
     }
 
     const getTagClass = (mark) => {
-      if (mark === '有更新') return 'tag-update'
-      if (mark === '未知') return 'tag-unknown'
-      return 'tag-normal'
+      if (mark === "有更新") return "tag-update"
+      if (mark === "未知") return "tag-unknown"
+      return "tag-normal"
     }
 
     onMounted(() => {
@@ -393,9 +386,9 @@ export default {
       handleSearchInput,
       selectScript,
       formatDesc,
-      goHome: () => router.push('/')
+      goHome: () => router.push("/"),
     }
-  }
+  },
 }
 </script>
 
@@ -800,22 +793,22 @@ export default {
   margin-bottom: 24px;
   position: relative;
 }
-.modal-header h3 { 
-    margin: 0; 
-    font-size: 20px; 
-    color: var(--primary); 
+.modal-header h3 {
+    margin: 0;
+    font-size: 20px;
+    color: var(--primary);
     font-weight: 900;
     text-shadow: 1px 1px 0 #fff;
     flex: 1;
     text-align: center;
     margin-left: 32px; /* 平衡关闭按钮的位置 */
 }
-.close-btn { 
-  background: #FFF; 
-  border: 2px solid #FFE6EE; 
-  width: 32px; height: 32px; 
-  border-radius: 50%; 
-  color: #FB7299; 
+.close-btn {
+  background: #FFF;
+  border: 2px solid #FFE6EE;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  color: #FB7299;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s;
@@ -828,11 +821,11 @@ export default {
     margin-bottom: 24px;
 }
 
-.input-label { 
-  font-size: 14px; 
-  color: #888; 
-  margin-bottom: 8px; 
-  font-weight: bold; 
+.input-label {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 8px;
+  font-weight: bold;
   padding-left: 8px;
 }
 
@@ -865,13 +858,13 @@ export default {
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
 }
-.modal-input:focus { 
-  border-color: var(--primary); 
-  background: #FFF; 
+.modal-input:focus {
+  border-color: var(--primary);
+  background: #FFF;
   box-shadow: 0 0 0 6px rgba(251, 114, 153, 0.15);
 }
-.modal-input::placeholder { 
-  color: #ccc; font-size: 14px; 
+.modal-input::placeholder {
+  color: #ccc; font-size: 14px;
 }
 
 /* 搜索下拉 */
@@ -937,10 +930,10 @@ export default {
   pointer-events: none;
 }
 
-.modal-tips { 
-    font-size: 12px; 
-    color: #BBB; 
-    margin-top: 12px; 
+.modal-tips {
+    font-size: 12px;
+    color: #BBB;
+    margin-top: 12px;
     padding-left: 8px;
 }
 
@@ -959,25 +952,25 @@ export default {
   cursor: pointer;
   transition: all 0.2s;
 }
-.btn-cancel { 
-    background: #F2F3F5; 
-    color: #999; 
+.btn-cancel {
+    background: #F2F3F5;
+    color: #999;
 }
 .btn-cancel:hover { background: #E5E6EB; }
 
-.btn-confirm { 
+.btn-confirm {
    background: linear-gradient(90deg, #FB7299, #FF5C8A);
-   color: #FFF; 
+   color: #FFF;
    box-shadow: 0 4px 12px rgba(251, 114, 153, 0.4);
 }
-.btn-confirm:hover { 
+.btn-confirm:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(251, 114, 153, 0.5);
 }
-.btn-confirm:disabled { 
-    background: #E0E0E0; 
-    box-shadow: none; 
-    color: #AAA; 
+.btn-confirm:disabled {
+    background: #E0E0E0;
+    box-shadow: none;
+    color: #AAA;
     transform: none;
     cursor: not-allowed;
 }

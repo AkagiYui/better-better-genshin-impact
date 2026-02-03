@@ -1,7 +1,6 @@
 <template>
   <div class="anime-container">
     <div class="layout-wrapper">
-      
       <aside class="control-panel">
         <div class="panel-header">
           <h1>🌸 联机管理</h1>
@@ -16,7 +15,7 @@
             </span>
           </div>
           <div class="sakura-switch" :class="{ active: isDebugMode }" @click="isDebugMode = !isDebugMode">
-            <div class="switch-handle"></div>
+            <div class="switch-handle" />
           </div>
         </div>
 
@@ -24,9 +23,9 @@
           <div class="switch-label">
             <span>📡 在线状态</span>
           </div>
-          <div class="status-badge" @click="fetchOnlineStatus" :title="statusLoading ? '正在刷新' : '点击刷新'">
+          <div class="status-badge" :title="statusLoading ? '正在刷新' : '点击刷新'" @click="fetchOnlineStatus">
             <span v-if="statusLoading">刷新中...</span>
-            <span class="badge-online">{{ onlineStatus }}</span>  
+            <span class="badge-online">{{ onlineStatus }}</span>
             <!-- <span v-else-if="onlineStatus === true" class="badge-online">在线</span>
             <span v-else-if="onlineStatus === false" class="badge-offline">离线</span>
             <span v-else class="badge-unknown">未知</span> -->
@@ -46,27 +45,27 @@
 
         <div class="action-buttons">
           <button class="anime-btn btn-online" @click="StartOnline(null)">
-            <span class="icon">🐶</span> 
+            <span class="icon">🐶</span>
             <span>一键上线</span>
           </button>
-          
+
           <button class="anime-btn btn-refresh" @click="refreshAll">
-            <span class="icon">🔄</span> 
+            <span class="icon">🔄</span>
             <span>刷新详情</span>
           </button>
-          
+
           <button class="anime-btn btn-report" @click="openReportBomb">
-            <span class="icon">🧨</span> 
+            <span class="icon">🧨</span>
             <span>举报炸弹</span>
           </button>
-          
+
           <button class="anime-btn btn-offline" @click="offline(null)">
-            <span class="icon">💤</span> 
+            <span class="icon">💤</span>
             <span>一键下线</span>
           </button>
-          
+
           <button class="anime-btn btn-home" @click="goHome">
-            <span class="icon">🏠</span> 
+            <span class="icon">🏠</span>
             <span>返回主页</span>
           </button>
         </div>
@@ -78,30 +77,28 @@
           <p>暂无房间数据，请点击刷新...</p>
         </div>
 
-        <div class="room-grid" v-else>
-          <div 
-            v-for="(item, index) in detailList" 
-            :key="item.key || index" 
-            class="room-card"
-          >
+        <div v-else class="room-grid">
+          <div
+            v-for="(item, index) in detailList"
+            :key="item.key || index"
+            class="room-card">
             <div class="card-header">
               <h3 class="room-title">{{ item.title }}</h3>
               <span class="room-count" :class="{ 'has-people': item.count > 0 }">
                 {{ item.count }} 人在线
               </span>
             </div>
-            
+
             <p class="room-desc">{{ item.description || '暂无描述' }}</p>
 
-            <div class="divider"></div>
+            <div class="divider" />
 
             <div class="member-area">
               <div v-if="item.members && item.members.length > 0" class="member-list">
-                <div 
-                  v-for="(member, mIndex) in item.members" 
-                  :key="mIndex" 
-                  class="member-pill"
-                >
+                <div
+                  v-for="(member, mIndex) in item.members"
+                  :key="mIndex"
+                  class="member-pill">
                   <span class="avatar">👤</span>
                   <span class="name">{{ member.name }}</span>
                   <span class="status-tag" :class="member.abgi_type === 'debug' ? 'tag-debug' : 'tag-run'">
@@ -116,19 +113,18 @@
           </div>
         </div>
       </main>
-      
+
       <a-modal
         v-model:open="reportModal.open"
         title="举报炸弹"
         :confirm-loading="reportModal.loading"
         :width="isMobile ? '95vw' : 520"
         centered
-        @ok="handleReportOk"
-        @cancel="handleReportCancel"
         ok-text="提交"
         cancel-text="取消"
         class="anime-modal"
-      >
+        @ok="handleReportOk"
+        @cancel="handleReportCancel">
         <div style="display:flex; flex-direction: column; gap:12px; padding-top: 8px;">
           <div>
             <div style="font-weight:700; margin-bottom:6px;">炸弹人</div>
@@ -145,10 +141,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
-import { message, Modal } from 'ant-design-vue'
-import api, { apiMethods } from '@/utils/api'
-import { useRouter } from 'vue-router'
+import { ref, reactive, onMounted, onUnmounted } from "vue"
+import { message, Modal } from "ant-design-vue"
+import { useRouter } from "vue-router"
+import api, { apiMethods } from "@/utils/api"
 
 const isDebugMode = ref(false)
 const detailList = ref([])
@@ -161,13 +157,13 @@ const isMobile = ref(window.innerWidth <= 480)
 const reportModal = reactive({
   open: false,
   loading: false,
-  BombName: '',
-  BombAction: ''
+  BombName: "",
+  BombAction: "",
 })
 
 const openReportBomb = () => {
-  reportModal.BombName = ''
-  reportModal.BombAction = ''
+  reportModal.BombName = ""
+  reportModal.BombAction = ""
   reportModal.open = true
 }
 
@@ -177,35 +173,35 @@ const handleReportCancel = () => {
 
 const handleReportOk = async () => {
   if (!reportModal.BombName || !reportModal.BombAction) {
-    message.warning('请填写完整信息')
+    message.warning("请填写完整信息")
     return
   }
   reportModal.loading = true
   try {
     const res = await apiMethods.reportBomb({
       BombName: reportModal.BombName,
-      BombAction: reportModal.BombAction
+      BombAction: reportModal.BombAction,
     })
-    
+
     // 优先显示后端返回的 message (兼容 200 和被拦截器处理的 500)
     if (res && res.message) {
       Modal.info({
-        title: '举报结果',
+        title: "举报结果",
         content: res.message,
-        okText: '确定',
+        okText: "确定",
         width: isMobile.value ? 360 : 520,
         centered: true,
         centered: true,
-        class: 'anime-modal'
+        class: "anime-modal",
       })
     } else {
-      message.success('举报成功')
+      message.success("举报成功")
     }
 
     reportModal.open = false
   } catch (e) {
     // 处理未被拦截器转换为数据的错误
-    const errorMsg = e.response?.data?.message || e.message || '举报失败'
+    const errorMsg = e.response?.data?.message || e.message || "举报失败"
     message.error(errorMsg)
   } finally {
     reportModal.loading = false
@@ -219,7 +215,7 @@ const handleReportOk = async () => {
 //  */
 // const isWebView = () => {
 //   const ua = navigator.userAgent.toLowerCase()
-  
+
 //   // 1. 微信、QQ 等常见 APP 内核
 //   if (ua.match(/micromessenger|qq\/|weibo/i)) {
 //     return true
@@ -237,7 +233,7 @@ const handleReportOk = async () => {
 
 const fetchOnlineDetail = async () => {
   try {
-    const res = await api.get('/api/abgiSSE/getOnlineUser')
+    const res = await api.get("/api/abgiSSE/getOnlineUser")
     detailList.value = res.map(item => ({
       key: item.group_name,
       title: item.group_name,
@@ -245,22 +241,22 @@ const fetchOnlineDetail = async () => {
       count: item.count,
       members: Array.isArray(item.members) ? item.members : [],
       status: item.count > 0,
-      time: ''
+      time: "",
     }))
   } catch (e) {
-    message.error('获取联机详情失败')
+    message.error("获取联机详情失败")
   }
 }
 
 const fetchOnlineStatus = async () => {
   statusLoading.value = "未知"
   try {
-    const res = await api.get('/api/abgiSSE/getOnlineStatus')
+    const res = await api.get("/api/abgiSSE/getOnlineStatus")
     // 接口返回 true/false；确保布尔值
     onlineStatus.value = res
   } catch (e) {
-    console.error('获取在线状态失败', e)
-    message.error('获取在线状态失败')
+    console.error("获取在线状态失败", e)
+    message.error("获取在线状态失败")
     onlineStatus.value = null
   } finally {
     statusLoading.value = false
@@ -272,7 +268,7 @@ const fetchLaunchCount = async () => {
     const res = await apiMethods.getNumberOfLaunches()
     launchCount.value = res.number || 0
   } catch (e) {
-    console.error('获取上线次数失败', e)
+    console.error("获取上线次数失败", e)
   }
 }
 
@@ -283,85 +279,85 @@ const refreshAll = async () => {
 
 const clearLaunchCount = async () => {
   Modal.confirm({
-    title: '确认清零？',
-    content: '确定要清空上线次数吗？',
-    okText: '确定',
-    cancelText: '取消',
+    title: "确认清零？",
+    content: "确定要清空上线次数吗？",
+    okText: "确定",
+    cancelText: "取消",
     centered: true,
-    class: 'anime-modal',
+    class: "anime-modal",
     async onOk() {
       try {
         await apiMethods.clearNumberOfLaunches()
         Modal.destroyAll()
-        message.success('清零成功')
+        message.success("清零成功")
         fetchLaunchCount()
       } catch (e) {
-        message.error(e.message || '清零失败')
+        message.error(e.message || "清零失败")
       }
-    }
+    },
   })
 }
 
 const offline = (typeKey) => {
   Modal.confirm({
-    title: '确认下线吗？',
-    content: typeKey ? `下线【${typeKey}】？` : '确认全部下线？',
-    okText: '确定',
-    cancelText: '取消',
+    title: "确认下线吗？",
+    content: typeKey ? `下线【${typeKey}】？` : "确认全部下线？",
+    okText: "确定",
+    cancelText: "取消",
     centered: true,
-    class: 'anime-modal',
+    class: "anime-modal",
     async onOk() {
       try {
-        await apiMethods.offline(typeKey || 'all')
+        await apiMethods.offline(typeKey || "all")
         Modal.destroyAll()
-        Modal.info({ title: '下线结果', content: '下线成功', okText: '关闭', centered: true })
+        Modal.info({ title: "下线结果", content: "下线成功", okText: "关闭", centered: true })
         await fetchOnlineDetail()
         // 下线后同时刷新在线状态
         await fetchOnlineStatus()
       } catch (e) {
-        message.error(e.message || '操作失败')
+        message.error(e.message || "操作失败")
       }
-    }
+    },
   })
 }
 
 const StartOnline = (typeKey) => {
   Modal.confirm({
-    title: '确认上线吗？',
-    content: typeKey ? `上线【${typeKey}】？` : '确认一键上线？',
-    okText: '确定',
-    cancelText: '取消',
+    title: "确认上线吗？",
+    content: typeKey ? `上线【${typeKey}】？` : "确认一键上线？",
+    okText: "确定",
+    cancelText: "取消",
     centered: true,
-    class: 'anime-modal',
+    class: "anime-modal",
     async onOk() {
       try {
-        const response = await apiMethods.StartOnline(typeKey || 'noDebug', isDebugMode.value)
+        const response = await apiMethods.StartOnline(typeKey || "noDebug", isDebugMode.value)
         console.log(response)
         Modal.destroyAll()
-        Modal.info({ title: '上线结果', content: response, okText: '关闭', centered: true })
+        Modal.info({ title: "上线结果", content: response, okText: "关闭", centered: true })
         await fetchOnlineDetail()
         await fetchLaunchCount() // 上线成功后刷新上线次数
         // 上线后同时刷新在线状态
         await fetchOnlineStatus()
       } catch (e) {
         console.log("=====", e)
-        const errorMsg = e.response && e.response.data ? e.response.data : '上线失败';
+        const errorMsg = e.response && e.response.data ? e.response.data : "上线失败"
         message.error(errorMsg)
       }
-    }
+    },
   })
 }
 
 const goHome = () => {
-  router.push('/')
+  router.push("/")
 }
 
 onMounted(() => {
   const handleResize = () => {
     isMobile.value = window.innerWidth <= 480
   }
-  window.addEventListener('resize', handleResize)
-  
+  window.addEventListener("resize", handleResize)
+
   // // === 在这里进行拦截 ===
   // if (isWebView()) {
   //   // 暴力替换整个页面内容
@@ -385,7 +381,7 @@ onMounted(() => {
   //   // 阻止后续逻辑执行
   //   return
   // }
-  
+
   // 正常环境则加载数据
   fetchOnlineDetail()
   fetchLaunchCount()
@@ -395,7 +391,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   const handleResize = () => {}
-  window.removeEventListener('resize', handleResize)
+  window.removeEventListener("resize", handleResize)
 })
 
 </script>
@@ -407,7 +403,7 @@ onUnmounted(() => {
 .anime-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #fff0f5 0%, #e6f7ff 100%);
-  background-image: 
+  background-image:
     radial-gradient(#ffc0cb 15%, transparent 16%),
     radial-gradient(#87ceeb 15%, transparent 16%);
   background-size: 30px 30px;
@@ -840,7 +836,7 @@ onUnmounted(() => {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .control-panel {
     width: 100%;
     position: relative;
@@ -849,7 +845,7 @@ onUnmounted(() => {
     padding: 20px;
     box-sizing: border-box;
   }
-  
+
   .action-buttons {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -866,16 +862,16 @@ onUnmounted(() => {
   .anime-container {
     padding: 10px;
   }
-  
+
   .panel-header h1 {
     font-size: 22px;
   }
-  
+
   /* 手机端按钮两行排列 */
   .action-buttons {
     grid-template-columns: 1fr 1fr;
   }
-  
+
   .room-grid {
     grid-template-columns: 1fr; /* 手机端单列 */
   }

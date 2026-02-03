@@ -26,28 +26,25 @@
             <td class="path-cell">
               <div class="path-scroll">
                 <!-- 级联选择替换输入框 -->
-                <a-cascader
+                <ACascader
                   v-model:value="item.folderName"
                   :options="cascaderOptions"
                   placeholder="请选择地图追踪文件夹路径"
                   change-on-select
-                  style="width: 95%;"
-                />
+                  style="width: 95%;" />
               </div>
             </td>
             <td>
               <button
                 :disabled="savingIdx === idx"
-                @click="updateSingle(idx)"
-              >
+                @click="updateSingle(idx)">
                 {{ savingIdx === idx ? '新增或者更新中...' : '新增或者更新' }}
               </button>
               <!-- 新增清理按钮（每行） -->
               <button
                 :disabled="cleaningIdx === idx"
-                @click="cleanSingle(idx)"
                 style="margin-left:8px;"
-              >
+                @click="cleanSingle(idx)">
                 {{ cleaningIdx === idx ? '清理中...' : '清理' }}
               </button>
             </td>
@@ -70,35 +67,32 @@
           <div class="mobile-row">
             <span class="mobile-label">地图追踪文件夹：</span>
             <!-- 级联选择替换输入框 -->
-            <a-cascader
+            <ACascader
               v-model:value="item.folderName"
               :options="cascaderOptions"
               placeholder="请选择地图追踪文件夹路径"
               change-on-select
-              style="width: 100%;"
-            />
+              style="width: 100%;" />
           </div>
           <div class="mobile-row">
             <button
               :disabled="savingIdx === idx"
-              @click="updateSingle(idx)"
               class="mobile-btn"
-            >
+              @click="updateSingle(idx)">
               {{ savingIdx === idx ? '新增或者更新中...' : '新增或者更新' }}
             </button>
             <!-- 新增清理按钮（移动端每卡片） -->
             <button
               :disabled="cleaningIdx === idx"
-              @click="cleanSingle(idx)"
               class="mobile-btn"
               style="margin-left:8px;"
-            >
+              @click="cleanSingle(idx)">
               {{ cleaningIdx === idx ? '清理中...' : '清理' }}
             </button>
           </div>
         </div>
       </div>
-      <button type="button" @click="addPathing" style="margin-top:16px;">添加地图追踪</button>
+      <button type="button" style="margin-top:16px;" @click="addPathing">添加地图追踪</button>
       <!-- 新增保存·按钮 -->
       <!-- <button
         type="button"
@@ -110,7 +104,7 @@
       </button> -->
 
       <!-- 刷新按钮 -->
-        <!-- <button
+      <!-- <button
         type="button"
         @click="ListPathingUpdatePaths()"
         :disabled="refresh"
@@ -118,15 +112,14 @@
       >
         {{ refresh ? '刷新中...' : '刷新' }}
       </button> -->
-
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { apiMethods } from '@/utils/api'
-import { Cascader as ACascader,message, Modal } from "ant-design-vue"
+import { ref, onMounted } from "vue"
+import { Cascader as ACascader, message, Modal } from "ant-design-vue"
+import { apiMethods } from "@/utils/api"
 
 
 const pathingList = ref([])
@@ -142,15 +135,15 @@ const cascaderOptions = ref([]) // 级联选择用数据
 const fetchPathing = async () => {
   loading.value = true
   try {
-    const res = await fetch('/api/scriptGroup/ConfigPathing')
+    const res = await fetch("/api/scriptGroup/ConfigPathing")
     const json = await res.json()
     // folderName字符串转数组
     pathingList.value = (json.data || []).map(item => ({
       ...item,
-      folderName: item.folderName ? item.folderName.split('\\') : []
+      folderName: item.folderName ? item.folderName.split("\\") : [],
     }))
   } catch (e) {
-    alert('加载路径配置失败')
+    alert("加载路径配置失败")
     pathingList.value = []
   } finally {
     loading.value = false
@@ -164,10 +157,10 @@ const fetchConfigOptions = async () => {
     // 直接用字符串数组
     configOptions.value = (response || []).map(item => ({
       label: item,
-      value: item
+      value: item,
     }))
   } catch (error) {
-    console.error('获取配置选项失败:', error)
+    console.error("获取配置选项失败:", error)
   }
 }
 
@@ -177,19 +170,19 @@ function convertToCascaderOptions(data) {
   return data.map(item => ({
     label: item.fileName,
     value: item.fileName,
-    children: item.fileNameChild ? convertToCascaderOptions(item.fileNameChild) : undefined
+    children: item.fileNameChild ? convertToCascaderOptions(item.fileNameChild) : undefined,
   }))
 }
 
 // 获取地图追踪文件夹选项（递归结构）
 const fetchPathOptions = async () => {
   try {
-    const res = await fetch('/api/scriptGroup/listAllGroups')
+    const res = await fetch("/api/scriptGroup/listAllGroups")
     const json = await res.json()
     pathOptions.value = json.data || []
     cascaderOptions.value = convertToCascaderOptions(pathOptions.value)
   } catch (error) {
-    console.error('获取地图追踪路径失败:', error)
+    console.error("获取地图追踪路径失败:", error)
     pathOptions.value = []
     cascaderOptions.value = []
   }
@@ -214,7 +207,7 @@ function isLastLevel(arr) {
 const updateSingle = async (idx) => {
   const item = pathingList.value[idx]
   if (!isLastLevel(item.folderName)) {
-    alert('请将地图追踪文件夹路径选择到最后一级！')
+    alert("请将地图追踪文件夹路径选择到最后一级！")
     return // 直接返回，不做任何更新操作
   }
   savingIdx.value = idx
@@ -223,23 +216,23 @@ const updateSingle = async (idx) => {
     const payload = {
       ...pathingList.value[idx],
       folderName: Array.isArray(pathingList.value[idx].folderName)
-        ? pathingList.value[idx].folderName.join('\\')
-        : pathingList.value[idx].folderName
+        ? pathingList.value[idx].folderName.join("\\")
+        : pathingList.value[idx].folderName,
     }
-    const res = await fetch('/api/scriptGroup/UpdatePathing', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+    const res = await fetch("/api/scriptGroup/UpdatePathing", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
     })
     const json = await res.json()
-    if (json.status === 'success') {
-      alert(json.data || '保存成功')
+    if (json.status === "success") {
+      alert(json.data || "保存成功")
       await fetchPathing()
     } else {
-      alert(json.data || '保存失败')
+      alert(json.data || "保存失败")
     }
   } catch (e) {
-    alert('保存失败')
+    alert("保存失败")
   } finally {
     savingIdx.value = -1
   }
@@ -247,20 +240,20 @@ const updateSingle = async (idx) => {
 
 const ListPathingUpdatePaths = async () => {
   Modal.confirm({
-    title: '确认刷新？',
-    content: '刷新将会重新读取配置？',
-    okText: '确定',
-    cancelText: '取消',
+    title: "确认刷新？",
+    content: "刷新将会重新读取配置？",
+    okText: "确定",
+    cancelText: "取消",
     onOk: async () => {
       try {
         await apiMethods.listPathingUpdatePaths()
-        message.success('刷新成功！')
+        message.success("刷新成功！")
         // 刷新当前列表
         await fetchPathing()
       } catch (error) {
-        message.error('刷新失败！')
+        message.error("刷新失败！")
       }
-    }
+    },
   })
 }
 
@@ -268,7 +261,7 @@ const saveAll = async () => {
   // 校验所有项
   for (const item of pathingList.value) {
     if (!isLastLevel(item.folderName)) {
-      alert('请将所有地图追踪文件夹路径选择到最后一级！')
+      alert("请将所有地图追踪文件夹路径选择到最后一级！")
       savingAll.value = false
       return
     }
@@ -279,23 +272,23 @@ const saveAll = async () => {
     const payload = pathingList.value.map(item => ({
       ...item,
       folderName: Array.isArray(item.folderName)
-        ? item.folderName.join('\\')
-        : item.folderName
+        ? item.folderName.join("\\")
+        : item.folderName,
     }))
-    const res = await fetch('/api/scriptGroup/savePathing', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+    const res = await fetch("/api/scriptGroup/savePathing", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
     })
     const json = await res.json()
-    if (json.status === 'success') {
-      alert(json.message || '批量保存成功')
+    if (json.status === "success") {
+      alert(json.message || "批量保存成功")
       await fetchPathing()
     } else {
-      alert(json.msg || '批量保存失败')
+      alert(json.msg || "批量保存失败")
     }
   } catch (e) {
-    alert('批量保存失败')
+    alert("批量保存失败")
   } finally {
     savingAll.value = false
   }
@@ -309,13 +302,13 @@ const cleanSingle = async (idx) => {
     const payload = {
       ...item,
       folderName: Array.isArray(item.folderName)
-        ? item.folderName.join('\\')
-        : item.folderName
+        ? item.folderName.join("\\")
+        : item.folderName,
     }
-    const res = await fetch('/api/scriptGroup/cleanAllPathing', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+    const res = await fetch("/api/scriptGroup/cleanAllPathing", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
     })
     let json
     try {
@@ -326,25 +319,25 @@ const cleanSingle = async (idx) => {
       try {
         json = JSON.parse(text)
       } catch {
-        json = { status: 'error', msg: text }
+        json = { status: "error", msg: text }
       }
     }
-    console.log('清理返回:', json)
-    if (json.status === 'success') {
-      alert(json.message || '清理成功')
+    console.log("清理返回:", json)
+    if (json.status === "success") {
+      alert(json.message || "清理成功")
       await fetchPathing()
     } else {
-      alert(json.message || '清理失败')
+      alert(json.message || "清理失败")
     }
   } catch (e) {
-    alert('清理失败',e)
+    alert("清理失败", e)
   } finally {
     cleaningIdx.value = -1
   }
 }
 
 const addPathing = () => {
-  pathingList.value.push({ name: '', folderName: [] })
+  pathingList.value.push({ name: "", folderName: [] })
 }
 
 onMounted(() => {

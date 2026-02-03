@@ -1,16 +1,16 @@
 <template>
   <div class="app-container" :class="{ 'theme-hacker': isHackerTheme }">
-    <canvas ref="animeStars" id="bg-canvas"></canvas>
+    <canvas id="bg-canvas" ref="animeStars" />
 
     <header class="navbar">
       <div class="nav-center">
         <h1 class="page-title">BGI实时日志</h1>
-        <div class="status-dot" :class="{ active: ws && ws.readyState === 1 }"></div>
+        <div class="status-dot" :class="{ active: ws && ws.readyState === 1 }" />
       </div>
 
       <div class="nav-right">
         <div class="select-wrapper">
-          <select v-model="selectedLog" @change="onLogChange" class="glass-select">
+          <select v-model="selectedLog" class="glass-select" @change="onLogChange">
             <option value="" disabled>选择日志源...</option>
             <option v-for="file in logFiles" :key="file" :value="file">{{ file }}</option>
           </select>
@@ -26,39 +26,37 @@
         <div class="panel-header">
           <span class="panel-label">实时日志</span>
           <div class="window-controls">
-            <span class="dot red"></span>
-            <span class="dot yellow"></span>
-            <span class="dot green"></span>
+            <span class="dot red" />
+            <span class="dot yellow" />
+            <span class="dot green" />
           </div>
         </div>
-        <div class="log-viewport" ref="logContainer">
+        <div ref="logContainer" class="log-viewport">
           <pre class="log-text">{{ logContent }}</pre>
         </div>
       </section>
 
       <aside class="panel-section swiper-section">
         <div class="swiper-container right-bg-swiper">
-          <div class="swiper-wrapper" ref="swiperWrapper">
-          </div>
-          <div class="decorative-frame"></div>
+          <div ref="swiperWrapper" class="swiper-wrapper" />
+          <div class="decorative-frame" />
         </div>
       </aside>
     </div>
 
-    <button class="glass-btn floating-home-btn" @click="goHome" title="返回首页">
+    <button class="glass-btn floating-home-btn" title="返回首页" @click="goHome">
       <span class="icon">⌂</span>
     </button>
-
   </div>
 </template>
 
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
-import { Swiper } from 'swiper/bundle'
-import 'swiper/css/bundle'
-import { getBaseURL } from '@/utils/api' 
+import { ref, onMounted, onUnmounted, nextTick } from "vue"
+import { useRouter } from "vue-router"
+import { Swiper } from "swiper/bundle"
+import "swiper/css/bundle"
+import { getBaseURL } from "@/utils/api"
 
 const router = useRouter()
 
@@ -66,9 +64,9 @@ const router = useRouter()
 const animeStars = ref(null)
 const logContainer = ref(null)
 const swiperWrapper = ref(null)
-const selectedLog = ref('')
+const selectedLog = ref("")
 const logFiles = ref([])
-const logContent = ref('>> System Initializing...\n>> Waiting for log selection...')
+const logContent = ref(">> System Initializing...\n>> Waiting for log selection...")
 const isHackerTheme = ref(false)
 
 // --- 常量配置 ---
@@ -76,11 +74,11 @@ const CONSTANTS = {
   STAR_COUNT: 80,
   SWIPER_CONFIG: {
     delay: 8000,
-    speed: 1200
+    speed: 1200,
   },
   STATIC_IMAGES: [], //['bd.jpg', 'ff.png', 'ng.jpg', 'sh.jpg'], // 确保这些图片在 public/img/ 下
-  IMG_CACHE_KEY: 'sys_bg_cache_v1',
-  IMG_CACHE_TTL: 604800000 // 7天
+  IMG_CACHE_KEY: "sys_bg_cache_v1",
+  IMG_CACHE_TTL: 604800000, // 7天
 }
 
 // --- WebSocket 变量 ---
@@ -98,7 +96,7 @@ let scrollRaf = 0
 
 // --- 核心逻辑 ---
 
-const goHome = () => router.push('/')
+const goHome = () => router.push("/")
 
 const toggleTheme = () => {
   isHackerTheme.value = !isHackerTheme.value
@@ -134,7 +132,7 @@ const onLogScroll = () => {
 const setupStars = () => {
   if (!animeStars.value) return
   canvas = animeStars.value
-  ctx = canvas.getContext('2d')
+  ctx = canvas.getContext("2d")
   width = window.innerWidth
   height = window.innerHeight
   canvas.width = width
@@ -153,9 +151,9 @@ const setupStars = () => {
       maxBrightness: Math.random() * 0.5 + 0.5,
       increasing: Math.random() > 0.5,
       // 颜色配置：粉色魔法 vs 绿色代码
-      color: isHacker 
-        ? (Math.random() > 0.8 ? '#0f0' : '#00ff41') 
-        : (Math.random() > 0.5 ? '#ff7eb3' : '#7afcff')
+      color: isHacker
+        ? (Math.random() > 0.8 ? "#0f0" : "#00ff41")
+        : (Math.random() > 0.5 ? "#ff7eb3" : "#7afcff"),
     })
   }
 }
@@ -182,11 +180,11 @@ const drawStars = () => {
 
     ctx.globalAlpha = star.brightness
     ctx.fillStyle = star.color
-    
+
     if (isHacker) {
       // 绘制字符
-      ctx.font = '12px monospace'
-      ctx.fillText(Math.random() > 0.5 ? '1' : '0', star.x, star.y)
+      ctx.font = "12px monospace"
+      ctx.fillText(Math.random() > 0.5 ? "1" : "0", star.x, star.y)
     } else {
       // 绘制圆点
       ctx.beginPath()
@@ -207,7 +205,7 @@ const connectWebSocket = name => {
   logContent.value = `>> 连接日志: ${name}...\n`
 
   try {
-    const protocol = location.protocol === 'https:' ? 'wss' : 'ws'
+    const protocol = location.protocol === "https:" ? "wss" : "ws"
     const wsUrl = `${getBaseURL()}/ws/${encodeURIComponent(name)}`
     ws = new WebSocket(wsUrl)
 
@@ -225,7 +223,7 @@ const connectWebSocket = name => {
       logContent.value += `\n>> [CLOSED] 连接已终止 (Code: ${e.code})`
     }
     ws.onerror = () => {
-      logContent.value += `\n>> [ERROR] 连接失败.`
+      logContent.value += "\n>> [ERROR] 连接失败."
     }
   } catch (err) {
     logContent.value += `\n>> [FATAL] 连接失败: ${err.message}`
@@ -235,19 +233,19 @@ const connectWebSocket = name => {
 // --- 数据加载 (保持原有) ---
 const loadLogFiles = async () => {
   try {
-    const token = localStorage.getItem('bbgi-token')
-    const headers = token ? { 'Authorization': token } : {}
-    const res = await fetch(getBaseURL()+'/api/logFiles', { headers })
-    
+    const token = localStorage.getItem("bbgi-token")
+    const headers = token ? { "Authorization": token } : {}
+    const res = await fetch(`${getBaseURL()}/api/logFiles`, { headers })
+
     if (!res.ok) throw new Error(`Status ${res.status}`)
     const data = await res.json()
-    
+
     if (data.files?.length) {
       logFiles.value = data.files
       selectedLog.value = data.files[0]
       connectWebSocket(data.files[0])
     } else {
-      logContent.value = '>> No log files available.'
+      logContent.value = ">> No log files available."
     }
   } catch (err) {
     logContent.value = `>> Failed to load file list: ${err.message}`
@@ -263,19 +261,19 @@ const getImages = async () => {
   // 简单的缓存/加载逻辑
   const cached = localStorage.getItem(CONSTANTS.IMG_CACHE_KEY)
   const list = cached ? JSON.parse(cached).list : CONSTANTS.STATIC_IMAGES
-  
+
   // 渲染DOM
-  swiperWrapper.value.innerHTML = ''
+  swiperWrapper.value.innerHTML = ""
   list.forEach(src => {
-    const div = document.createElement('div')
-    div.className = 'swiper-slide'
-    const img = document.createElement('img')
+    const div = document.createElement("div")
+    div.className = "swiper-slide"
+    const img = document.createElement("img")
     img.src = `/img/${src}`
     // 使用 Object-fit: cover 保证填满1/3区域
-    img.style.width = '100%'
-    img.style.height = '100%'
-    img.style.objectFit = 'cover'
-    img.style.borderRadius = '12px'
+    img.style.width = "100%"
+    img.style.height = "100%"
+    img.style.objectFit = "cover"
+    img.style.borderRadius = "12px"
     div.appendChild(img)
     swiperWrapper.value.appendChild(div)
   })
@@ -284,16 +282,16 @@ const getImages = async () => {
 
   // 初始化 Swiper
   if (mySwiper) mySwiper.destroy()
-  mySwiper = new Swiper('.right-bg-swiper', {
-    effect: 'fade',
+  mySwiper = new Swiper(".right-bg-swiper", {
+    effect: "fade",
     fadeEffect: { crossFade: true },
     loop: true,
     speed: CONSTANTS.SWIPER_CONFIG.speed,
     autoplay: {
       delay: CONSTANTS.SWIPER_CONFIG.delay,
-      disableOnInteraction: false
+      disableOnInteraction: false,
     },
-    allowTouchMove: false // 禁止手动拖拽
+    allowTouchMove: false, // 禁止手动拖拽
   })
 }
 
@@ -314,10 +312,10 @@ onMounted(() => {
   drawStars()
   loadLogFiles()
   getImages()
-  window.addEventListener('resize', handleResize)
+  window.addEventListener("resize", handleResize)
   // 在挂载后注册日志容器的滚动监听器，用于检测用户是否手动滚动
   nextTick(() => {
-    if (logContainer.value) logContainer.value.addEventListener('scroll', onLogScroll)
+    if (logContainer.value) logContainer.value.addEventListener("scroll", onLogScroll)
   })
 })
 
@@ -325,8 +323,8 @@ onUnmounted(() => {
   if (ws) ws.close()
   if (mySwiper) mySwiper.destroy()
   if (rafId) cancelAnimationFrame(rafId)
-  window.removeEventListener('resize', handleResize)
-  if (logContainer.value) logContainer.value.removeEventListener('scroll', onLogScroll)
+  window.removeEventListener("resize", handleResize)
+  if (logContainer.value) logContainer.value.removeEventListener("scroll", onLogScroll)
 })
 </script>
 
@@ -364,7 +362,7 @@ html, body {
   --font-ui: 'Nunito', sans-serif;
   --font-code: 'JetBrains Mono', monospace;
   --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-  
+
   /* 布局修复 */
   position: relative;
   width: 100%;  /* 改用 100% 避免 vw 计算误差 */
@@ -501,7 +499,7 @@ html, body {
 }
 
 .log-section {
-  flex: 2; 
+  flex: 2;
   position: relative;
   min-width: 0; /* 防止Flex子项溢出 */
 }
@@ -660,11 +658,11 @@ html, body {
     flex: 1;
     width: 100%;
   }
-  
+
   .navbar {
     padding: 0 12px;
   }
-  
+
   .glass-select {
     min-width: 120px;
     font-size: 0.8rem;

@@ -1,649 +1,640 @@
 <template>
-    <div class="other-page">
-        <!-- 页面头部 -->
-        <header class="page-header enhanced-header">
-            <div class="header-bg"></div>
-            <div class="header-content">
-                <div class="header-logo">
-                    <span class="logo-icon">🧩</span>
-                </div>
-                <div class="header-title-group">
-                    <h1>日志分析</h1>
-                </div>
-                <button class="btn header-btn" @click="$router.push('/')">返回首页</button>
-            </div>
-            <div class="header-divider"></div>
-        </header>
+  <div class="other-page">
+    <!-- 页面头部 -->
+    <header class="page-header enhanced-header">
+      <div class="header-bg" />
+      <div class="header-content">
+        <div class="header-logo">
+          <span class="logo-icon">🧩</span>
+        </div>
+        <div class="header-title-group">
+          <h1>日志分析</h1>
+        </div>
+        <button class="btn header-btn" @click="$router.push('/')">返回首页</button>
+      </div>
+      <div class="header-divider" />
+    </header>
 
-        <!-- 书签导航 -->
-        <div v-if="analysisData.length > 0" class="bookmark-nav">
-            <div class="bookmark-header" @click="toggleBookmark">
-                <span class="bookmark-title">📑 快速导航</span>
-                <!-- <button class="bookmark-toggle"  :class="{ 'active': bookmarkVisible }">
+    <!-- 书签导航 -->
+    <div v-if="analysisData.length > 0" class="bookmark-nav">
+      <div class="bookmark-header" @click="toggleBookmark">
+        <span class="bookmark-title">📑 快速导航</span>
+        <!-- <button class="bookmark-toggle"  :class="{ 'active': bookmarkVisible }">
                   {{ bookmarkVisible ? '◀' : '▶' }}
                 </button> -->
-            </div>
-            <transition name="slide-left">
-                <div v-if="bookmarkVisible" class="bookmark-list">
-                    <div
-                            v-for="(group, index) in analysisData"
-                            :key="group.GroupName"
-                            class="bookmark-item"
-                            :class="{ 'active': currentActiveGroup === group.GroupName }"
-                            @click="scrollToGroup(group.GroupName)"
-                    >
-                        <span class="bookmark-number">{{ index + 1 }}</span>
-                        <span class="bookmark-name">{{ formatGroupName(group.GroupName) }}</span>
-                        <span class="bookmark-time">{{ group.Consuming }}</span>
-                    </div>
-                </div>
-            </transition>
+      </div>
+      <transition name="slide-left">
+        <div v-if="bookmarkVisible" class="bookmark-list">
+          <div
+            v-for="(group, index) in analysisData"
+            :key="group.GroupName"
+            class="bookmark-item"
+            :class="{ 'active': currentActiveGroup === group.GroupName }"
+            @click="scrollToGroup(group.GroupName)">
+            <span class="bookmark-number">{{ index + 1 }}</span>
+            <span class="bookmark-name">{{ formatGroupName(group.GroupName) }}</span>
+            <span class="bookmark-time">{{ group.Consuming }}</span>
+          </div>
+        </div>
+      </transition>
+    </div>
+
+    <div class="container">
+      <!-- 文件选择面板 -->
+      <section class="panel file-selector-panel">
+        <div class="file-selector-header">
+          <h3>日志文件</h3>
+          <select
+            v-model="selectedFile"
+            class="file-select"
+            :disabled="loading || logFiles.length === 0">
+            <option value="" disabled>请选择文件</option>
+            <option v-for="file in logFiles" :key="file" :value="file">
+              {{ formatFileName(file) }}
+            </option>
+          </select>
+          <button
+            class="btn view-detail-btn"
+            :disabled="!selectedFile || loading"
+            title="查看日志详情"
+            @click="viewLogDetail">
+            📄 查看详情
+          </button>
+        </div>
+      </section>
+
+      <!-- 详细日志分析 -->
+      <section v-if="analysisData.length > 0" class="panel analysis-panel">
+        <div class="panel-title">
+          <h2>📊 日志分析结果</h2>
+          <div class="stats-badge">
+            <span class="stats-count">{{ analysisData.length }}</span>
+            <span class="stats-label">个配置组</span>
+          </div>
         </div>
 
-        <div class="container">
-            <!-- 文件选择面板 -->
-            <section class="panel file-selector-panel">
-                <div class="file-selector-header">
-                    <h3>日志文件</h3>
-                    <select
-                            v-model="selectedFile"
-                            class="file-select"
-                            :disabled="loading || logFiles.length === 0"
-                    >
-                        <option value="" disabled>请选择文件</option>
-                        <option v-for="file in logFiles" :key="file" :value="file">
-                            {{ formatFileName(file) }}
-                        </option>
-                    </select>
-                    <button 
-                        class="btn view-detail-btn" 
-                        @click="viewLogDetail"
-                        :disabled="!selectedFile || loading"
-                        title="查看日志详情"
-                    >
-                        📄 查看详情
-                    </button>
-                </div>
-            </section>
+        <div class="analysis-result">
+          <div
+            v-for="(group, index) in analysisData"
+            :id="`group-${group.GroupName}`"
+            :key="group.GroupName"
+            class="group-card"
+            :style="{ '--delay': index * 0.1 + 's' }">
+            <!-- 卡片头部 - 始终可见 -->
+            <div class="group-header">
+              <div class="group-title" @click="toggleGroupDetails(group.GroupName)">
+                <div class="group-icon">🔧</div>
+                <div class="group-main-info">
+                  <h3 class="group-name">{{ group.GroupName }}</h3>
 
-            <!-- 详细日志分析 -->
-            <section v-if="analysisData.length > 0" class="panel analysis-panel">
-                <div class="panel-title">
-                    <h2>📊 日志分析结果</h2>
-                    <div class="stats-badge">
-                        <span class="stats-count">{{ analysisData.length }}</span>
-                        <span class="stats-label">个配置组</span>
-                    </div>
-                </div>
-
-                <div class="analysis-result">
-                    <div
-                            v-for="(group, index) in analysisData"
-                            :key="group.GroupName"
-                            :id="`group-${group.GroupName}`"
-                            class="group-card"
-                            :style="{ '--delay': index * 0.1 + 's' }"
-                    >
-                        <!-- 卡片头部 - 始终可见 -->
-                        <div class="group-header">
-                            <div class="group-title" @click="toggleGroupDetails(group.GroupName)">
-                                <div class="group-icon">🔧</div>
-                                <div class="group-main-info">
-                                    <h3 class="group-name">{{ group.GroupName }}</h3>
-                        
-                                <div v-for="(seg,index) in group.Segments" :key="index">
-                                 
-                                    <div class="group-time-info">
-                                        <span class="time-badge start">{{ seg.StartTime }}</span>
-                                        <span class="duration-arrow">→</span>
-                                        <span class="time-badge end">{{ seg.EndTime }}</span>
-                                        <span class="duration-badge">{{ seg.Consuming }}</span>
-                                        <span class="duration-badge" style="
-                                        background-color: #fce44d; 
+                  <div v-for="(seg,index) in group.Segments" :key="index">
+                    <div class="group-time-info">
+                      <span class="time-badge start">{{ seg.StartTime }}</span>
+                      <span class="duration-arrow">→</span>
+                      <span class="time-badge end">{{ seg.EndTime }}</span>
+                      <span class="duration-badge">{{ seg.Consuming }}</span>
+                      <span
+                        class="duration-badge"
+                        style="
+                                        background-color: #fce44d;
                                         color: #855f2d;
-                                        padding: 2px 10px; 
-                                        border-radius: 20px; 
-                                        display: inline-flex; 
-                                        align-items: center; 
+                                        padding: 2px 10px;
+                                        border-radius: 20px;
+                                        display: inline-flex;
+                                        align-items: center;
                                         font-weight: bold;
                                         border: 1px solid #e09b40;">
-                                        
-                                        <svg t="1769046672535" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1697" width="18" height="18" style="margin-right: 5px;">
-                                            <path d="M443.904 623.104a281.6 278.016 90 1 0 556.032 0 281.6 278.016 90 1 0-556.032 0Z" fill="#E09B40" p-id="1698"></path>
-                                            <path d="M721.92 604.672m-278.016 0a278.016 278.016 0 1 0 556.032 0 278.016 278.016 0 1 0-556.032 0Z" fill="#FFD151" p-id="1699"></path>
-                                            <path d="M562.688 740.352l159.744-332.288 33.792-79.36c-11.264-1.536-23.04-2.56-34.304-2.56-153.6 0-278.016 124.416-278.016 278.016 0 71.168 27.136 135.68 70.656 184.832l48.128-48.64z" fill="#FFDD99" p-id="1700"></path>
-                                            <path d="M721.92 604.672m-231.424 0a231.424 231.424 0 1 0 462.848 0 231.424 231.424 0 1 0-462.848 0Z" fill="#D39548" p-id="1701"></path>
-                                            <path d="M491.52 612.352a230.912 223.744 0 1 0 461.824 0 230.912 223.744 0 1 0-461.824 0Z" fill="#E6B141" p-id="1702"></path>
-                                            <path d="M662.016 686.592l33.28 10.752 33.28 6.144 40.448-8.704v13.824l-37.376 12.8-34.816-8.704zM668.672 549.376l33.792-10.752 32.768-6.144 40.96 8.192V527.36l-37.376-13.312-35.328 9.216z" fill="#D39548" p-id="1703"></path>
-                                            <path d="M177.152 657.408c1.536 1.024 3.584 2.048 5.12 2.56l9.728-16.896c-1.536-1.024-3.584-1.536-5.12-2.56l-9.728 16.896z" fill="#EFC04B" p-id="1711"></path>
-                                        </svg>
-                                        &nbsp;{{ seg.Mola }}
-                                    </span>
-                                    </div>
-                                </div>
-                               
-                                </div>
-                            </div>
-                            <div class="group-actions">
-                                <button class="btn archive-btn-always" @click="archiveGroup(group)" title="归档此配置组">
-                                    📥 归档
-                                </button>
-                                <button class="btn error-extract-btn" @click="extractErrors(group)" title="提取错误信息">
-                                    ⚠️ 错误提取
-                                </button>
-                                <!-- <button class="toggle-btn" @click="toggleGroupDetails(group.GroupName)">
+
+                        <svg t="1769046672535" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1697" width="18" height="18" style="margin-right: 5px;">
+                          <path d="M443.904 623.104a281.6 278.016 90 1 0 556.032 0 281.6 278.016 90 1 0-556.032 0Z" fill="#E09B40" p-id="1698" />
+                          <path d="M721.92 604.672m-278.016 0a278.016 278.016 0 1 0 556.032 0 278.016 278.016 0 1 0-556.032 0Z" fill="#FFD151" p-id="1699" />
+                          <path d="M562.688 740.352l159.744-332.288 33.792-79.36c-11.264-1.536-23.04-2.56-34.304-2.56-153.6 0-278.016 124.416-278.016 278.016 0 71.168 27.136 135.68 70.656 184.832l48.128-48.64z" fill="#FFDD99" p-id="1700" />
+                          <path d="M721.92 604.672m-231.424 0a231.424 231.424 0 1 0 462.848 0 231.424 231.424 0 1 0-462.848 0Z" fill="#D39548" p-id="1701" />
+                          <path d="M491.52 612.352a230.912 223.744 0 1 0 461.824 0 230.912 223.744 0 1 0-461.824 0Z" fill="#E6B141" p-id="1702" />
+                          <path d="M662.016 686.592l33.28 10.752 33.28 6.144 40.448-8.704v13.824l-37.376 12.8-34.816-8.704zM668.672 549.376l33.792-10.752 32.768-6.144 40.96 8.192V527.36l-37.376-13.312-35.328 9.216z" fill="#D39548" p-id="1703" />
+                          <path d="M177.152 657.408c1.536 1.024 3.584 2.048 5.12 2.56l9.728-16.896c-1.536-1.024-3.584-1.536-5.12-2.56l-9.728 16.896z" fill="#EFC04B" p-id="1711" />
+                        </svg>
+                        &nbsp;{{ seg.Mola }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="group-actions">
+                <button class="btn archive-btn-always" title="归档此配置组" @click="archiveGroup(group)">
+                  📥 归档
+                </button>
+                <button class="btn error-extract-btn" title="提取错误信息" @click="extractErrors(group)">
+                  ⚠️ 错误提取
+                </button>
+                <!-- <button class="toggle-btn" @click="toggleGroupDetails(group.GroupName)">
                                   <span v-if="expandedGroups.includes(group.GroupName)" style="color: #ff6eb4;">📖 收起</span>
                                   <span v-else style="color: #ff6eb4;">📋 详情</span>
                                 </button> -->
-                            </div>
-                        </div>
-
-                        <!-- 卡片内容 - 可折叠 -->
-                        <transition name="slide-down">
-                            <div v-if="expandedGroups.includes(group.GroupName)" class="group-content">
-                                <div class="error-section">
-                                    <h4 class="section-title">❗ 错误汇总</h4>
-                                    <div class="error-summary" v-html="formatMap(group.ErrorSummary)"></div>
-                                </div>
-
-                                <!-- 收入汇总 -->
-                                <div  class="group-content" >
-                                    <h4 class="section-title" style="cursor: pointer;" @click="lookIncome">💰 查询收入汇总</h4>
-                                    <div class="error-summary income" v-html="formatMap(group.SumIncome)"></div>
-                                </div>
-
-
-                                <!-- 子任务详情 -->
-                                <div v-if="group.LogAnalysis2Json && group.LogAnalysis2Json.length > 0" class="tasks-section">
-                                    <h4 class="section-title">📝 子任务详情</h4>
-                                    <div class="tasks-grid">
-                                        <div
-                                                v-for="sub in group.LogAnalysis2Json"
-                                                :key="sub.JsonName"
-                                                class="task-card"
-                                        >
-                                            <div class="task-header">
-                                                <span class="task-icon">⚙️</span>
-                                                <h5 class="task-name">{{ sub.JsonName }}</h5>
-                                            </div>
-                                            <div class="task-details">
-                                                <div class="task-time">
-                                                    <span class="task-time-label">开始：</span>
-                                                    <span class="task-start">{{ sub.StartTime }}</span>
-                                                    <span class="task-time-label">结束：</span>
-                                                    <span class="task-end">{{ sub.EndTime }}</span>
-                                                    <span class="task-time-label">耗时：</span>
-                                                    <span class="task-duration">{{ sub.Consuming }}</span>
-                                                </div>
-                                                <div class="task-income">
-                                                    <strong>💰 收入：</strong>
-                                                    <div class="income-content" v-html="formatMap(sub.Income)"></div>
-                                                </div>
-                                                <div class="task-errors">
-                                                    <strong>⚠️ 错误：</strong>
-                                                    <div class="error-content" v-html="formatMap(sub.Errors)"></div>
-                                                    <strong>⚠️ 相关坐标：</strong>
-                                                    <div class="error-content" v-html="formatMap(sub.ErrorsMark)"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div v-else class="no-tasks">
-                                    <div class="no-tasks-icon">📭</div>
-                                    <p>暂无子任务记录</p>
-                                </div>
-                            </div>
-                        </transition>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 加载状态 -->
-            <section v-else-if="loading" class="panel">
-                <p class="loading-text">正在加载数据...</p>
-            </section>
-
-            <!-- 无数据状态 -->
-            <section v-else class="panel">
-                <p class="no-data-text">暂无数据</p>
-            </section>
-
-        </div>
-
-        <!-- 回到顶部按钮 -->
-        <button
-                class="back-to-top-btn"
-                @click="scrollToTop"
-                title="回到顶部"
-        >
-            <span class="back-to-top-icon">⬆️</span>
-            <span class="back-to-top-text">顶部</span>
-        </button>
-
-        <!-- 错误提取弹框 -->
-        <div v-if="showErrorModal" class="error-modal-overlay" @click="closeErrorModal">
-            <div class="error-modal" @click.stop>
-                <div class="error-modal-header">
-                    <h3 style="color: #ff0000;">⚠️ 错误信息提取</h3>
-                    <button class="modal-close-btn" @click="closeErrorModal">×</button>
-                </div>
-                <div class="error-modal-content">
-                    <div class="error-summary-info">
-                        <p><strong>配置组：</strong>{{ currentErrorGroup?.GroupName }}</p>
-                        <p><strong>文件：</strong>{{ selectedFile }}</p>
-                        <p><strong>错误总数：</strong>{{ extractedErrors.length }}</p>
-                    </div>
-                    
-                    <div v-if="extractedErrors.length > 0" class="error-table-container">
-                        <div class="error-table-header">
-                            <button class="copy-all-btn" @click="copyAllErrors">
-                                📋 复制全部（含汇总信息）
-                            </button>
-                        </div>
-                        <div class="error-table">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>序号</th>
-                                        <th>子任务名称</th>
-                                        <th>错误名称</th>
-                                        <th>坐标</th>
-                                        <th>次数</th>
-                                        <th>时间</th>
-                                        <th>操作</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="(error, index) in extractedErrors" :key="index">
-                                        <td>{{ index + 1 }}</td>
-                                        <td>{{ error.taskName || '未知任务' }}</td>
-                                        <td>{{ error.errorName || '未知错误' }}</td>
-                                        <td>{{ error.coordinates || '无坐标' }}</td>
-                                        <td>{{ error.count || 1 }}</td>
-                                        <td>{{ error.ErrorTime || '未知时间' }}</td>
-                                        <td>
-                                            <button class="copy-single-btn" @click="copySingleError(error, index)" title="复制此错误（含汇总信息）">
-                                                复制
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    
-                    <div v-else class="no-errors">
-                        <div class="no-errors-icon">✅</div>
-                        <p>该配置组暂无错误信息</p>
-                    </div>
-                </div>
+              </div>
             </div>
+
+            <!-- 卡片内容 - 可折叠 -->
+            <transition name="slide-down">
+              <div v-if="expandedGroups.includes(group.GroupName)" class="group-content">
+                <div class="error-section">
+                  <h4 class="section-title">❗ 错误汇总</h4>
+                  <div class="error-summary" v-html="formatMap(group.ErrorSummary)" />
+                </div>
+
+                <!-- 收入汇总 -->
+                <div class="group-content">
+                  <h4 class="section-title" style="cursor: pointer;" @click="lookIncome">💰 查询收入汇总</h4>
+                  <div class="error-summary income" v-html="formatMap(group.SumIncome)" />
+                </div>
+
+
+                <!-- 子任务详情 -->
+                <div v-if="group.LogAnalysis2Json && group.LogAnalysis2Json.length > 0" class="tasks-section">
+                  <h4 class="section-title">📝 子任务详情</h4>
+                  <div class="tasks-grid">
+                    <div
+                      v-for="sub in group.LogAnalysis2Json"
+                      :key="sub.JsonName"
+                      class="task-card">
+                      <div class="task-header">
+                        <span class="task-icon">⚙️</span>
+                        <h5 class="task-name">{{ sub.JsonName }}</h5>
+                      </div>
+                      <div class="task-details">
+                        <div class="task-time">
+                          <span class="task-time-label">开始：</span>
+                          <span class="task-start">{{ sub.StartTime }}</span>
+                          <span class="task-time-label">结束：</span>
+                          <span class="task-end">{{ sub.EndTime }}</span>
+                          <span class="task-time-label">耗时：</span>
+                          <span class="task-duration">{{ sub.Consuming }}</span>
+                        </div>
+                        <div class="task-income">
+                          <strong>💰 收入：</strong>
+                          <div class="income-content" v-html="formatMap(sub.Income)" />
+                        </div>
+                        <div class="task-errors">
+                          <strong>⚠️ 错误：</strong>
+                          <div class="error-content" v-html="formatMap(sub.Errors)" />
+                          <strong>⚠️ 相关坐标：</strong>
+                          <div class="error-content" v-html="formatMap(sub.ErrorsMark)" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div v-else class="no-tasks">
+                  <div class="no-tasks-icon">📭</div>
+                  <p>暂无子任务记录</p>
+                </div>
+              </div>
+            </transition>
+          </div>
         </div>
+      </section>
 
+      <!-- 加载状态 -->
+      <section v-else-if="loading" class="panel">
+        <p class="loading-text">正在加载数据...</p>
+      </section>
 
+      <!-- 无数据状态 -->
+      <section v-else class="panel">
+        <p class="no-data-text">暂无数据</p>
+      </section>
     </div>
+
+    <!-- 回到顶部按钮 -->
+    <button
+      class="back-to-top-btn"
+      title="回到顶部"
+      @click="scrollToTop">
+      <span class="back-to-top-icon">⬆️</span>
+      <span class="back-to-top-text">顶部</span>
+    </button>
+
+    <!-- 错误提取弹框 -->
+    <div v-if="showErrorModal" class="error-modal-overlay" @click="closeErrorModal">
+      <div class="error-modal" @click.stop>
+        <div class="error-modal-header">
+          <h3 style="color: #ff0000;">⚠️ 错误信息提取</h3>
+          <button class="modal-close-btn" @click="closeErrorModal">×</button>
+        </div>
+        <div class="error-modal-content">
+          <div class="error-summary-info">
+            <p><strong>配置组：</strong>{{ currentErrorGroup?.GroupName }}</p>
+            <p><strong>文件：</strong>{{ selectedFile }}</p>
+            <p><strong>错误总数：</strong>{{ extractedErrors.length }}</p>
+          </div>
+
+          <div v-if="extractedErrors.length > 0" class="error-table-container">
+            <div class="error-table-header">
+              <button class="copy-all-btn" @click="copyAllErrors">
+                📋 复制全部（含汇总信息）
+              </button>
+            </div>
+            <div class="error-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>序号</th>
+                    <th>子任务名称</th>
+                    <th>错误名称</th>
+                    <th>坐标</th>
+                    <th>次数</th>
+                    <th>时间</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(error, index) in extractedErrors" :key="index">
+                    <td>{{ index + 1 }}</td>
+                    <td>{{ error.taskName || '未知任务' }}</td>
+                    <td>{{ error.errorName || '未知错误' }}</td>
+                    <td>{{ error.coordinates || '无坐标' }}</td>
+                    <td>{{ error.count || 1 }}</td>
+                    <td>{{ error.ErrorTime || '未知时间' }}</td>
+                    <td>
+                      <button class="copy-single-btn" title="复制此错误（含汇总信息）" @click="copySingleError(error, index)">
+                        复制
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div v-else class="no-errors">
+            <div class="no-errors-icon">✅</div>
+            <p>该配置组暂无错误信息</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
-import api from '@/utils/api'
+import api from "@/utils/api"
 
 export default {
-    name: 'Other',
-    data() {
-        return {
-            logFiles: [],
-            selectedFile: '',
-            analysisData: [],
-            loading: false,
-            expandedGroups: [], // 记录展开的配置组
-            bookmarkVisible: false, // 书签是否可见，默认折叠
-            currentActiveGroup: '', // 当前活跃的配置组
-            showErrorModal: false, // 控制错误提取弹框的显示
-            currentErrorGroup: null, // 当前正在提取错误的配置组
-            extractedErrors: [] // 提取到的错误信息
-        }
-    },
-    async mounted() {
-        await this.loadLogFiles()
-    },
-    watch: {
-        // 监听 selectedFile 变化，自动加载分析数据
-        selectedFile(newVal, oldVal) {
-            if (newVal && newVal !== oldVal) {
-                this.loadAnalysisData()
-            }
-        }
-    },
-    methods: {
-        // 加载日志文件列表
-        async loadLogFiles() {
-            try {
-                const response = await api.get('/api/logFiles')
-                this.logFiles = response.files || []
-                if (this.logFiles.length > 0) {
-                    this.selectedFile = this.logFiles[0] // 默认选择最新的文件
-                    // 不再这里调用 loadAnalysisData，交由 watch 处理
-                }
-            } catch (error) {
-                console.error('加载日志文件列表失败:', error)
-                this.$message?.error('加载日志文件列表失败')
-            }
-        },
-
-        // 加载分析数据
-        async loadAnalysisData() {
-            if (!this.selectedFile) return
-
-            this.loading = true
-            try {
-
-                const response = await api.get(`/api/LogAnalysis2Page?file=${encodeURIComponent(this.selectedFile)}`)
-                this.analysisData = response.data || []
-                // 重置当前活跃组和展开状态
-                this.currentActiveGroup = ''
-                this.expandedGroups = []
-            } catch (error) {
-                console.error('加载分析数据失败:', error)
-                this.$message?.error('加载分析数据失败')
-            } finally {
-                this.loading = false
-            }
-        },
-
-        // 归档配置组
-        async archiveGroup(group) {
-    
-            try {
-                const archiveItem = {
-                    GroupName: group.GroupName,
-                    Segments: group.Segments
-                }
-
-                const response = await api.post('/api/archive', archiveItem)
-                this.$message?.success('归档成功: ' + response)
-            } catch (error) {
-                console.error('归档失败:', error)
-                this.$message?.error('归档失败')
-            }
-        },
-
-        // 格式化映射数据
-        formatMap(mapData) {
-            if (!mapData || Object.keys(mapData).length === 0) {
-                return '(无记录)'
-            }
-            return Object.entries(mapData)
-                .map(([k, v]) => `- ${k}：${v}`)
-                .join('<br>')
-        },
-
-        // 格式化文件名显示
-        formatFileName(fileName) {
-            if (!fileName) return ''
-
-            // 如果文件名太长，显示省略号
-            if (fileName.length > 50) {
-                return fileName.substring(0, 47) + '...'
-            }
-            return fileName
-        },
-
-        // 切换配置组详情展开/收起 - 手风琴效果
-        toggleGroupDetails(groupName) {
-            const index = this.expandedGroups.indexOf(groupName)
-            if (index > -1) {
-                // 如果当前组已展开，则收起
-                this.expandedGroups.splice(index, 1)
-            } else {
-                // 如果当前组未展开，则收起所有其他组，只展开当前组
-                this.expandedGroups = [groupName]
-            }
-        },
-
-        // 切换书签显示/隐藏
-        toggleBookmark() {
-
-            this.bookmarkVisible = !this.bookmarkVisible
-        },
-
-        // 滚动到指定配置组
-        scrollToGroup(groupName) {
-            // 点击导航时自动展开导航
-            this.bookmarkVisible = true
-            const element = document.getElementById(`group-${groupName}`)
-            if (element) {
-                element.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start',
-                    inline: 'nearest'
-                })
-                // 设置当前活跃组
-                this.currentActiveGroup = groupName
-                // 可选：自动展开该组的详情
-                if (!this.expandedGroups.includes(groupName)) {
-                    this.expandedGroups = [groupName]
-                }
-            }
-        },
-
-        // 格式化配置组名称
-        formatGroupName(groupName) {
-            if (!groupName) return ''
-
-            // 如果名称太长，显示省略号
-            if (groupName.length > 20) {
-                return groupName.substring(0, 17) + '...'
-            }
-            return groupName
-        },
-
-        // 测试点击
-        testClick() {
-
-
-            // 使用更简单有效的方法
-            try {
-                // 方法1: 滚动到页面顶部元素
-                const pageHeader = document.querySelector('.page-header')
-                if (pageHeader) {
-                    pageHeader.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    })
-                }
-
-                // 方法2: 直接设置滚动位置
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                })
-
-                // 方法3: 备用方案
-                document.documentElement.scrollTop = 0
-                document.body.scrollTop = 0
-
-            } catch (error) {
-                console.error('滚动失败:', error)
-            }
-        },
-
-        // 回到顶部
-        scrollToTop() {
-            console.log('回到顶部按钮被点击')
-            try {
-                // 方法1: 滚动到页面顶部元素
-                const pageHeader = document.querySelector('.page-header')
-                if (pageHeader) {
-                    pageHeader.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    })
-                }
-
-                // 方法2: 直接设置滚动位置
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                })
-
-                // 方法3: 备用方案
-                document.documentElement.scrollTop = 0
-                document.body.scrollTop = 0
-
-            } catch (error) {
-                console.error('滚动到顶部失败:', error)
-            }
-        },
-        // 查询收入汇总
-        lookIncome(){
-            const incomeElements = document.querySelectorAll('.income');
-            incomeElements.forEach(el => {
-                if (el.style.display === 'none') {
-                    el.style.display = 'block';
-                } else {
-                    el.style.display = 'none';
-                }
-            });
-        },
-        // 提取错误信息
-        extractErrors(group) {
-            this.currentErrorGroup = group; // 设置当前正在提取错误的配置组
-            this.extractedErrors = []; // 清空之前提取的错误
-            
-            // 从配置组中提取错误信息
-            const errors = [];
-            
-            // 从子任务中提取错误
-            if (group.LogAnalysis2Json && group.LogAnalysis2Json.length > 0) {
-                group.LogAnalysis2Json.forEach(subTask => {
-                    if (subTask.Errors && Object.keys(subTask.Errors).length > 0) {
-                        Object.entries(subTask.Errors).forEach(([errorName, errorCount]) => {
-                            // 坐标提取逻辑 - 直接使用 ErrorsMark 的完整内容
-                            let coordinates = '无坐标';
-                            
-                            if (subTask.ErrorsMark && Object.keys(subTask.ErrorsMark).length > 0) {
-                                // 将 ErrorsMark 对象转换为字符串格式
-                                coordinates = Object.entries(subTask.ErrorsMark)
-                                    .map(([key, value]) => `${key}: ${value}`)
-                                    .join(', ');
-                            }
-                            
-                            // 添加调试信息
-                            console.log('错误提取调试:', {
-                                taskName: subTask.JsonName,
-                                errorName: errorName,
-                                errorsMark: subTask.ErrorsMark,
-                                extractedCoordinates: coordinates,
-                                ErrorTime: subTask.ErrorTime,
-                            });
-                            
-                            errors.push({
-                                taskName: subTask.JsonName,
-                                errorName: errorName,
-                                coordinates: coordinates,
-                                count: errorCount,
-                                ErrorTime: subTask.ErrorTime,
-                            });
-                        });
-                    }
-                });
-            }
-            
-            // 从配置组级别的错误汇总中提取
-            if (group.ErrorSummary && Object.keys(group.ErrorSummary).length > 0) {
-                Object.entries(group.ErrorSummary).forEach(([errorName, errorCount]) => {
-                    // 检查是否已经添加过相同的错误
-                    const existingError = errors.find(err => err.errorName === errorName);
-                    if (!existingError) {
-                        errors.push({
-                            taskName: '配置组级别',
-                            errorName: errorName,
-                            coordinates: '无坐标',
-                            count: errorCount
-                        });
-                    }
-                });
-            }
-            
-            this.extractedErrors = errors;
-            this.showErrorModal = true; // 显示弹框
-            
-            if (errors.length > 0) {
-                this.$message?.success(`成功提取到 ${errors.length} 条错误信息！`);
-            } else {
-                this.$message?.info('该配置组暂无错误信息');
-            }
-        },
-        // 关闭错误提取弹框
-        closeErrorModal() {
-            this.showErrorModal = false;
-            this.currentErrorGroup = null;
-            this.extractedErrors = [];
-        },
-        // 复制全部错误信息
-        copyAllErrors() {
-            // 构建汇总信息
-            const summaryInfo = [
-                `配置组: ${this.currentErrorGroup?.GroupName || '未知配置组'}`,
-                `文件: ${this.selectedFile || '未知文件'}`,
-                `错误总数: ${this.extractedErrors.length}`,
-                `提取时间: ${new Date().toLocaleString()}`,
-                '======\n'
-            ].join('\n');
-            
-            // 构建错误详情
-            const errorDetails = this.extractedErrors.map(err => {
-                return `子任务: ${err.taskName || '未知任务'}, 错误: ${err.errorName || '未知错误'}, 坐标: ${err.coordinates || '无坐标'}, 次数: ${err.count || 1}\n======`;
-            }).join('\n');
-            
-            // 组合完整信息
-            const fullText = summaryInfo + errorDetails;
-            this.copyToClipboard(fullText);
-        },
-        // 复制单个错误信息
-        copySingleError(error, index) {
-            // 构建汇总信息
-            const summaryInfo = [
-                `配置组: ${this.currentErrorGroup?.GroupName || '未知配置组'}`,
-                `文件: ${this.selectedFile || '未知文件'}`,
-                `错误总数: ${this.extractedErrors.length}`,
-                `当前错误序号: ${index + 1}`,
-                `提取时间: ${new Date().toLocaleString()}`,
-                ''
-            ].join('\n');
-            
-            // 构建单个错误详情
-            const errorDetail = `子任务: ${error.taskName || '未知任务'}, 错误: ${error.errorName || '未知错误'}, 坐标: ${error.coordinates || '无坐标'}, 次数: ${error.count || 1}`;
-            
-            // 组合完整信息
-            const fullText = summaryInfo + errorDetail;
-            this.copyToClipboard(fullText);
-        },
-        // 复制到剪贴板
-        copyToClipboard(text) {
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            this.$message?.success('复制成功！（包含配置组、文件、错误总数等汇总信息）');
-        },
-        // 查看日志详情
-        viewLogDetail() {
-            if (!this.selectedFile) {
-                this.$message?.warning('请先选择一个日志文件');
-                return;
-            }
-            // 跳转到日志详情页面，传递文件名参数
-            this.$router.push({
-                path: '/logDetail',
-                query: { file: this.selectedFile }
-            });
-        }
+  name: "Other",
+  data() {
+    return {
+      logFiles: [],
+      selectedFile: "",
+      analysisData: [],
+      loading: false,
+      expandedGroups: [], // 记录展开的配置组
+      bookmarkVisible: false, // 书签是否可见，默认折叠
+      currentActiveGroup: "", // 当前活跃的配置组
+      showErrorModal: false, // 控制错误提取弹框的显示
+      currentErrorGroup: null, // 当前正在提取错误的配置组
+      extractedErrors: [], // 提取到的错误信息
     }
+  },
+  watch: {
+    // 监听 selectedFile 变化，自动加载分析数据
+    selectedFile(newVal, oldVal) {
+      if (newVal && newVal !== oldVal) {
+        this.loadAnalysisData()
+      }
+    },
+  },
+  async mounted() {
+    await this.loadLogFiles()
+  },
+  methods: {
+    // 加载日志文件列表
+    async loadLogFiles() {
+      try {
+        const response = await api.get("/api/logFiles")
+        this.logFiles = response.files || []
+        if (this.logFiles.length > 0) {
+          this.selectedFile = this.logFiles[0] // 默认选择最新的文件
+          // 不再这里调用 loadAnalysisData，交由 watch 处理
+        }
+      } catch (error) {
+        console.error("加载日志文件列表失败:", error)
+        this.$message?.error("加载日志文件列表失败")
+      }
+    },
+
+    // 加载分析数据
+    async loadAnalysisData() {
+      if (!this.selectedFile) return
+
+      this.loading = true
+      try {
+
+        const response = await api.get(`/api/LogAnalysis2Page?file=${encodeURIComponent(this.selectedFile)}`)
+        this.analysisData = response.data || []
+        // 重置当前活跃组和展开状态
+        this.currentActiveGroup = ""
+        this.expandedGroups = []
+      } catch (error) {
+        console.error("加载分析数据失败:", error)
+        this.$message?.error("加载分析数据失败")
+      } finally {
+        this.loading = false
+      }
+    },
+
+    // 归档配置组
+    async archiveGroup(group) {
+
+      try {
+        const archiveItem = {
+          GroupName: group.GroupName,
+          Segments: group.Segments,
+        }
+
+        const response = await api.post("/api/archive", archiveItem)
+        this.$message?.success(`归档成功: ${response}`)
+      } catch (error) {
+        console.error("归档失败:", error)
+        this.$message?.error("归档失败")
+      }
+    },
+
+    // 格式化映射数据
+    formatMap(mapData) {
+      if (!mapData || Object.keys(mapData).length === 0) {
+        return "(无记录)"
+      }
+      return Object.entries(mapData)
+        .map(([k, v]) => `- ${k}：${v}`)
+        .join("<br>")
+    },
+
+    // 格式化文件名显示
+    formatFileName(fileName) {
+      if (!fileName) return ""
+
+      // 如果文件名太长，显示省略号
+      if (fileName.length > 50) {
+        return `${fileName.substring(0, 47)}...`
+      }
+      return fileName
+    },
+
+    // 切换配置组详情展开/收起 - 手风琴效果
+    toggleGroupDetails(groupName) {
+      const index = this.expandedGroups.indexOf(groupName)
+      if (index > -1) {
+        // 如果当前组已展开，则收起
+        this.expandedGroups.splice(index, 1)
+      } else {
+        // 如果当前组未展开，则收起所有其他组，只展开当前组
+        this.expandedGroups = [groupName]
+      }
+    },
+
+    // 切换书签显示/隐藏
+    toggleBookmark() {
+
+      this.bookmarkVisible = !this.bookmarkVisible
+    },
+
+    // 滚动到指定配置组
+    scrollToGroup(groupName) {
+      // 点击导航时自动展开导航
+      this.bookmarkVisible = true
+      const element = document.getElementById(`group-${groupName}`)
+      if (element) {
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+          inline: "nearest",
+        })
+        // 设置当前活跃组
+        this.currentActiveGroup = groupName
+        // 可选：自动展开该组的详情
+        if (!this.expandedGroups.includes(groupName)) {
+          this.expandedGroups = [groupName]
+        }
+      }
+    },
+
+    // 格式化配置组名称
+    formatGroupName(groupName) {
+      if (!groupName) return ""
+
+      // 如果名称太长，显示省略号
+      if (groupName.length > 20) {
+        return `${groupName.substring(0, 17)}...`
+      }
+      return groupName
+    },
+
+    // 测试点击
+    testClick() {
+
+
+      // 使用更简单有效的方法
+      try {
+        // 方法1: 滚动到页面顶部元素
+        const pageHeader = document.querySelector(".page-header")
+        if (pageHeader) {
+          pageHeader.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          })
+        }
+
+        // 方法2: 直接设置滚动位置
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        })
+
+        // 方法3: 备用方案
+        document.documentElement.scrollTop = 0
+        document.body.scrollTop = 0
+
+      } catch (error) {
+        console.error("滚动失败:", error)
+      }
+    },
+
+    // 回到顶部
+    scrollToTop() {
+      console.log("回到顶部按钮被点击")
+      try {
+        // 方法1: 滚动到页面顶部元素
+        const pageHeader = document.querySelector(".page-header")
+        if (pageHeader) {
+          pageHeader.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          })
+        }
+
+        // 方法2: 直接设置滚动位置
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        })
+
+        // 方法3: 备用方案
+        document.documentElement.scrollTop = 0
+        document.body.scrollTop = 0
+
+      } catch (error) {
+        console.error("滚动到顶部失败:", error)
+      }
+    },
+    // 查询收入汇总
+    lookIncome() {
+      const incomeElements = document.querySelectorAll(".income")
+      incomeElements.forEach(el => {
+        if (el.style.display === "none") {
+          el.style.display = "block"
+        } else {
+          el.style.display = "none"
+        }
+      })
+    },
+    // 提取错误信息
+    extractErrors(group) {
+      this.currentErrorGroup = group // 设置当前正在提取错误的配置组
+      this.extractedErrors = [] // 清空之前提取的错误
+
+      // 从配置组中提取错误信息
+      const errors = []
+
+      // 从子任务中提取错误
+      if (group.LogAnalysis2Json && group.LogAnalysis2Json.length > 0) {
+        group.LogAnalysis2Json.forEach(subTask => {
+          if (subTask.Errors && Object.keys(subTask.Errors).length > 0) {
+            Object.entries(subTask.Errors).forEach(([errorName, errorCount]) => {
+              // 坐标提取逻辑 - 直接使用 ErrorsMark 的完整内容
+              let coordinates = "无坐标"
+
+              if (subTask.ErrorsMark && Object.keys(subTask.ErrorsMark).length > 0) {
+                // 将 ErrorsMark 对象转换为字符串格式
+                coordinates = Object.entries(subTask.ErrorsMark)
+                  .map(([key, value]) => `${key}: ${value}`)
+                  .join(", ")
+              }
+
+              // 添加调试信息
+              console.log("错误提取调试:", {
+                taskName: subTask.JsonName,
+                errorName: errorName,
+                errorsMark: subTask.ErrorsMark,
+                extractedCoordinates: coordinates,
+                ErrorTime: subTask.ErrorTime,
+              })
+
+              errors.push({
+                taskName: subTask.JsonName,
+                errorName: errorName,
+                coordinates: coordinates,
+                count: errorCount,
+                ErrorTime: subTask.ErrorTime,
+              })
+            })
+          }
+        })
+      }
+
+      // 从配置组级别的错误汇总中提取
+      if (group.ErrorSummary && Object.keys(group.ErrorSummary).length > 0) {
+        Object.entries(group.ErrorSummary).forEach(([errorName, errorCount]) => {
+          // 检查是否已经添加过相同的错误
+          const existingError = errors.find(err => err.errorName === errorName)
+          if (!existingError) {
+            errors.push({
+              taskName: "配置组级别",
+              errorName: errorName,
+              coordinates: "无坐标",
+              count: errorCount,
+            })
+          }
+        })
+      }
+
+      this.extractedErrors = errors
+      this.showErrorModal = true // 显示弹框
+
+      if (errors.length > 0) {
+        this.$message?.success(`成功提取到 ${errors.length} 条错误信息！`)
+      } else {
+        this.$message?.info("该配置组暂无错误信息")
+      }
+    },
+    // 关闭错误提取弹框
+    closeErrorModal() {
+      this.showErrorModal = false
+      this.currentErrorGroup = null
+      this.extractedErrors = []
+    },
+    // 复制全部错误信息
+    copyAllErrors() {
+      // 构建汇总信息
+      const summaryInfo = [
+        `配置组: ${this.currentErrorGroup?.GroupName || "未知配置组"}`,
+        `文件: ${this.selectedFile || "未知文件"}`,
+        `错误总数: ${this.extractedErrors.length}`,
+        `提取时间: ${new Date().toLocaleString()}`,
+        "======\n",
+      ].join("\n")
+
+      // 构建错误详情
+      const errorDetails = this.extractedErrors.map(err => {
+        return `子任务: ${err.taskName || "未知任务"}, 错误: ${err.errorName || "未知错误"}, 坐标: ${err.coordinates || "无坐标"}, 次数: ${err.count || 1}\n======`
+      }).join("\n")
+
+      // 组合完整信息
+      const fullText = summaryInfo + errorDetails
+      this.copyToClipboard(fullText)
+    },
+    // 复制单个错误信息
+    copySingleError(error, index) {
+      // 构建汇总信息
+      const summaryInfo = [
+        `配置组: ${this.currentErrorGroup?.GroupName || "未知配置组"}`,
+        `文件: ${this.selectedFile || "未知文件"}`,
+        `错误总数: ${this.extractedErrors.length}`,
+        `当前错误序号: ${index + 1}`,
+        `提取时间: ${new Date().toLocaleString()}`,
+        "",
+      ].join("\n")
+
+      // 构建单个错误详情
+      const errorDetail = `子任务: ${error.taskName || "未知任务"}, 错误: ${error.errorName || "未知错误"}, 坐标: ${error.coordinates || "无坐标"}, 次数: ${error.count || 1}`
+
+      // 组合完整信息
+      const fullText = summaryInfo + errorDetail
+      this.copyToClipboard(fullText)
+    },
+    // 复制到剪贴板
+    copyToClipboard(text) {
+      const textarea = document.createElement("textarea")
+      textarea.value = text
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand("copy")
+      document.body.removeChild(textarea)
+      this.$message?.success("复制成功！（包含配置组、文件、错误总数等汇总信息）")
+    },
+    // 查看日志详情
+    viewLogDetail() {
+      if (!this.selectedFile) {
+        this.$message?.warning("请先选择一个日志文件")
+        return
+      }
+      // 跳转到日志详情页面，传递文件名参数
+      this.$router.push({
+        path: "/logDetail",
+        query: { file: this.selectedFile },
+      })
+    },
+  },
 }
 </script>
 
@@ -738,7 +729,6 @@ export default {
     text-shadow: 0 2px 12px #ffc0da;
     letter-spacing: 2px;
 }
-
 
 
 .header-btn {

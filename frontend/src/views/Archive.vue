@@ -2,10 +2,10 @@
   <div class="archive-page">
     <!-- 背景：二次元中二风（纯CSS，不改逻辑） -->
     <div class="bg-layer" aria-hidden="true">
-      <div class="bg-grid"></div>
-      <div class="bg-orbs"></div>
-      <div class="bg-sparkles"></div>
-      <div class="bg-vignette"></div>
+      <div class="bg-grid" />
+      <div class="bg-orbs" />
+      <div class="bg-sparkles" />
+      <div class="bg-vignette" />
     </div>
 
     <!-- 漂浮装饰 -->
@@ -43,7 +43,7 @@
     </header>
 
     <div class="container">
-      <section class="panel cute-panel" id="archiveListPanel">
+      <section id="archiveListPanel" class="panel cute-panel">
         <div class="panel-header">
           <h2 class="cute-subtitle">
             <span class="subtitle-icon">📋</span>
@@ -79,21 +79,21 @@
           <table v-else id="archiveTable" class="cute-table desktop-table">
             <thead>
               <tr class="table-header-row">
-                <th data-key="title" @click="sortBy('title')" class="sortable-header">
+                <th data-key="title" class="sortable-header" @click="sortBy('title')">
                   <span class="th-inner">
                     <span class="th-emoji">📝</span>
                     <span class="th-text">标题</span>
-                    <span class="sort-indicator" v-if="currentSort.key === 'title'">
+                    <span v-if="currentSort.key === 'title'" class="sort-indicator">
                       {{ currentSort.asc ? '↑' : '↓' }}
                     </span>
                   </span>
                 </th>
 
-                <th data-key="execute_time" @click="sortBy('execute_time')" class="sortable-header">
+                <th data-key="execute_time" class="sortable-header" @click="sortBy('execute_time')">
                   <span class="th-inner">
                     <span class="th-emoji">⏱️</span>
                     <span class="th-text">执行时长</span>
-                    <span class="sort-indicator" v-if="currentSort.key === 'execute_time'">
+                    <span v-if="currentSort.key === 'execute_time'" class="sort-indicator">
                       {{ currentSort.asc ? '↑' : '↓' }}
                     </span>
                   </span>
@@ -123,11 +123,10 @@
                 v-for="(item, index) in sortedData"
                 :key="item.id"
                 :class="{ 'fade-out': item.deleting, 'table-row': true }"
-                :style="{ animationDelay: index * 0.06 + 's' }"
-              >
+                :style="{ animationDelay: index * 0.06 + 's' }">
                 <td class="title-cell">
                   <div class="cell-main">
-                    <span class="cell-dot" aria-hidden="true"></span>
+                    <span class="cell-dot" aria-hidden="true" />
                     <span class="cell-text" :title="item.title">{{ item.title }}</span>
                   </div>
                 </td>
@@ -140,7 +139,7 @@
                 </td>
 
                 <td class="action-cell">
-                  <button class="btn delete-btn cute-delete-btn" @click="deleteItem(item)" :disabled="item.deleting">
+                  <button class="btn delete-btn cute-delete-btn" :disabled="item.deleting" @click="deleteItem(item)">
                     <span class="delete-icon">{{ item.deleting ? '⏳' : '🗑️' }}</span>
                     <span class="delete-text">{{ item.deleting ? '删除中...' : '删除' }}</span>
                   </button>
@@ -163,8 +162,7 @@
               v-for="(item, index) in sortedData"
               :key="item.id"
               :class="{ 'fade-out': item.deleting, 'mobile-card': true }"
-              :style="{ animationDelay: index * 0.06 + 's' }"
-            >
+              :style="{ animationDelay: index * 0.06 + 's' }">
               <div class="card-header">
                 <div class="card-title">
                   <span class="title-icon">📝</span>
@@ -178,7 +176,7 @@
               </div>
 
               <div class="card-actions">
-                <button class="btn delete-btn mobile-delete-btn" @click="deleteItem(item)" :disabled="item.deleting">
+                <button class="btn delete-btn mobile-delete-btn" :disabled="item.deleting" @click="deleteItem(item)">
                   <span class="delete-icon">{{ item.deleting ? '⏳' : '🗑️' }}</span>
                   <span class="delete-text">{{ item.deleting ? '删除中...' : '删除' }}</span>
                 </button>
@@ -191,24 +189,24 @@
 
     <!-- 底部装饰 -->
     <div class="bottom-decoration" aria-hidden="true">
-      <div class="bottom-ribbon"></div>
-      <div class="bottom-glow"></div>
+      <div class="bottom-ribbon" />
+      <div class="bottom-glow" />
     </div>
   </div>
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { apiMethods } from '@/utils/api'
-import { message, Modal } from 'ant-design-vue'
+import { ref, computed, onMounted } from "vue"
+import { useRouter } from "vue-router"
+import { message, Modal } from "ant-design-vue"
+import { apiMethods } from "@/utils/api"
 
 export default {
-  name: 'Archive',
+  name: "Archive",
   setup() {
     const router = useRouter()
     const archiveData = ref([])
-    const currentSort = ref({ key: 'created_at', asc: false })
+    const currentSort = ref({ key: "created_at", asc: false })
     const loading = ref(false)
     const error = ref(null)
 
@@ -216,16 +214,16 @@ export default {
     const sortedData = computed(() => {
       const sorted = [...archiveData.value]
       sorted.sort((a, b) => {
-        const valA = String(a[currentSort.value.key] || '')
-        const valB = String(b[currentSort.value.key] || '')
+        const valA = String(a[currentSort.value.key] || "")
+        const valB = String(b[currentSort.value.key] || "")
         return currentSort.value.asc ? valA.localeCompare(valB) : valB.localeCompare(valA)
       })
       return sorted
     })
 
-          setInterval(() => {
-        debugger
-      }, 100)
+    setInterval(() => {
+      debugger
+    }, 100)
 
     // 排序方法（不改逻辑）
     const sortBy = (key) => {
@@ -246,8 +244,8 @@ export default {
         const data = await apiMethods.getArchiveList()
         archiveData.value = data
       } catch (err) {
-        console.error('加载归档列表失败:', err)
-        error.value = '加载归档列表失败，请稍后重试'
+        console.error("加载归档列表失败:", err)
+        error.value = "加载归档列表失败，请稍后重试"
         archiveData.value = []
       } finally {
         loading.value = false
@@ -267,40 +265,40 @@ export default {
           archiveData.value = archiveData.value.filter((r) => r.id !== item.id)
         }, 500)
       } catch (error) {
-        console.error('删除失败:', error)
-        alert('删除失败')
+        console.error("删除失败:", error)
+        alert("删除失败")
         item.deleting = false
       }
     }
 
     // 返回首页
     const goHome = () => {
-      router.push('/')
+      router.push("/")
     }
 
     // 全部删除归档记录（不改接口/字段/逻辑）
     const allDelete = () => {
       Modal.confirm({
-        title: '确认删除?',
-        content: '确认删除所有归档记录吗？',
-        okText: '确定',
-        cancelText: '取消',
+        title: "确认删除?",
+        content: "确认删除所有归档记录吗？",
+        okText: "确定",
+        cancelText: "取消",
         onOk: async () => {
           try {
             await apiMethods.deleteAllArchive()
-            message.success('全部归档记录已删除！')
+            message.success("全部归档记录已删除！")
             archiveData.value = []
           } catch (error) {
-            console.log('删除失败:', error)
-            message.error('删除失败，请稍后重试')
+            console.log("删除失败:", error)
+            message.error("删除失败，请稍后重试")
           }
-        }
+        },
       })
     }
 
     // 保留原函数（不改结构/调用点），避免 debugger 导致页面不可用
     const dee = async () => {
-      for (var i = 0; i <= 100; i++) {
+      for (let i = 0; i <= 100; i++) {
         // noop
       }
     }
@@ -319,9 +317,9 @@ export default {
       deleteItem,
       goHome,
       allDelete,
-      loadArchiveList
+      loadArchiveList,
     }
-  }
+  },
 }
 </script>
 
