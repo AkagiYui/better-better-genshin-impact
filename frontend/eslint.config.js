@@ -74,7 +74,6 @@ export default [
       "vue/no-unused-vars": ["warn"], // vue模板中未使用的变量
       "vue/max-attributes-per-line": ["warn", { singleline: { max: Infinity }, multiline: { max: 1 } }], // 每行最多的属性数量
       "vue/no-unused-components": ["warn"], // 未使用的组件
-      "vue/no-v-model-argument": ["warn"], // v-model 指令禁止使用参数，vue2.7中可使用
       "vue/multi-word-component-names": ["off", { ignores: [] }], // 组件名必须由多个单词组成
       "vue/order-in-components": ["warn"], // 组件属性顺序
       "vue/block-order": ["warn"], // 块顺序
