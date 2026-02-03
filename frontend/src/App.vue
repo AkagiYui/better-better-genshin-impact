@@ -1,79 +1,12 @@
 <template>
   <div id="app">
-    <!-- API BaseURL 悬浮输入框 -->
-    <div class="api-base-input-container">
-      <div class="api-base-input-wrapper">
-        <input
-          ref="baseURLInput"
-          v-model="baseURL"
-          @blur="saveBaseURL"
-          @keyup.enter="saveBaseURL"
-          placeholder="API BaseURL"
-          class="api-base-input"
-        />
-        <button @click="clearBaseURL" class="api-base-clear" title="清除">✕</button>
-      </div>
-    </div>
+    <BaseUrlInput />
     <router-view />
   </div>
 </template>
 
-<script>
-import { getBaseURL, setBaseURL } from './utils/api'
-
-export default {
-  name: 'App',
-  data() {
-    return {
-      baseURL: ''
-    }
-  },
-  mounted() {
-    // 1. 首先检查URL参数中是否有api-base
-    const urlParams = new URLSearchParams(window.location.search)
-    const apiBaseParam = urlParams.get('api-base')
-    
-    if (apiBaseParam && this.isValidURL(apiBaseParam)) {
-      // 如果URL参数中有合法的api-base，使用它
-      this.baseURL = apiBaseParam
-      setBaseURL(apiBaseParam)
-      // 清除URL参数，避免刷新时重复处理
-      const newUrl = window.location.pathname
-      window.history.replaceState({}, '', newUrl)
-    } else {
-      // 否则使用localStorage中保存的值
-      this.baseURL = getBaseURL() || ''
-    }
-  },
-  methods: {
-    saveBaseURL() {
-      const url = this.baseURL.trim()
-      if (url && this.isValidURL(url)) {
-        setBaseURL(url)
-        this.$message.success('API BaseURL 已更新')
-      } else if (url === '') {
-        setBaseURL('')
-        this.$message.info('API BaseURL 已清除，使用默认配置')
-      } else {
-        this.$message.error('请输入有效的URL')
-        this.baseURL = getBaseURL() || ''
-      }
-    },
-    clearBaseURL() {
-      this.baseURL = ''
-      setBaseURL('')
-      this.$message.info('API BaseURL 已清除，使用默认配置')
-    },
-    isValidURL(url) {
-      try {
-        new URL(url)
-        return true
-      } catch {
-        return false
-      }
-    }
-  }
-}
+<script setup>
+import BaseUrlInput from "@/components/BaseUrlInput.vue"
 </script>
 
 <style>
@@ -93,57 +26,6 @@ html, body {
   height: 100vh;
 }
 
-/* API BaseURL 悬浮输入框样式 */
-.api-base-input-container {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  z-index: 9999;
-}
-
-.api-base-input-wrapper {
-  display: flex;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  padding: 4px;
-  border: 2px solid #ff6699;
-}
-
-.api-base-input {
-  border: none;
-  outline: none;
-  padding: 6px 10px;
-  font-size: 13px;
-  width: 200px;
-  background: transparent;
-  color: #333;
-}
-
-.api-base-input::placeholder {
-  color: #999;
-}
-
-.api-base-clear {
-  border: none;
-  background: #ff6699;
-  color: white;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  transition: background 0.2s;
-  margin-left: 4px;
-}
-
-.api-base-clear:hover {
-  background: #ff4477;
-}
 
 /* =========================== */
 /* 日期选择器全局修复 - 最高优先级 */
