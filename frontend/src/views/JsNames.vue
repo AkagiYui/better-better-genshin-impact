@@ -168,7 +168,14 @@
 <script>
 import { ref, computed, onMounted, onUnmounted, reactive, nextTick } from "vue"
 import { useRouter } from "vue-router"
-import { apiMethods } from "@/api"
+import {
+  getJsNames,
+  updateJs,
+  batchUpdate,
+  resetRepo,
+  getAllScripts,
+  subscribeScript
+} from "@/api"
 
 export default {
   name: "JsNamesAnimeTheme",
@@ -224,7 +231,7 @@ export default {
 
     const loadPluginList = async () => {
       try {
-        const data = await apiMethods.getJsNames()
+        const data = await getJsNames()
         pluginData.value = data.data || []
       } catch (e) {
         console.error(e)
@@ -236,7 +243,7 @@ export default {
       if (!name) return
       isUpdating[name] = true
       try {
-        await apiMethods.updateJs(name)
+        await updateJs(name)
         await loadPluginList()
       } catch (e) {
         alert(`更新失败: ${e.message}`)
@@ -250,7 +257,7 @@ export default {
       if (!confirm(`准备好批量更新 ${updateCount.value} 个脚本了吗？`)) return
 
       try {
-        await apiMethods.batchUpdate()
+        await batchUpdate()
         alert("请求已发送，正在努力更新中...")
         loadPluginList()
       } catch (e) {
@@ -261,7 +268,7 @@ export default {
     const resetRepo = async () => {
       if (!confirm("⚠️ 警告：重置仓库会覆盖本地修改，真的要重置吗？")) return
       try {
-        await apiMethods.resetRepo()
+        await resetRepo()
         alert("仓库已重置完毕")
         loadPluginList()
       } catch (e) {
@@ -303,7 +310,7 @@ export default {
         isSearchingScript.value = true
         try {
           // 调用新增的接口
-          const res = await apiMethods.getAllScripts(query)
+          const res = await getAllScripts(query)
           if (res && res.code === 200) {
             searchList.value = res.data || []
             showSearchResult.value = true
@@ -332,7 +339,7 @@ export default {
     const confirmSubscribe = async () => {
       if (!subscribeInput.value) return
       try {
-        const res = await apiMethods.subscribeScript(subscribeInput.value.trim())
+        const res = await subscribeScript(subscribeInput.value.trim())
         if (res.message && res.message.includes("成功")) {
           alert("🎉 契约签订成功！")
           closeSubscribeModal()

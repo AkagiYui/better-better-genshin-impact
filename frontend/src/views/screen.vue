@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { apiMethods } from "@/api"
+import { getStatus } from "@/api"
 export default {
   name: "App",
   data() {
@@ -120,7 +120,7 @@ export default {
     // 获取状态信息
     async fetchStatus() {
       try {
-        const response = await apiMethods.getStatus()
+        const response = await getStatus()
         this.statusData = response.data || {}
       } catch (error) {
         console.error("获取状态信息失败:", error)

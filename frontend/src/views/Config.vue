@@ -281,7 +281,7 @@ import { message } from "ant-design-vue"
 import { QuestionCircleOutlined, PlusOutlined, DeleteOutlined } from "@ant-design/icons-vue"
 import { useRouter } from "vue-router"
 // 假设这是你的API路径，保持不变
-import { apiMethods } from "@/api"
+import { getOneLongAllName, mysPush, updateConfig } from "@/api"
 
 const router = useRouter()
 const formRef = ref()
@@ -360,7 +360,7 @@ const formData = reactive({
 // 获取配置选项
 const fetchConfigOptions = async () => {
   try {
-    const response = await apiMethods.getOneLongAllName()
+    const response = await getOneLongAllName()
     configOptions.value = response.data?.map(item => ({
       label: item.replace(".json", ""),
       value: item,
@@ -384,7 +384,7 @@ const removeLogKeyword = (index) => {
 // 加载配置
 const loadConfig = async () => {
   try {
-    const response = await apiMethods.getConfig()
+    const response = await getConfig()
     const data = response.data
     console.log(data)
 
@@ -471,7 +471,7 @@ const handleSubmit = async () => {
     }
 
     console.log("提交的配置:", payload)
-    await apiMethods.updateConfig(payload)
+    await updateConfig(payload)
     message.success("保存成功！")
     setTimeout(() => {
       router.push("/")
@@ -488,7 +488,7 @@ const handleMysPush = async () => {
   mysPushLoading.value = true
   try {
     const noticeType = formData.Notice.Type || ""
-    const res = await apiMethods.mysPush(noticeType)
+    const res = await mysPush(noticeType)
     // api.js 的响应拦截器返回的是 response.data，后端可能返回 { status, message }
     if (res && (res.status === 200 || res.status === "200")) {
       message.success("米游社签到推送设置成功")

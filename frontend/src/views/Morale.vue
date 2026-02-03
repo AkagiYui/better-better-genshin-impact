@@ -195,7 +195,7 @@
 </template>
 
 <script>
-import api from "@/api"
+import { api, getMorale, updateMorale } from "@/api"
 import { message } from "ant-design-vue"
 import locale from "ant-design-vue/es/date-picker/locale/zh_CN"
 import dayjs from "dayjs"
@@ -319,7 +319,7 @@ export default {
           date: this.filters.date,
         }
 
-        const response = await api.get("/api/BagStatistics/Morale", { params })
+        const response = await getMorale(params)
         console.log("API返回数据:", response)
         console.log("response.data:", response.data)
 
@@ -366,7 +366,7 @@ export default {
         // 显示加载提示
         const loadingMessage = message.loading("正在更新摩拉记录，请耐心等待...", 0)
 
-        const response = await api.post("/api/BagStatistics/updateMorale")
+        const response = await updateMorale()
         console.log("更新摩拉记录返回:", response)
 
         // 关闭加载提示

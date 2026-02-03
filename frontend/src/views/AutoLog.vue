@@ -315,7 +315,7 @@ import {
   SyncOutlined,
 } from "@ant-design/icons-vue"
 // 请确保路径正确
-import { apiMethods } from "@/api"
+import { queryAutoLogs } from "@/api"
 
 // 设置 dayjs 为中文
 dayjs.locale("zh-cn")
@@ -516,7 +516,7 @@ const normalizeLogs = (raw) => {
 const fetchLogs = async () => {
   loading.value = true
   try {
-    const res = await apiMethods.queryAutoLogs(selectedDate.value)
+    const res = await queryAutoLogs(selectedDate.value)
     if (res?.status === "success") {
       logs.value = normalizeLogs(res.msg).reverse()
     } else {

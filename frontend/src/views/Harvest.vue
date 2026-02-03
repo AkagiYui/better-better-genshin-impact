@@ -42,7 +42,7 @@
 <script setup>
 import { ref, onMounted } from "vue"
 import { message } from "ant-design-vue"
-import { apiMethods } from "@/api"
+import { getHarvest } from "@/api"
 
 const loading = ref(false)
 const selectedPeriod = ref("today")
@@ -95,7 +95,7 @@ const getRankColor = (rank) => {
 const refreshData = async () => {
   loading.value = true
   try {
-    const response = await apiMethods.getHarvest()
+    const response = await getHarvest()
     harvestData.value = response.data || []
   } catch (error) {
     message.error(`获取收获数据失败: ${error.message}`)

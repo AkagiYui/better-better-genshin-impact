@@ -219,7 +219,7 @@ import { ref, reactive, onMounted, onUnmounted, computed, watch, h } from "vue"
 import { message, Modal, Select } from "ant-design-vue"
 import { useRouter } from "vue-router"
 // 假设这里有您的API工具，如果报错请保留您原来的引入方式
-import { apiMethods, getBaseURL } from "@/api"
+import { mysSignIn as mysSignInApi, getBaseURL, closeBgi, backup,  sendImage as sendImageApi, indexSX, getOneLongAllName, startOneLong, getStatus, GetAppInfo } from "@/api"
 
 const router = useRouter()
 
@@ -546,7 +546,7 @@ const mysSignIn = () => {
     title: "确认签到？", content: "是否要米游社签到？", okText: "确定", cancelText: "取消",
     onOk: async () => {
       try {
-        const res = await apiMethods.mysSignIn()
+        const res = await mysSignInApi()
         Modal.info({ title: "结果", content: res.message || "发送成功" })
       } catch(e) { message.error("失败") }
     },
@@ -557,7 +557,7 @@ const handleCloseBgi = () => {
   Modal.confirm({
     title: "确认关闭？", content: "是否关闭【BGI和原神】？",
     onOk: async () => {
-      try { await apiMethods.closeBgi(); message.success("已发送关闭指令") } catch(e) { message.error("失败") }
+      try { await closeBgi(); message.success("已发送关闭指令") } catch(e) { message.error("失败") }
     },
   })
 }
@@ -571,7 +571,7 @@ const handleBackup = () => {
     centered: true, // 居中显示
     onOk: async () => {
       try {
-        await apiMethods.backup()
+        await backup()
         message.success("备份成功")
       } catch(e) {
         message.error("备份失败")
@@ -584,13 +584,13 @@ const sendImage = () => {
   Modal.confirm({
     title: "发送截图", content: "确认发送当前截图？",
     onOk: async () => {
-      try { const res = await apiMethods.sendImage(); Modal.info({ content: res.data || "成功" }) } catch(e) { message.error("失败") }
+      try { const res = await sendImageApi(); Modal.info({ content: res.data || "成功" }) } catch(e) { message.error("失败") }
     },
   })
 }
 
 const indexSXBtn = () => {
-  apiMethods.indexSX()
+  indexSX()
   refreshStatus()
   message.success("正在重启中····")
 }
@@ -625,7 +625,7 @@ const oneLongModal = reactive({ visible: false, loading: false, options: [], sel
 const handleOneLongLoad = async () => {
   try {
     oneLongModal.loading = true
-    const res = await apiMethods.getOneLongAllName()
+    const res = await getOneLongAllName()
     oneLongModal.options = res.data || []
     if (oneLongModal.options.length) oneLongModal.selectedValue = oneLongModal.options[0]
   } catch(e) { message.error("加载列表失败") } finally { oneLongModal.loading = false }
@@ -634,7 +634,7 @@ const handleOneLongOk = async () => {
   if (!oneLongModal.selectedValue) return
   try {
     oneLongModal.loading = true
-    await apiMethods.startOneLong(oneLongModal.selectedValue)
+    await startOneLong(oneLongModal.selectedValue)
     message.success(`启动 ${oneLongModal.selectedValue}`)
     oneLongModal.visible = false
   } catch(e) { message.error("启动失败") } finally { oneLongModal.loading = false }
@@ -694,7 +694,7 @@ const initSakuraAnimation = () => {
 
 const refreshStatus = async () => {
   try {
-    const res = await apiMethods.getStatus()
+    const res = await getStatus()
     Object.assign(statusData, res)
   } catch(e) { console.error(e) }
 }
@@ -752,7 +752,7 @@ onMounted(() => {
     console.log("✨ UniApp Bridge 已就绪")
     // 自动握手一次
     if (window.uni && window.uni.postMessage) {
-      const res = await apiMethods.GetAppInfo()
+      const res = await GetAppInfo()
       window.uni.postMessage({ data: res })
       console.log("✨ 已向 UniApp 发送握手消息", JSON.stringify(res))
     }

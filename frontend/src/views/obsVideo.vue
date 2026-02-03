@@ -250,7 +250,18 @@
 import { ref, onMounted, reactive, computed } from "vue"
 import dayjs from "dayjs"
 import { Modal, notification } from "ant-design-vue"
-import { apiMethods } from "@/api"
+import {
+  IsRecording,
+  GetReplayBufferStatus,
+  StartRecording,
+  StopRecording,
+  StartReplayBuffer,
+  StopReplayBuffer,
+  SaveReplayBuffer,
+  GetVideoInfo,
+  DeleteVideo as DeleteVideoApi,
+  DeleteAllVideo
+} from "@/api"
 
 function getToken() {
   return localStorage.getItem("bbgi-token") || ""
@@ -329,7 +340,7 @@ function checkConnection() {
 async function getRecordingStatus() {
   loadingStatus.gettingStatus = true
   try {
-    const res = await apiMethods.IsRecording()
+    const res = await IsRecording()
     // 如果 API 成功返回，说明连接正常
     isObsConnected.value = true
     isRecording.value = res.msg?.outputActive === true
@@ -346,7 +357,7 @@ async function getRecordingStatus() {
 async function getReplayBufferStatus() {
   loadingStatus.gettingReplayStatus = true
   try {
-    const res = await apiMethods.GetReplayBufferStatus()
+    const res = await GetReplayBufferStatus()
     isObsConnected.value = true // 更新连接状态
     isReplayBufferActive.value = res.msg?.outputActive === true
   } catch (err) {
@@ -361,7 +372,7 @@ async function startRecording() {
   if (!isObsConnected.value) return // 双重保险
   loadingStatus.starting = true
   try {
-    const res = await apiMethods.StartRecording()
+    const res = await StartRecording()
     if (res.status === "success") {
       isRecording.value = true
       setTimeout(() => getRecordingStatus(), 500)
@@ -381,7 +392,7 @@ async function stopRecording() {
   if (!isObsConnected.value) return
   loadingStatus.stopping = true
   try {
-    const res = await apiMethods.StopRecording()
+    const res = await StopRecording()
     if (res.status === "success") {
       isRecording.value = false
       setTimeout(() => getRecordingStatus(), 1000)
@@ -398,7 +409,7 @@ async function startReplayBuffer() {
   if (!isObsConnected.value) return
   loadingStatus.startingReplay = true
   try {
-    const res = await apiMethods.StartReplayBuffer()
+    const res = await StartReplayBuffer()
     if (res.status === "success") {
       isReplayBufferActive.value = true
       setTimeout(() => getReplayBufferStatus(), 500)
@@ -416,7 +427,7 @@ async function stopReplayBuffer() {
   if (!isObsConnected.value) return
   loadingStatus.stoppingReplay = true
   try {
-    const res = await apiMethods.StopReplayBuffer()
+    const res = await StopReplayBuffer()
     if (res.status === "success") {
       isReplayBufferActive.value = false
       setTimeout(() => getReplayBufferStatus(), 500)
@@ -434,7 +445,7 @@ async function saveReplayBuffer() {
   if (!isObsConnected.value) return
   loadingStatus.savingReplay = true
   try {
-    const res = await apiMethods.SaveReplayBuffer()
+    const res = await SaveReplayBuffer()
     if (res.status === "success") {
       alert("✨ 回放已保存！")
       fetchVideos()
@@ -451,7 +462,7 @@ async function saveReplayBuffer() {
 async function fetchVideos() {
   loadingStatus.fetchingVideos = true
   try {
-    const res = await apiMethods.GetVideoInfo()
+    const res = await GetVideoInfo()
     if (res.status === "success") {
       // 保存原始服务器顺序，后续可用于切换排序/恢复
       originalVideos.value = res.msg || []
@@ -509,7 +520,7 @@ async function DeleteVideo(name) {
       deletingVideoName.value = name
       loadingStatus.deletingVideo = true
       try {
-        const res = await apiMethods.DeleteVideo(name)
+        const res = await DeleteVideoApi(name)
         if (res && res.status === "success") {
           notification.success({ message: "删除成功" })
           fetchVideos()
@@ -559,7 +570,7 @@ async function confirmDeleteAll() {
 async function DeleteAllVideos() {
   loadingStatus.deletingAll = true
   try {
-    const res = await apiMethods.DeleteAllVideo()
+    const res = await DeleteAllVideo()
     if (res && res.status === "success") {
       notification.success({ message: res.message || "已删除所有视频" })
 

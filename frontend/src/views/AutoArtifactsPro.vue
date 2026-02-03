@@ -105,7 +105,7 @@ import { useRouter } from "vue-router"
 import { Swiper } from "swiper"
 import "swiper/css"
 import "swiper/css/effect-fade"
-import { apiMethods } from "@/api"
+import { getAutoArtifactsPro } from "@/api"
 
 export default {
   name: "AutoArtifactsPro",
@@ -179,7 +179,7 @@ export default {
     const loadData = async () => {
       try {
         loading.value = true
-        const data = await apiMethods.getAutoArtifactsPro()
+        const data = await getAutoArtifactsPro()
 
         if (data) {
           title.value = data.title || "AutoArtifactsPro"

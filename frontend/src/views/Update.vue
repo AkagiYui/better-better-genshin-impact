@@ -110,7 +110,14 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue"
 import { message } from "ant-design-vue"
-import { apiMethods } from "@/api"
+import {
+  aBgiGetCurrentVersion,
+  aBgiGetLastVersion,
+  aBgiUpdate,
+  aBgiGetVersions,
+  getBgiDownloadStatus,
+  downloadBgi
+} from "@/api"
 
 // --- State Definitions ---
 const currentVersion = ref("加载中...")
@@ -140,10 +147,10 @@ const refresh = async () => {
   checking.value = true
   note.value = ""
   try {
-    const cur = await apiMethods.aBgiGetCurrentVersion()
+    const cur = await aBgiGetCurrentVersion()
     currentVersion.value = cur?.version ?? cur?.data?.version ?? (typeof cur === "string" ? cur : JSON.stringify(cur))
 
-    const last = await apiMethods.aBgiGetLastVersion()
+    const last = await aBgiGetLastVersion()
     latestVersion.value = last?.version ?? last?.data?.version ?? (typeof last === "string" ? last : JSON.stringify(last))
   } catch (err) {
     message.error("获取版本信息失败")
@@ -158,7 +165,7 @@ const doUpdate = async () => {
   loading.value = true
   note.value = ""
   try {
-    await apiMethods.aBgiUpdate()
+    await aBgiUpdate()
     setTimeout(() => {
       window.location.href = "/"
     }, 3500)
@@ -178,7 +185,7 @@ const refreshBgiVersions = async () => {
   bgiLatestVersion.value = "加载中..."
   bgiCanUpdate.value = false
   try {
-    const res = await apiMethods.aBgiGetVersions()
+    const res = await aBgiGetVersions()
     if (res) {
       bgiCurrentVersion.value = res.currentVersion ?? res.current ?? bgiCurrentVersion.value
       bgiLatestVersion.value = res.lastVersion ?? res.latest ?? bgiLatestVersion.value
@@ -202,7 +209,7 @@ const startBgiPolling = () => {
   }
   bgiTimerId = setInterval(async () => {
     try {
-      const status = await apiMethods.getBgiDownloadStatus()
+      const status = await getBgiDownloadStatus()
       if (!status) return
 
       if (typeof status.percent !== "undefined") {
@@ -236,7 +243,7 @@ const downloadByUrl = () => {
   downloading.value = true
   downloadPercent.value = 0
   note.value = ""
-  apiMethods.downloadBgi()
+  downloadBgi()
     .then(() => {
       startBgiPolling()
     })
@@ -248,7 +255,7 @@ const downloadByUrl = () => {
 
 const resumeBgiDownloadIfNeeded = async () => {
   try {
-    const status = await apiMethods.getBgiDownloadStatus()
+    const status = await getBgiDownloadStatus()
     if (!status) return
     if (status.status === "downloading") {
       downloading.value = true

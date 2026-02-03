@@ -199,7 +199,7 @@
 import { ref, computed, onMounted } from "vue"
 import { useRouter } from "vue-router"
 import { message, Modal } from "ant-design-vue"
-import { apiMethods } from "@/api"
+import { getArchiveList, deleteArchive, deleteAllArchive } from "@/api"
 
 export default {
   name: "Archive",
@@ -241,7 +241,7 @@ export default {
       try {
         loading.value = true
         error.value = null
-        const data = await apiMethods.getArchiveList()
+        const data = await getArchiveList()
         archiveData.value = data
       } catch (err) {
         console.error("加载归档列表失败:", err)
@@ -258,7 +258,7 @@ export default {
 
       try {
         item.deleting = true
-        await apiMethods.deleteArchive(item.id)
+        await deleteArchive(item.id)
 
         // 添加淡出效果
         setTimeout(() => {
@@ -285,7 +285,7 @@ export default {
         cancelText: "取消",
         onOk: async () => {
           try {
-            await apiMethods.deleteAllArchive()
+            await deleteAllArchive()
             message.success("全部归档记录已删除！")
             archiveData.value = []
           } catch (error) {

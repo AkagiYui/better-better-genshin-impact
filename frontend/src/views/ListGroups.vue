@@ -184,7 +184,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue"
 import { message } from "ant-design-vue"
-import api, { apiMethods } from "@/api"
+import { getListGroups, startGroups } from "@/api"
 
 // 响应式数据
 const pageTitle = ref("配置组列表")
@@ -253,7 +253,7 @@ const startCarousel = () => {
 const loadGroups = async () => {
   loading.value = true
   try {
-    const response = await apiMethods.getListGroups()
+    const response = await getListGroups()
     if (response && response.items) {
       groups.value = response.items
       pageTitle.value = response.title || "配置组列表"
@@ -276,7 +276,7 @@ const startGroup = async (groupName) => {
   if (isStarting.value) return
   isStarting.value = true
   try {
-    await apiMethods.startGroups([groupName])
+    await startGroups([groupName])
     message.success(`已启动: ${groupName}`)
   } catch (error) {
     message.error("启动失败")
@@ -314,7 +314,7 @@ const startSelected = async () => {
   isStarting.value = true
   showLoadingOverlay.value = true
   try {
-    await apiMethods.startGroups(selectedGroups.value)
+    await startGroups(selectedGroups.value)
     message.success(`成功启动 ${selectedGroups.value.length} 个服务`)
     clearSelection()
   } catch (error) {

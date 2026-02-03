@@ -90,7 +90,7 @@
 import { ref, onMounted } from "vue"
 import { useRouter } from "vue-router"
 import { message } from "ant-design-vue"
-import { apiMethods } from "@/api"
+import { getSystemConfig, login } from "@/api"
 
 const router = useRouter()
 const formRef = ref(null)
@@ -106,7 +106,7 @@ const formState = ref({
 // 页面挂载时获取系统配置
 onMounted(async () => {
   try {
-    const response = await apiMethods.getSystemConfig()
+    const response = await getSystemConfig()
     if (response.systemName) {
       systemName.value = response.systemName
     }
@@ -145,7 +145,7 @@ const onFinish = async () => {
   errorMessage.value = ""
 
   try {
-    const response = await apiMethods.login(
+    const response = await login(
       formState.value.username,
       formState.value.password,
     )

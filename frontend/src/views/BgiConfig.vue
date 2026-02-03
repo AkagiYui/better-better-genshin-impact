@@ -121,7 +121,7 @@
 import { ref, reactive, onMounted } from "vue"
 import { message } from "ant-design-vue"
 import { useRouter } from "vue-router"
-import { apiMethods } from "@/api"
+import { getBgiConfigAll, findBgiConfig, saveBgiConfig } from "@/api"
 
 const configList = ref([])
 const currentName = ref("")
@@ -135,7 +135,7 @@ const router = useRouter()
 
 const loadConfigList = async () => {
   try {
-    const res = await apiMethods.getBgiConfigAll()
+    const res = await getBgiConfigAll()
     configList.value = Array.isArray(res.msg) ? res.msg : []
   } catch (err) {
     console.error(err)
@@ -146,7 +146,7 @@ const loadConfigList = async () => {
 const selectConfig = async (name) => {
   currentName.value = name
   try {
-    const res = await apiMethods.findBgiConfig(name)
+    const res = await findBgiConfig(name)
     const data = res.msg || {}
     // 原始数据保留到 taskList
     taskList.value = Array.isArray(data.TaskEnabledList) ? data.TaskEnabledList.map(t => ({ ...t })) : []
@@ -184,7 +184,7 @@ const saveConfig = async () => {
       Name: currentName.value,
       TaskEnabledList: orderedList,
     }
-    await apiMethods.saveBgiConfig(payload)
+    await saveBgiConfig(payload)
     message.success("保存成功")
   } catch (err) {
     console.error(err)

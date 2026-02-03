@@ -119,7 +119,7 @@
 <script setup>
 import { ref, onMounted } from "vue"
 import { Cascader as ACascader, message, Modal } from "ant-design-vue"
-import { apiMethods } from "@/api"
+import { getListGroups, listPathingUpdatePaths } from "@/api"
 
 
 const pathingList = ref([])
@@ -153,7 +153,7 @@ const fetchPathing = async () => {
 // 获取配置选项
 const fetchConfigOptions = async () => {
   try {
-    const response = await apiMethods.getListGroups()
+    const response = await getListGroups()
     // 直接用字符串数组
     configOptions.value = (response || []).map(item => ({
       label: item,
@@ -246,7 +246,7 @@ const ListPathingUpdatePaths = async () => {
     cancelText: "取消",
     onOk: async () => {
       try {
-        await apiMethods.listPathingUpdatePaths()
+        await listPathingUpdatePaths()
         message.success("刷新成功！")
         // 刷新当前列表
         await fetchPathing()

@@ -233,7 +233,16 @@ import {
   PlayCircleOutlined,
   PauseCircleOutlined,
 } from "@ant-design/icons-vue"
-import { apiMethods } from "@/api"
+import {
+  getTaskCronList,
+  getAvailableTaskCronNames,
+  addTaskCron,
+  updateTaskCron,
+  AtOnceRunTaskCron,
+  removeTaskCron,
+  pauseTaskCron,
+  resumeTaskCron
+} from "@/api"
 
 // --- 逻辑部分保持原样 ---
 
@@ -270,7 +279,7 @@ const isEditing = computed(() => editingTaskId.value !== null)
 const fetchTaskList = async () => {
   tableLoading.value = true
   try {
-    const list = await apiMethods.getTaskCronList()
+    const list = await getTaskCronList()
     taskCronList.value = Array.isArray(list)
       ? list.map(normalizeTaskCron)
       : []
@@ -284,7 +293,7 @@ const fetchTaskList = async () => {
 const fetchTaskNameOptions = async () => {
   dropdownLoading.value = true
   try {
-    const names = await apiMethods.getAvailableTaskCronNames()
+    const names = await getAvailableTaskCronNames()
     availableTaskNames.value = Array.isArray(names) ? names : []
   } catch (error) {
     message.error("获取可用任务名称失败")
@@ -321,12 +330,12 @@ const handleSubmitTask = async () => {
     }
     let res
     if (editing) {
-      res = await apiMethods.updateTaskCron({
+      res = await updateTaskCron({
         id: editingTaskId.value,
         ...payload,
       })
     } else {
-      res = await apiMethods.addTaskCron(payload)
+      res = await addTaskCron(payload)
     }
     const msg = typeof res === "string"
       ? res
@@ -392,7 +401,7 @@ const AtOnceRunTask = (type, data) => {
     centered: true, // 居中显示
     onOk: async () => {
       try {
-        const res = await apiMethods.AtOnceRunTaskCron(type, data)
+        const res = await AtOnceRunTaskCron(type, data)
         const msg = typeof res === "string" ? res : "任务指令已发送"
         message.success(msg)
         fetchTaskList()
@@ -416,7 +425,7 @@ const AtOnceRunTask = (type, data) => {
 
 const removeTask = async (id, entry_id) => {
   try {
-    const res = await apiMethods.removeTaskCron(id, entry_id)
+    const res = await removeTaskCron(id, entry_id)
     const msg = typeof res === "string" ? res : "任务已删除"
     message.success(msg)
     fetchTaskList()
@@ -435,9 +444,9 @@ const togglePause = async (record) => {
   try {
     let res
     if (paused) {
-      res = await apiMethods.resumeTaskCron(id)
+      res = await resumeTaskCron(id)
     } else {
-      res = await apiMethods.pauseTaskCron(id)
+      res = await pauseTaskCron(id)
     }
     const defaultMsg = paused ? "任务已恢复" : "任务已暂停"
     const msg = typeof res === "object" && res !== null && res.msg

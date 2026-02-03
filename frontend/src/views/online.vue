@@ -78,10 +78,7 @@
         </div>
 
         <div v-else class="room-grid">
-          <div
-            v-for="(item, index) in detailList"
-            :key="item.key || index"
-            class="room-card">
+          <div v-for="(item, index) in detailList" :key="item.key || index" class="room-card">
             <div class="card-header">
               <h3 class="room-title">{{ item.title }}</h3>
               <span class="room-count" :class="{ 'has-people': item.count > 0 }">
@@ -95,14 +92,12 @@
 
             <div class="member-area">
               <div v-if="item.members && item.members.length > 0" class="member-list">
-                <div
-                  v-for="(member, mIndex) in item.members"
-                  :key="mIndex"
-                  class="member-pill">
+                <div v-for="(member, mIndex) in item.members" :key="mIndex" class="member-pill">
                   <span class="avatar">👤</span>
                   <span class="name">{{ member.name }}</span>
                   <span class="status-tag" :class="member.abgi_type === 'debug' ? 'tag-debug' : 'tag-run'">
-                    {{ member.abgi_type === 'noDebug' ? '正常跑' : (member.abgi_type === 'debug' ? '调试中' : member.abgi_type) }}
+                    {{ member.abgi_type === 'noDebug' ? '正常跑' : (member.abgi_type === 'debug' ? '调试中' :
+                      member.abgi_type) }}
                   </span>
                 </div>
               </div>
@@ -144,7 +139,14 @@
 import { ref, reactive, onMounted, onUnmounted } from "vue"
 import { message, Modal } from "ant-design-vue"
 import { useRouter } from "vue-router"
-import api, { apiMethods } from "@/api"
+
+import {
+  reportBomb,
+  getNumberOfLaunches,
+  clearNumberOfLaunches,
+  offline as offlineApi,
+  StartOnline as StartOnlineApi,
+} from "@/api"
 
 const isDebugMode = ref(false)
 const detailList = ref([])
@@ -178,7 +180,7 @@ const handleReportOk = async () => {
   }
   reportModal.loading = true
   try {
-    const res = await apiMethods.reportBomb({
+    const res = await reportBomb({
       BombName: reportModal.BombName,
       BombAction: reportModal.BombAction,
     })
@@ -265,7 +267,7 @@ const fetchOnlineStatus = async () => {
 
 const fetchLaunchCount = async () => {
   try {
-    const res = await apiMethods.getNumberOfLaunches()
+    const res = await getNumberOfLaunches()
     launchCount.value = res.number || 0
   } catch (e) {
     console.error("获取上线次数失败", e)
@@ -287,7 +289,7 @@ const clearLaunchCount = async () => {
     class: "anime-modal",
     async onOk() {
       try {
-        await apiMethods.clearNumberOfLaunches()
+        await clearNumberOfLaunches()
         Modal.destroyAll()
         message.success("清零成功")
         fetchLaunchCount()
@@ -308,7 +310,7 @@ const offline = (typeKey) => {
     class: "anime-modal",
     async onOk() {
       try {
-        await apiMethods.offline(typeKey || "all")
+        await offlineApi(typeKey || "all")
         Modal.destroyAll()
         Modal.info({ title: "下线结果", content: "下线成功", okText: "关闭", centered: true })
         await fetchOnlineDetail()
@@ -331,7 +333,7 @@ const StartOnline = (typeKey) => {
     class: "anime-modal",
     async onOk() {
       try {
-        const response = await apiMethods.StartOnline(typeKey || "noDebug", isDebugMode.value)
+        const response = await StartOnlineApi(typeKey || "noDebug", isDebugMode.value)
         console.log(response)
         Modal.destroyAll()
         Modal.info({ title: "上线结果", content: response, okText: "关闭", centered: true })
@@ -390,7 +392,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  const handleResize = () => {}
+  const handleResize = () => { }
   window.removeEventListener("resize", handleResize)
 })
 
@@ -466,7 +468,7 @@ onUnmounted(() => {
   background: #fdfdfd;
   padding: 15px;
   border-radius: 16px;
-  box-shadow: inset 0 2px 6px rgba(0,0,0,0.04);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .status-group {
@@ -476,10 +478,14 @@ onUnmounted(() => {
   background: #fff8f9;
   padding: 12px;
   border-radius: 12px;
-  box-shadow: inset 0 1px 4px rgba(0,0,0,0.03);
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.03);
 }
 
-.status-text-small { font-size: 12px; color: #999; margin-top: 2px; }
+.status-text-small {
+  font-size: 12px;
+  color: #999;
+  margin-top: 2px;
+}
 
 .status-badge {
   min-width: 86px;
@@ -491,9 +497,23 @@ onUnmounted(() => {
   user-select: none;
 }
 
-.badge-online { background: #e6ffec; color: #237804; border: 1px solid #b7eb8f; }
-.badge-offline { background: #fff1f0; color: #cf1322; border: 1px solid #ffa39e; }
-.badge-unknown { background: #fffbe6; color: #614700; border: 1px solid #ffe58f; }
+.badge-online {
+  background: #e6ffec;
+  color: #237804;
+  border: 1px solid #b7eb8f;
+}
+
+.badge-offline {
+  background: #fff1f0;
+  color: #cf1322;
+  border: 1px solid #ffa39e;
+}
+
+.badge-unknown {
+  background: #fffbe6;
+  color: #614700;
+  border: 1px solid #ffe58f;
+}
 
 .switch-label {
   display: flex;
@@ -507,7 +527,10 @@ onUnmounted(() => {
   color: #ccc;
   margin-top: 2px;
 }
-.status-text.active { color: #ff69b4; }
+
+.status-text.active {
+  color: #ff69b4;
+}
 
 /* 自定义樱花开关 */
 .sakura-switch {
@@ -534,7 +557,7 @@ onUnmounted(() => {
   top: 3px;
   left: 3px;
   transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .sakura-switch.active .switch-handle {
@@ -621,7 +644,7 @@ onUnmounted(() => {
   justify-content: center;
   gap: 10px;
   transition: all 0.2s;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   position: relative;
   overflow: hidden;
 }
@@ -661,6 +684,7 @@ onUnmounted(() => {
   border: 2px solid #eee;
   box-shadow: none;
 }
+
 .btn-home:hover {
   background: #f8f8f8;
   border-color: #ddd;
@@ -672,29 +696,35 @@ onUnmounted(() => {
   background: #fff0f5;
   box-shadow: 0 12px 32px rgba(255, 182, 193, 0.35);
 }
+
 .anime-modal :deep(.ant-modal-header) {
   background: transparent;
   border-bottom: 2px dashed #ffb6c1;
 }
+
 .anime-modal :deep(.ant-modal-title) {
   color: #ff3385;
   text-align: center;
   font-weight: 800;
 }
+
 .anime-modal :deep(.ant-modal-footer) {
   display: flex;
   justify-content: center;
   gap: 12px;
 }
+
 .anime-modal :deep(.ant-btn) {
   border-radius: 12px;
   font-weight: 700;
 }
+
 .anime-modal :deep(.ant-btn-primary) {
   background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
   border-color: #ff85ad;
   color: #fff;
 }
+
 .anime-modal :deep(.ant-input) {
   border-radius: 12px;
   border: 2px solid #ffd6e7;
@@ -712,11 +742,16 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   padding: 60px;
-  background: rgba(255,255,255,0.6);
+  background: rgba(255, 255, 255, 0.6);
   border-radius: 20px;
   color: #aaa;
 }
-.empty-icon { font-size: 48px; margin-bottom: 10px; opacity: 0.5; }
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 10px;
+  opacity: 0.5;
+}
 
 .room-grid {
   display: grid;
@@ -763,6 +798,7 @@ onUnmounted(() => {
   border-radius: 10px;
   color: #999;
 }
+
 .room-count.has-people {
   background: #e6f7ff;
   color: #1890ff;
@@ -799,11 +835,21 @@ onUnmounted(() => {
 }
 
 .member-pill:hover {
-  background: #fff0f5; /* 浅粉色 hover */
+  background: #fff0f5;
+  /* 浅粉色 hover */
 }
 
-.avatar { margin-right: 8px; font-size: 14px; }
-.name { flex: 1; font-size: 14px; color: #555; font-weight: 600; }
+.avatar {
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+.name {
+  flex: 1;
+  font-size: 14px;
+  color: #555;
+  font-weight: 600;
+}
 
 .status-tag {
   font-size: 11px;
@@ -873,7 +919,8 @@ onUnmounted(() => {
   }
 
   .room-grid {
-    grid-template-columns: 1fr; /* 手机端单列 */
+    grid-template-columns: 1fr;
+    /* 手机端单列 */
   }
 }
 </style>
@@ -885,29 +932,35 @@ onUnmounted(() => {
   background: #fff0f5;
   box-shadow: 0 12px 32px rgba(255, 182, 193, 0.35);
 }
+
 .anime-modal .ant-modal-header {
   background: transparent;
   border-bottom: 2px dashed #ffb6c1;
 }
+
 .anime-modal .ant-modal-title {
   color: #ff3385;
   text-align: center;
   font-weight: 800;
 }
+
 .anime-modal .ant-modal-footer {
   display: flex;
   justify-content: center;
   gap: 12px;
 }
+
 .anime-modal .ant-btn {
   border-radius: 12px;
   font-weight: 700;
 }
+
 .anime-modal .ant-btn-primary {
   background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
   border-color: #ff85ad;
   color: #fff;
 }
+
 .anime-modal .ant-input {
   border-radius: 12px;
   border: 2px solid #ffd6e7;

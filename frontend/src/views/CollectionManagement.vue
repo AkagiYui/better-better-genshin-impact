@@ -376,7 +376,11 @@
 import { ref, onMounted, computed, onUnmounted } from "vue"
 import { message } from "ant-design-vue"
 import dayjs from "dayjs"
-import { apiMethods } from "@/api"
+import {
+  getAllUserFiles,
+  getCollectionManagement,
+  getPickupHistory
+} from "@/api"
 
 const loading = ref(false)
 const accountLoading = ref(false)
@@ -507,7 +511,7 @@ const formatDateDiff = (dateStr) => {
 const fetchAccountList = async () => {
   accountLoading.value = true
   try {
-    const response = await apiMethods.getAllUserFiles()
+    const response = await getAllUserFiles()
     accountList.value = response || []
 
     // 默认选中第一个账户
@@ -745,7 +749,7 @@ const refreshData = async () => {
 
   loading.value = true
   try {
-    const response = await apiMethods.getCollectionManagement(selectedAccount.value)
+    const response = await getCollectionManagement(selectedAccount.value)
 
     // 如果返回的是树形结构
     if (response && typeof response === "object") {
@@ -772,7 +776,7 @@ const refreshPickupData = async () => {
 
   pickupLoading.value = true
   try {
-    const response = await apiMethods.getPickupHistory(selectedAccount.value)
+    const response = await getPickupHistory(selectedAccount.value)
     pickupData.value = response || []
   } catch (error) {
     message.error(`获取采集历史失败: ${error.message}`)

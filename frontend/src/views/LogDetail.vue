@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import api from "@/api"
+import { api, getLogInfo } from "@/api"
 import indexHtmlContent from "@/assets/index.html?raw"
 
 export default {
@@ -69,7 +69,7 @@ export default {
       this.loading = true
       try {
         // 调用接口获取日志内容
-        const response = await api.get(`/api/logInfo?fileName=${encodeURIComponent(this.currentFileName)}`)
+        const response = await getLogInfo(this.currentFileName)
         this.logContent = response || ""
 
         // 加载 index.html 模板并注入日志内容

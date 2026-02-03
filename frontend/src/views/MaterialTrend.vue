@@ -84,7 +84,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { message } from "ant-design-vue"
 import * as echarts from "echarts"
 import { useRouter } from "vue-router"
-import { apiMethods } from "@/api"
+import { getBagStatistics } from "@/api"
 
 const loading = ref(false)
 const statistics = ref([])
@@ -163,7 +163,7 @@ const normalizeRecord = (record = {}) => {
 const fetchStatistics = async () => {
   loading.value = true
   try {
-    const response = await apiMethods.getBagStatistics()
+    const response = await getBagStatistics()
     if (!Array.isArray(response)) {
       statistics.value = []
       message.warning("未获取到材料统计数据")

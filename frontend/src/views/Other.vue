@@ -278,7 +278,7 @@
 </template>
 
 <script>
-import api from "@/api"
+import { api, getLogFiles, archive, logAnalysis2Page } from "@/api"
 
 export default {
   name: "Other",
@@ -311,7 +311,7 @@ export default {
     // 加载日志文件列表
     async loadLogFiles() {
       try {
-        const response = await api.get("/api/logFiles")
+        const response = await getLogFiles()
         this.logFiles = response.files || []
         if (this.logFiles.length > 0) {
           this.selectedFile = this.logFiles[0] // 默认选择最新的文件
@@ -330,7 +330,7 @@ export default {
       this.loading = true
       try {
 
-        const response = await api.get(`/api/LogAnalysis2Page?file=${encodeURIComponent(this.selectedFile)}`)
+        const response = await logAnalysis2Page(this.selectedFile)
         this.analysisData = response.data || []
         // 重置当前活跃组和展开状态
         this.currentActiveGroup = ""
@@ -352,7 +352,7 @@ export default {
           Segments: group.Segments,
         }
 
-        const response = await api.post("/api/archive", archiveItem)
+        const response = await archive(archiveItem)
         this.$message?.success(`归档成功: ${response}`)
       } catch (error) {
         console.error("归档失败:", error)

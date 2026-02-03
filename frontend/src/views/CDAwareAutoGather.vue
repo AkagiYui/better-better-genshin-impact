@@ -104,7 +104,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue"
-import { apiMethods } from "@/api"
+import { getCDAwareAutoGather, CDAllMaterial as CDAllMaterialApi, UpdateAllCD as UpdateAllCDApi } from "@/api"
 
 // 响应式数据
 const loading = ref(false)
@@ -210,7 +210,7 @@ const fetchData = async () => {
   error.value = ""
 
   try {
-    const response = await apiMethods.getCDAwareAutoGather(filterStatus.value)
+    const response = await getCDAwareAutoGather(filterStatus.value)
     // 为每个gather项添加expanded属性用于控制折叠状态
     const processedData = (response || []).map(account => ({
       ...account,
@@ -257,7 +257,7 @@ const refreshData = () => {
 // 是否加入背包统计
 const CDAllMaterial = async () => {
   try {
-    await apiMethods.CDAllMaterial()
+    await CDAllMaterialApi()
     fetchData()
   } catch (err) {
     console.error("CDAllMaterial失败:", err)
@@ -266,7 +266,7 @@ const CDAllMaterial = async () => {
 
 const UpdateAllCD = async () => {
   try {
-    await apiMethods.UpdateAllCD()
+    await UpdateAllCDApi()
     alert("更新成功,具体请看日志:logs/。没有更新的材料，请联系abgi")
   } catch (err) {
     console.error("CDAllMaterial失败:", err)

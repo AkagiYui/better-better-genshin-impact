@@ -124,7 +124,7 @@
 <script>
 import { ref, computed, onMounted } from "vue"
 import { Modal, message } from "ant-design-vue"
-import { apiMethods } from "@/api"
+import { getLogFiles, getLogAnalysis, addBagStatistics } from "@/api"
 
 export default {
   name: "LogAnalysis",
@@ -157,7 +157,7 @@ export default {
 
     const loadLogFiles = async () => {
       try {
-        const response = await apiMethods.getLogFiles()
+        const response = await getLogFiles()
         logFiles.value = response.files || []
 
         if (logFiles.value.length > 0) {
@@ -179,7 +179,7 @@ export default {
       error.value = ""
 
       try {
-        const data = await apiMethods.getLogAnalysis(selectedFile.value)
+        const data = await getLogAnalysis(selectedFile.value)
         // 确保返回的是数组格式
         analysisData.value = Array.isArray(data) ? data : []
       } catch (err) {
@@ -199,7 +199,7 @@ export default {
 
       addingItem.value = materialName
       try {
-        await apiMethods.addBagStatistics(materialName)
+        await addBagStatistics(materialName)
         message.success(`材料 "${materialName}" 已添加到关注列表`)
         // 添加成功后，更新本地数据的 isFocus 状态
         const item = analysisData.value.find(i => i.name === materialName)

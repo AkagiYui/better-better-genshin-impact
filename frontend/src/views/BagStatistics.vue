@@ -289,8 +289,18 @@
 
 <script>
 import { Modal, message } from "ant-design-vue"
-import { apiMethods } from "@/api"
-import api from "@/api"
+import {
+  api,
+  getBagStatistics,
+  getBlackList,
+  addBlackList,
+  deleteBlackList,
+  deleteBag,
+  eatStatistics,
+  deleteBagStatistics,
+  clearBagStatistics,
+  addBagStatistics
+} from "@/api"
 
 export default {
   name: "BagStatistics",
@@ -461,7 +471,7 @@ export default {
     async loadData() {
       try {
         this.isLoading = true
-        this.items = await apiMethods.getBagStatistics()
+        this.items = await getBagStatistics()
       } catch (error) {
         console.error("加载数据失败:", error)
         message.error("加载背包统计数据失败，请稍后重试")
@@ -479,7 +489,7 @@ export default {
       this.showDetailModal = true
       try {
         // 这里原逻辑是获取所有 overflow 数据，不需要 item 参数也能查
-        const data = await api.get("/api/checkBag")
+        const data = await checkBag()
         this.checkBagData = data
       } catch (e) {
         console.error(e)
@@ -491,7 +501,7 @@ export default {
 
     async loadBlackList() {
       try {
-        const response = await apiMethods.getBlackList()
+        const response = await getBlackList()
         this.blackList = response.data.BlackLists || []
       } catch (error) {
         console.error("加载黑名单失败:", error)
@@ -501,7 +511,7 @@ export default {
     async addToBlackList(materialName) {
       if (this.blackList.includes(materialName)) return
       try {
-        await apiMethods.addBlackList([materialName])
+        await addBlackList([materialName])
         this.blackList.push(materialName)
         message.success("已添加到黑名单")
       } catch (error) {
@@ -517,7 +527,7 @@ export default {
         cancelText: "取消",
         onOk: async () => {
           try {
-            await apiMethods.deleteBlackList(materialName)
+            await deleteBlackList(materialName)
             this.blackList = this.blackList.filter(item => item !== materialName)
             message.success("已从黑名单中移除")
           } catch (error) {
@@ -539,7 +549,7 @@ export default {
         okType: "danger",
         onOk: async () => {
           try {
-            const data = await api.post("/api/deleteBag")
+            const data = await deleteBag()
             message.success(data.message || "操作成功！")
             await this.loadData()
           } catch (error) {
@@ -560,7 +570,7 @@ export default {
 
     async loadEatStatistics() {
       try {
-        const data = await api.get("/api/EatStatistics")
+        const data = await eatStatistics()
         this.eatStatisticsData = data
         // 默认选择最新日期
         const dates = Object.keys(data).sort().reverse()
@@ -681,7 +691,7 @@ export default {
         okType: "danger",
         onOk: async () => {
           try {
-            await api.delete(`/api/BagStatistics/DELETE?name=${encodeURIComponent(materialName)}`)
+            await deleteBagStatistics(materialName)
             message.success("材料删除成功！")
             await this.loadData()
           } catch (error) {
@@ -709,7 +719,7 @@ export default {
       }
 
       try {
-        await api.post(`/api/BagStatistics/ADD?name=${encodeURIComponent(this.newMaterialName.trim())}`)
+        await addBagStatistics(this.newMaterialName.trim())
         message.success("材料添加成功！")
         this.closeAddMaterialModal()
         await this.loadData()
@@ -728,7 +738,7 @@ export default {
         okType: "danger",
         onOk: async () => {
           try {
-            await api.post("/api/BagStatistics/CLEAR")
+            await clearBagStatistics()
             message.success("所有统计数据已清空！")
             await this.loadData()
           } catch (error) {
