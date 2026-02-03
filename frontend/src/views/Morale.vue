@@ -373,7 +373,7 @@ export default {
         loadingMessage()
 
         // 获取后端返回的消息
-        const messageText = response.message
+        const messageText = response.data?.message || response.message
 
         // 弹框提示，显示时间更长
         message.success({

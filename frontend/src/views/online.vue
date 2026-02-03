@@ -236,7 +236,7 @@ const handleReportOk = async () => {
 const fetchOnlineDetail = async () => {
   try {
     const res = await api.get("/api/abgiSSE/getOnlineUser")
-    detailList.value = res.map(item => ({
+    detailList.value = res.data.map(item => ({
       key: item.group_name,
       title: item.group_name,
       description: item.description,
@@ -255,7 +255,7 @@ const fetchOnlineStatus = async () => {
   try {
     const res = await api.get("/api/abgiSSE/getOnlineStatus")
     // 接口返回 true/false；确保布尔值
-    onlineStatus.value = res
+    onlineStatus.value = res.data
   } catch (e) {
     console.error("获取在线状态失败", e)
     message.error("获取在线状态失败")
@@ -268,7 +268,7 @@ const fetchOnlineStatus = async () => {
 const fetchLaunchCount = async () => {
   try {
     const res = await getNumberOfLaunches()
-    launchCount.value = res.number || 0
+    launchCount.value = res.data.number || 0
   } catch (e) {
     console.error("获取上线次数失败", e)
   }

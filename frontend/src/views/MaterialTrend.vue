@@ -164,12 +164,12 @@ const fetchStatistics = async () => {
   loading.value = true
   try {
     const response = await getBagStatistics()
-    if (!Array.isArray(response)) {
+    if (!Array.isArray(response.data)) {
       statistics.value = []
       message.warning("未获取到材料统计数据")
       return
     }
-    const normalized = response
+    const normalized = (response.data || [])
       .map(normalizeRecord)
       .filter(item => item.date)
       .sort((a, b) => a.date - b.date)

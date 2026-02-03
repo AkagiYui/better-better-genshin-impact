@@ -489,11 +489,11 @@ const handleMysPush = async () => {
   try {
     const noticeType = formData.Notice.Type || ""
     const res = await mysPush(noticeType)
-    // api.js 的响应拦截器返回的是 response.data，后端可能返回 { status, message }
-    if (res && (res.status === 200 || res.status === "200")) {
+    // api.js 的响应拦截器现在返回完整的 response 对象
+    if (res.data && (res.data.status === 200 || res.data.status === "200")) {
       message.success("米游社签到推送设置成功")
     } else {
-      message.success(`操作已发送，后端返回: ${res?.message || JSON.stringify(res)}`)
+      message.success(`操作已发送，后端返回: ${res.data?.message || JSON.stringify(res.data)}`)
     }
   } catch (error) {
     console.error("设置米游社签到推送失败", error)

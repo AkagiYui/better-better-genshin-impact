@@ -212,7 +212,7 @@ const fetchData = async () => {
   try {
     const response = await getCDAwareAutoGather(filterStatus.value)
     // 为每个gather项添加expanded属性用于控制折叠状态
-    const processedData = (response || []).map(account => ({
+    const processedData = (response.data || []).map(account => ({
       ...account,
       CDAwareAutoGather: account.CDAwareAutoGather.map(gather => ({
         ...gather,

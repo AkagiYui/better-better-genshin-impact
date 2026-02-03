@@ -695,7 +695,7 @@ const initSakuraAnimation = () => {
 const refreshStatus = async () => {
   try {
     const res = await getStatus()
-    Object.assign(statusData, res)
+    Object.assign(statusData, res.data || res)
   } catch(e) { console.error(e) }
 }
 

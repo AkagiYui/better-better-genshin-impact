@@ -155,7 +155,7 @@ const fetchConfigOptions = async () => {
   try {
     const response = await getListGroups()
     // 直接用字符串数组
-    configOptions.value = (response || []).map(item => ({
+    configOptions.value = (response.data || []).map(item => ({
       label: item,
       value: item,
     }))
