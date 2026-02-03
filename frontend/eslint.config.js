@@ -78,6 +78,7 @@ export default [
       "vue/order-in-components": ["warn"], // 组件属性顺序
       "vue/block-order": ["warn"], // 块顺序
       "vue/no-v-text-v-html-on-component": ["off"], // 组件中禁止使用v-text和v-html
+      "vue/no-v-html": ["off"], // 组件中禁止使用v-html
       "vue/component-definition-name-casing": ["warn", "PascalCase"], // 组件命名规范
       "vue/attributes-order": ["warn"], // 属性顺序
       "vue/attribute-hyphenation": ["warn"], // 属性命名规范
