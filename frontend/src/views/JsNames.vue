@@ -174,7 +174,7 @@ import {
   batchUpdate,
   resetRepo,
   getAllScripts,
-  subscribeScript
+  subscribeScript,
 } from "@/api"
 
 export default {

@@ -379,7 +379,7 @@ import dayjs from "dayjs"
 import {
   getAllUserFiles,
   getCollectionManagement,
-  getPickupHistory
+  getPickupHistory,
 } from "@/api"
 
 const loading = ref(false)

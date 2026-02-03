@@ -260,7 +260,7 @@ import {
   SaveReplayBuffer,
   GetVideoInfo,
   DeleteVideo as DeleteVideoApi,
-  DeleteAllVideo
+  DeleteAllVideo,
 } from "@/api"
 
 function getToken() {

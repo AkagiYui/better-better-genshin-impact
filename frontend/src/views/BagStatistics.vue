@@ -299,7 +299,7 @@ import {
   eatStatistics,
   deleteBagStatistics,
   clearBagStatistics,
-  addBagStatistics
+  addBagStatistics,
 } from "@/api"
 
 export default {

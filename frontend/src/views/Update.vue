@@ -116,7 +116,7 @@ import {
   aBgiUpdate,
   aBgiGetVersions,
   getBgiDownloadStatus,
-  downloadBgi
+  downloadBgi,
 } from "@/api"
 
 // --- State Definitions ---
