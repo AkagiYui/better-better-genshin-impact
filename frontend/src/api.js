@@ -1,5 +1,5 @@
 import axios from "axios"
-import router from "./router"
+import router from "./route"
 
 // 获取当前baseURL的函数
 export const getBaseURL = () => {
