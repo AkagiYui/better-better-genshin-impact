@@ -10,7 +10,7 @@
     <div class="main-container">
       <header class="kawaii-header">
         <div class="header-actions left">
-          <button class="kawaii-btn home-btn icon-btn" @click="goHome">
+          <button class="kawaii-btn home-btn icon-btn" @click="onHomeButtonClick">
             🏠 <span class="btn-text">主页</span>
           </button>
         </div>
@@ -21,20 +21,20 @@
         </div>
 
         <div class="header-actions right">
-          <button class="kawaii-btn overflow-btn icon-btn" @click="checkBag()">
+          <button class="kawaii-btn overflow-btn icon-btn" @click="onCheckBagButtonClick()">
             🔍 <span class="btn-text">溢出检查</span>
           </button>
 
-          <button class="kawaii-btn clean-btn icon-btn" @click="deleteBag">
+          <button class="kawaii-btn clean-btn icon-btn" @click="onDeleteBagButtonClick">
             🧹 <span class="btn-text">清理统计</span>
           </button>
-          <button class="kawaii-btn trend-btn icon-btn" @click="goBagStatisticsTrend">
+          <button class="kawaii-btn trend-btn icon-btn" @click="onBagStatisticsTrendButtonClick">
             📈 <span class="btn-text">变化图</span>
           </button>
-          <button class="kawaii-btn eat-btn icon-btn" @click="openEatStatisticsModal">
+          <button class="kawaii-btn eat-btn icon-btn" @click="onOpenEatStatisticsModalButtonClick">
             💊 <span class="btn-text">吃药查看</span>
           </button>
-          <button class="kawaii-btn morale-btn icon-btn" @click="goMoralePage">
+          <button class="kawaii-btn morale-btn icon-btn" @click="onMoralePageButtonClick">
             💰 <span class="btn-text">摩拉收益</span>
           </button>
         </div>
@@ -223,8 +223,8 @@
               type="text"
               class="kawaii-input"
               placeholder="请输入材料名称"
-              @keyup.enter="addMaterial">
-            <button class="kawaii-btn primary" style="margin-top: 15px; width: 100%;" @click="addMaterial">
+              @keyup.enter="onAddMaterialButtonClick">
+            <button class="kawaii-btn primary" style="margin-top: 15px; width: 100%;" @click="onAddMaterialButtonClick">
               ✨ 确认添加
             </button>
           </div>
@@ -287,469 +287,463 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted } from "vue"
+import { useRouter } from "vue-router"
 import { Modal, message } from "ant-design-vue"
 import {
-  api,
   getBagStatistics,
   getBlackList,
   addBlackList,
   deleteBlackList,
   deleteBag,
+  checkBag,
   eatStatistics,
   deleteBagStatistics,
   clearBagStatistics,
   addBagStatistics,
 } from "@/api"
 
-export default {
-  name: "BagStatistics",
-  data() {
-    return {
-      title: "背包统计",
-      items: [],
-      selectedMaterials: [],
-      allOre: ["萃凝晶", "水晶块", "星银矿石", "紫晶块", "白铁块", "铁块", "魔晶块", "石珀", "虹滴晶"],
-      isLoading: true,
-      filterCollapsed: true,
-      showDetailModal: false,
-      checkBagData: {},
-      showBlackListModal: false,
-      blackList: [],
-      showEatStatisticsModal: false,
-      eatStatisticsData: {},
-      selectedDate: "",
-      showAddMaterialModal: false,
-      newMaterialName: "",
+const router = useRouter()
+
+const title = ref("背包统计")
+const items = ref([])
+const selectedMaterials = ref([])
+const allOre = ref(["萃凝晶", "水晶块", "星银矿石", "紫晶块", "白铁块", "铁块", "魔晶块", "石珀", "虹滴晶"])
+const isLoading = ref(true)
+const filterCollapsed = ref(true)
+const showDetailModal = ref(false)
+const checkBagData = ref({})
+const showBlackListModal = ref(false)
+const blackList = ref([])
+const showEatStatisticsModal = ref(false)
+const eatStatisticsData = ref({})
+const selectedDate = ref("")
+const showAddMaterialModal = ref(false)
+const newMaterialName = ref("")
+
+// 基础数据处理与排序
+const sortedItems = computed(() => {
+  const processed = items.value.map(item => ({
+    date: item.Data || item.date,
+    cl: item.Cl || item.cl,
+    num: parseInt(item.Num || item.num || 0),
+  }))
+
+  return processed.sort((a, b) => {
+    if (a.cl === "原石" && b.cl !== "原石") return -1
+    if (a.cl !== "原石" && b.cl === "原石") return 1
+    if (a.cl === "摩拉数值" && b.cl !== "摩拉数值") return -1
+    if (a.cl !== "摩拉数值" && b.cl === "摩拉数值") return 1
+    return a.cl.localeCompare(b.cl)
+  })
+})
+
+
+const uniqueMaterials = computed(() => {
+  return [...new Set(sortedItems.value.map(item => item.cl))].sort()
+})
+
+
+const filteredDataRaw = computed(() => {
+  return selectedMaterials.value.length === 0
+    ? sortedItems.value
+    : sortedItems.value.filter(item => selectedMaterials.value.includes(item.cl))
+})
+
+// 处理显示逻辑：插入间隔行 (Spacer) 以区分不同材料
+const filteredItems = computed(() => {
+  const result = []
+  let lastCl = null
+  const materialMap = {} // 用于计算变化量
+
+  const rawData = filteredDataRaw.value
+
+  for (let i = 0; i < rawData.length; i++) {
+    const { date, cl, num } = rawData[i]
+
+    // 如果不是第一行，且材料名变了，插入间隔行
+    if (lastCl !== null && cl !== lastCl) {
+      result.push({ type: "spacer" })
     }
-  },
-  computed: {
-    // 基础数据处理与排序
-    sortedItems() {
-      const processed = this.items.map(item => ({
-        date: item.Data || item.date,
-        cl: item.Cl || item.cl,
-        num: parseInt(item.Num || item.num || 0),
-      }))
+    lastCl = cl
 
-      return processed.sort((a, b) => {
-        if (a.cl === "原石" && b.cl !== "原石") return -1
-        if (a.cl !== "原石" && b.cl === "原石") return 1
-        if (a.cl === "摩拉数值" && b.cl !== "摩拉数值") return -1
-        if (a.cl !== "摩拉数值" && b.cl === "摩拉数值") return 1
-        return a.cl.localeCompare(b.cl)
-      })
-    },
+    // 显示文本处理
+    let materialDisplay = cl
+    let numDisplay = num.toString()
+
+    if (cl === "原石") {
+      const pulls = Math.floor(num / 160)
+      if (pulls > 0) materialDisplay = `${cl} (${pulls}抽)`
+    }
+
+    // 计算差值
+    if (materialMap[cl] !== undefined) {
+      const prev = materialMap[cl]
+      const diff = num - prev.num
+      if (diff !== 0) {
+        const sign = diff > 0 ? "+" : ""
+        numDisplay = `${num} (${sign}${diff})`
+      }
+    }
+    materialMap[cl] = { date, num } // 记录上一条数据
+
+    result.push({
+      date,
+      cl,
+      num,
+      materialDisplay,
+      numDisplay,
+      type: "data",
+    })
+  }
+
+  return result
+})
 
 
-    uniqueMaterials() {
-      return [...new Set(this.sortedItems.map(item => item.cl))].sort()
-    },
+// 移动端分组数据
+const groupedMobileMaterials = computed(() => {
+  const groups = {}
+  const materialMap = {} // 用于计算变化量
 
+  // 使用 raw 数据避免包含 spacer
+  filteredDataRaw.value.forEach(item => {
+    if (!groups[item.cl]) groups[item.cl] = []
 
-    filteredDataRaw() {
-      return this.selectedMaterials.length === 0
-        ? this.sortedItems
-        : this.sortedItems.filter(item => this.selectedMaterials.includes(item.cl))
-    },
+    // 重新计算移动端的显示文本
+    let numDisplay = item.num.toString()
 
-    // 处理显示逻辑：插入间隔行 (Spacer) 以区分不同材料
-    filteredItems() {
-      const result = []
-      let lastCl = null
-      const materialMap = {} // 用于计算变化量
+    // 计算差值
+    if (materialMap[item.cl] !== undefined) {
+      const prev = materialMap[item.cl]
+      const diff = item.num - prev.num
+      if (diff !== 0) {
+        const sign = diff > 0 ? "+" : ""
+        numDisplay = `${item.num} (${sign}${diff})`
+      }
+    }
+    materialMap[item.cl] = { date: item.date, num: item.num }
 
-      const rawData = this.filteredDataRaw
-
-      for (let i = 0; i < rawData.length; i++) {
-        const { date, cl, num } = rawData[i]
-
-        // 如果不是第一行，且材料名变了，插入间隔行
-        if (lastCl !== null && cl !== lastCl) {
-          result.push({ type: "spacer" })
+    // 原石特殊显示（追加抽数信息）
+    if (item.cl === "原石") {
+      const pulls = Math.floor(item.num / 160)
+      if (pulls > 0) {
+        // 如果已有差值显示，则在差值后追加抽数
+        if (numDisplay.includes("(") && !numDisplay.includes("抽")) {
+          numDisplay = numDisplay.replace(")", ` | ${pulls}抽)`)
+        } else if (!numDisplay.includes("(")) {
+          numDisplay = `${item.num} (${pulls}抽)`
         }
-        lastCl = cl
-
-        // 显示文本处理
-        let materialDisplay = cl
-        let numDisplay = num.toString()
-
-        if (cl === "原石") {
-          const pulls = Math.floor(num / 160)
-          if (pulls > 0) materialDisplay = `${cl} (${pulls}抽)`
-        }
-
-        // 计算差值
-        if (materialMap[cl] !== undefined) {
-          const prev = materialMap[cl]
-          const diff = num - prev.num
-          if (diff !== 0) {
-            const sign = diff > 0 ? "+" : ""
-            numDisplay = `${num} (${sign}${diff})`
-          }
-        }
-        materialMap[cl] = { date, num } // 记录上一条数据
-
-        result.push({
-          date,
-          cl,
-          num,
-          materialDisplay,
-          numDisplay,
-          type: "data",
-        })
       }
+    }
 
-      return result
-    },
+    groups[item.cl].push({
+      ...item,
+      numDisplay,
+    })
+  })
 
+  return Object.keys(groups).map(cl => ({
+    cl,
+    items: groups[cl],
+  }))
+})
 
-    // 移动端分组数据
-    groupedMobileMaterials() {
-      const groups = {}
-      const materialMap = {} // 用于计算变化量
+// 吃药统计相关计算属性
+const availableDates = computed(() => {
+  return Object.keys(eatStatisticsData.value).sort().reverse()
+})
 
-      // 使用 raw 数据避免包含 spacer
-      this.filteredDataRaw.forEach(item => {
-        if (!groups[item.cl]) groups[item.cl] = []
+const dailyConsumptionSummary = computed(() => {
+  return getDailyConsumption()
+})
 
-        // 重新计算移动端的显示文本
-        let numDisplay = item.num.toString()
-
-        // 计算差值
-        if (materialMap[item.cl] !== undefined) {
-          const prev = materialMap[item.cl]
-          const diff = item.num - prev.num
-          if (diff !== 0) {
-            const sign = diff > 0 ? "+" : ""
-            numDisplay = `${item.num} (${sign}${diff})`
-          }
-        }
-        materialMap[item.cl] = { date: item.date, num: item.num }
-
-        // 原石特殊显示（追加抽数信息）
-        if (item.cl === "原石") {
-          const pulls = Math.floor(item.num / 160)
-          if (pulls > 0) {
-            // 如果已有差值显示，则在差值后追加抽数
-            if (numDisplay.includes("(") && !numDisplay.includes("抽")) {
-              numDisplay = numDisplay.replace(")", ` | ${pulls}抽)`)
-            } else if (!numDisplay.includes("(")) {
-              numDisplay = `${item.num} (${pulls}抽)`
-            }
-          }
-        }
-
-        groups[item.cl].push({
-          ...item,
-          numDisplay,
-        })
-      })
-
-      return Object.keys(groups).map(cl => ({
-        cl,
-        items: groups[cl],
-      }))
-    },
-
-    // 吃药统计相关计算属性
-    availableDates() {
-      return Object.keys(this.eatStatisticsData).sort().reverse()
-    },
-
-    dailyConsumptionSummary() {
-      return this.getDailyConsumption()
-    },
-  },
-
-  async mounted() {
-    await this.loadData()
-    await this.loadBlackList()
-  },
-
-  methods: {
-    async loadData() {
-      try {
-        this.isLoading = true
-        this.items = await getBagStatistics()
-      } catch (error) {
-        console.error("加载数据失败:", error)
-        message.error("加载背包统计数据失败，请稍后重试")
-      } finally {
-        this.isLoading = false
-      }
-    },
-
-    goHome() { this.$router.push("/") },
-    goBagStatisticsTrend() { this.$router.push("/MaterialTrend") },
-    goMoralePage() { this.$router.push("/Morale") },
-
-    // 修改：item 变为可选参数，支持按钮直接点击
-    async checkBag(item) {
-      this.showDetailModal = true
-      try {
-        // 这里原逻辑是获取所有 overflow 数据，不需要 item 参数也能查
-        const data = await checkBag()
-        this.checkBagData = data
-      } catch (e) {
-        console.error(e)
-        message.error("获取溢出数据失败，请稍后重试")
-      }
-    },
-
-    closeDetailModal() { this.showDetailModal = false },
-
-    async loadBlackList() {
-      try {
-        const response = await getBlackList()
-        this.blackList = response.data.BlackLists || []
-      } catch (error) {
-        console.error("加载黑名单失败:", error)
-      }
-    },
-
-    async addToBlackList(materialName) {
-      if (this.blackList.includes(materialName)) return
-      try {
-        await addBlackList([materialName])
-        this.blackList.push(materialName)
-        message.success("已添加到黑名单")
-      } catch (error) {
-        message.error(`添加黑名单失败: ${error.message || error}`)
-      }
-    },
-
-    async removeFromBlackList(materialName) {
-      Modal.confirm({
-        title: "确认移除",
-        content: `确定要从黑名单中移除 ${materialName} 吗？`,
-        okText: "确定",
-        cancelText: "取消",
-        onOk: async () => {
-          try {
-            await deleteBlackList(materialName)
-            this.blackList = this.blackList.filter(item => item !== materialName)
-            message.success("已从黑名单中移除")
-          } catch (error) {
-            message.error(`移除黑名单失败: ${error.message || error}`)
-          }
-        },
-      })
-    },
-
-    openBlackListModal() { this.showBlackListModal = true },
-    closeBlackListModal() { this.showBlackListModal = false },
-
-    async deleteBag() {
-      Modal.confirm({
-        title: "确认清理",
-        content: "确定要清理统计数据吗？只保留最近一天。",
-        okText: "确定",
-        cancelText: "取消",
-        okType: "danger",
-        onOk: async () => {
-          try {
-            const data = await deleteBag()
-            message.success(data.message || "操作成功！")
-            await this.loadData()
-          } catch (error) {
-            message.error(`请求出错：${error.message || error}`)
-          }
-        },
-      })
-    },
-
-    cancelSelection() { this.selectedMaterials = [] },
-    selectAllOre() { this.selectedMaterials = [...this.allOre] },
-    toggleFilter() { this.filterCollapsed = !this.filterCollapsed },
-
-    async openEatStatisticsModal() {
-      this.showEatStatisticsModal = true
-      await this.loadEatStatistics()
-    },
-
-    async loadEatStatistics() {
-      try {
-        const data = await eatStatistics()
-        this.eatStatisticsData = data
-        // 默认选择最新日期
-        const dates = Object.keys(data).sort().reverse()
-        if (dates.length > 0) {
-          this.selectedDate = dates[0]
-        }
-      } catch (error) {
-        console.error("加载吃药统计失败:", error)
-        message.error("加载吃药统计数据失败，请稍后重试")
-      }
-    },
-
-    closeEatStatisticsModal() {
-      this.showEatStatisticsModal = false
-      this.selectedDate = ""
-    },
-
-    // 计算选中日期的消耗统计（通过差值计算真实消耗）
-    getDailyConsumption() {
-      if (!this.selectedDate || !this.eatStatisticsData[this.selectedDate]) {
-        return {}
-      }
-
-      const records = [...this.eatStatisticsData[this.selectedDate]]
-      // 按时间排序（从旧到新）
-      records.sort((a, b) => {
-        const timeA = a.Time.replace("时间:", "")
-        const timeB = b.Time.replace("时间:", "")
-        return new Date(timeA) - new Date(timeB)
-      })
-
-      // 按物品名称分组
-      const groupedByName = {}
-      records.forEach(item => {
-        if (!groupedByName[item.Name]) {
-          groupedByName[item.Name] = []
-        }
-        groupedByName[item.Name].push(item)
-      })
-
-      // 计算每种物品的总消耗（累加所有差值）
-      const consumption = {}
-      Object.keys(groupedByName).forEach(name => {
-        const group = groupedByName[name]
-        let totalConsumption = 0
-        let previousCount = null
-
-        group.forEach(item => {
-          if (previousCount !== null) {
-            // 差值 = 当前数量 - 上一次数量
-            const diff = item.Count - previousCount
-            totalConsumption += diff
-          }
-          previousCount = item.Count
-        })
-
-        consumption[name] = totalConsumption
-      })
-
-      return consumption
-    },
-
-    // 获取带差值的详细记录（按物品名称分组，每组内按时间排序）
-    getDetailRecordsWithDiff(date) {
-      if (!date || !this.eatStatisticsData[date]) {
-        return []
-      }
-
-      const records = [...this.eatStatisticsData[date]]
-      // 先按时间排序（从旧到新）
-      records.sort((a, b) => {
-        const timeA = a.Time.replace("时间:", "")
-        const timeB = b.Time.replace("时间:", "")
-        return new Date(timeA) - new Date(timeB)
-      })
-
-      // 按物品名称分组
-      const groupedByName = {}
-      records.forEach(item => {
-        if (!groupedByName[item.Name]) {
-          groupedByName[item.Name] = []
-        }
-        groupedByName[item.Name].push(item)
-      })
-
-      // 为每组计算差值，并合并所有组
-      const result = []
-      Object.keys(groupedByName).sort().forEach(name => {
-        const group = groupedByName[name]
-        let previousCount = null
-
-        group.forEach(item => {
-          let diff = null
-
-          if (previousCount !== null) {
-            // 计算变化量：当前数量 - 上一次数量
-            diff = item.Count - previousCount
-          }
-
-          previousCount = item.Count
-
-          result.push({
-            ...item,
-            diff,
-          })
-        })
-      })
-
-      return result
-    },
-
-    async deleteMaterial(materialName) {
-      Modal.confirm({
-        title: "确认删除",
-        content: `确定要删除材料 "${materialName}" 的所有统计记录吗？此操作无法撤销！`,
-        okText: "确定删除",
-        cancelText: "取消",
-        okType: "danger",
-        onOk: async () => {
-          try {
-            await deleteBagStatistics(materialName)
-            message.success("材料删除成功！")
-            await this.loadData()
-          } catch (error) {
-            console.error("删除材料失败:", error)
-            message.error(`删除材料失败: ${error.message || error}`)
-          }
-        },
-      })
-    },
-
-    openAddMaterialModal() {
-      this.showAddMaterialModal = true
-      this.newMaterialName = ""
-    },
-
-    closeAddMaterialModal() {
-      this.showAddMaterialModal = false
-      this.newMaterialName = ""
-    },
-
-    async addMaterial() {
-      if (!this.newMaterialName.trim()) {
-        message.warning("请输入材料名称")
-        return
-      }
-
-      try {
-        await addBagStatistics(this.newMaterialName.trim())
-        message.success("材料添加成功！")
-        this.closeAddMaterialModal()
-        await this.loadData()
-      } catch (error) {
-        console.error("添加材料失败:", error)
-        message.error(`添加材料失败: ${error.message || error}`)
-      }
-    },
-
-    async clearAllStatistics() {
-      Modal.confirm({
-        title: "⚠️ 危险操作",
-        content: "确定要清空所有背包统计数据吗？此操作将删除所有材料的统计记录，且无法撤销！",
-        okText: "确定清空",
-        cancelText: "取消",
-        okType: "danger",
-        onOk: async () => {
-          try {
-            await clearBagStatistics()
-            message.success("所有统计数据已清空！")
-            await this.loadData()
-          } catch (error) {
-            console.error("清空数据失败:", error)
-            message.error(`清空数据失败: ${error.message || error}`)
-          }
-        },
-      })
-    },
-  },
+const loadData = async () => {
+  try {
+    isLoading.value = true
+    items.value = await getBagStatistics()
+  } catch (error) {
+    console.error("加载数据失败:", error)
+    message.error("加载背包统计数据失败，请稍后重试")
+  } finally {
+    isLoading.value = false
+  }
 }
+
+const onHomeButtonClick = () => { router.push("/") }
+const onBagStatisticsTrendButtonClick = () => { router.push("/MaterialTrend") }
+const onMoralePageButtonClick = () => { router.push("/Morale") }
+
+// 修改：item 变为可选参数，支持按钮直接点击
+const onCheckBagButtonClick = async (item) => {
+  showDetailModal.value = true
+  try {
+    // 这里原逻辑是获取所有 overflow 数据，不需要 item 参数也能查
+    const data = await checkBag()
+    checkBagData.value = data
+  } catch (e) {
+    console.error(e)
+    message.error("获取溢出数据失败，请稍后重试")
+  }
+}
+
+const closeDetailModal = () => { showDetailModal.value = false }
+
+const loadBlackList = async () => {
+  try {
+    const response = await getBlackList()
+    blackList.value = response.data.BlackLists || []
+  } catch (error) {
+    console.error("加载黑名单失败:", error)
+  }
+}
+
+const addToBlackList = async (materialName) => {
+  if (blackList.value.includes(materialName)) return
+  try {
+    await addBlackList([materialName])
+    blackList.value.push(materialName)
+    message.success("已添加到黑名单")
+  } catch (error) {
+    message.error(`添加黑名单失败: ${error.message || error}`)
+  }
+}
+
+const removeFromBlackList = async (materialName) => {
+  Modal.confirm({
+    title: "确认移除",
+    content: `确定要从黑名单中移除 ${materialName} 吗？`,
+    okText: "确定",
+    cancelText: "取消",
+    onOk: async () => {
+      try {
+        await deleteBlackList(materialName)
+        blackList.value = blackList.value.filter(item => item !== materialName)
+        message.success("已从黑名单中移除")
+      } catch (error) {
+        message.error(`移除黑名单失败: ${error.message || error}`)
+      }
+    },
+  })
+}
+
+const openBlackListModal = () => { showBlackListModal.value = true }
+const closeBlackListModal = () => { showBlackListModal.value = false }
+
+const onDeleteBagButtonClick = async () => {
+  Modal.confirm({
+    title: "确认清理",
+    content: "确定要清理统计数据吗？只保留最近一天。",
+    okText: "确定",
+    cancelText: "取消",
+    okType: "danger",
+    onOk: async () => {
+      try {
+        const data = await deleteBag()
+        message.success(data.message || "操作成功！")
+        await loadData()
+      } catch (error) {
+        message.error(`请求出错：${error.message || error}`)
+      }
+    },
+  })
+}
+
+const cancelSelection = () => { selectedMaterials.value = [] }
+const selectAllOre = () => { selectedMaterials.value = [...allOre.value] }
+const toggleFilter = () => { filterCollapsed.value = !filterCollapsed.value }
+
+const onOpenEatStatisticsModalButtonClick = async () => {
+  showEatStatisticsModal.value = true
+  await loadEatStatistics()
+}
+
+const loadEatStatistics = async () => {
+  try {
+    const data = await eatStatistics()
+    eatStatisticsData.value = data
+    // 默认选择最新日期
+    const dates = Object.keys(data).sort().reverse()
+    if (dates.length > 0) {
+      selectedDate.value = dates[0]
+    }
+  } catch (error) {
+    console.error("加载吃药统计失败:", error)
+    message.error("加载吃药统计数据失败，请稍后重试")
+  }
+}
+
+const closeEatStatisticsModal = () => {
+  showEatStatisticsModal.value = false
+  selectedDate.value = ""
+}
+
+// 计算选中日期的消耗统计（通过差值计算真实消耗）
+const getDailyConsumption = () => {
+  if (!selectedDate.value || !eatStatisticsData.value[selectedDate.value]) {
+    return {}
+  }
+
+  const records = [...eatStatisticsData.value[selectedDate.value]]
+  // 按时间排序（从旧到新）
+  records.sort((a, b) => {
+    const timeA = a.Time.replace("时间:", "")
+    const timeB = b.Time.replace("时间:", "")
+    return new Date(timeA) - new Date(timeB)
+  })
+
+  // 按物品名称分组
+  const groupedByName = {}
+  records.forEach(item => {
+    if (!groupedByName[item.Name]) {
+      groupedByName[item.Name] = []
+    }
+    groupedByName[item.Name].push(item)
+  })
+
+  // 计算每种物品的总消耗（累加所有差值）
+  const consumption = {}
+  Object.keys(groupedByName).forEach(name => {
+    const group = groupedByName[name]
+    let totalConsumption = 0
+    let previousCount = null
+
+    group.forEach(item => {
+      if (previousCount !== null) {
+        // 差值 = 当前数量 - 上一次数量
+        const diff = item.Count - previousCount
+        totalConsumption += diff
+      }
+      previousCount = item.Count
+    })
+
+    consumption[name] = totalConsumption
+  })
+
+  return consumption
+}
+
+// 获取带差值的详细记录（按物品名称分组，每组内按时间排序）
+const getDetailRecordsWithDiff = (date) => {
+  if (!date || !eatStatisticsData.value[date]) {
+    return []
+  }
+
+  const records = [...eatStatisticsData.value[date]]
+  // 先按时间排序（从旧到新）
+  records.sort((a, b) => {
+    const timeA = a.Time.replace("时间:", "")
+    const timeB = b.Time.replace("时间:", "")
+    return new Date(timeA) - new Date(timeB)
+  })
+
+  // 按物品名称分组
+  const groupedByName = {}
+  records.forEach(item => {
+    if (!groupedByName[item.Name]) {
+      groupedByName[item.Name] = []
+    }
+    groupedByName[item.Name].push(item)
+  })
+
+  // 为每组计算差值，并合并所有组
+  const result = []
+  Object.keys(groupedByName).sort().forEach(name => {
+    const group = groupedByName[name]
+    let previousCount = null
+
+    group.forEach(item => {
+      let diff = null
+
+      if (previousCount !== null) {
+        // 计算变化量：当前数量 - 上一次数量
+        diff = item.Count - previousCount
+      }
+
+      previousCount = item.Count
+
+      result.push({
+        ...item,
+        diff,
+      })
+    })
+  })
+
+  return result
+}
+
+const deleteMaterial = async (materialName) => {
+  Modal.confirm({
+    title: "确认删除",
+    content: `确定要删除材料 "${materialName}" 的所有统计记录吗？此操作无法撤销！`,
+    okText: "确定删除",
+    cancelText: "取消",
+    okType: "danger",
+    onOk: async () => {
+      try {
+        await deleteBagStatistics(materialName)
+        message.success("材料删除成功！")
+        await loadData()
+      } catch (error) {
+        console.error("删除材料失败:", error)
+        message.error(`删除材料失败: ${error.message || error}`)
+      }
+    },
+  })
+}
+
+const openAddMaterialModal = () => {
+  showAddMaterialModal.value = true
+  newMaterialName.value = ""
+}
+
+const closeAddMaterialModal = () => {
+  showAddMaterialModal.value = false
+  newMaterialName.value = ""
+}
+
+const onAddMaterialButtonClick = async () => {
+  if (!newMaterialName.value.trim()) {
+    message.warning("请输入材料名称")
+    return
+  }
+
+  try {
+    await addBagStatistics(newMaterialName.value.trim())
+    message.success("材料添加成功！")
+    closeAddMaterialModal()
+    await loadData()
+  } catch (error) {
+    console.error("添加材料失败:", error)
+    message.error(`添加材料失败: ${error.message || error}`)
+  }
+}
+
+const clearAllStatistics = async () => {
+  Modal.confirm({
+    title: "⚠️ 危险操作",
+    content: "确定要清空所有背包统计数据吗？此操作将删除所有材料的统计记录，且无法撤销！",
+    okText: "确定清空",
+    cancelText: "取消",
+    okType: "danger",
+    onOk: async () => {
+      try {
+        await clearBagStatistics()
+        message.success("所有统计数据已清空！")
+        await loadData()
+      } catch (error) {
+        console.error("清空数据失败:", error)
+        message.error(`清空数据失败: ${error.message || error}`)
+      }
+    },
+  })
+}
+
+onMounted(async () => {
+  await loadData()
+  await loadBlackList()
+})
 </script>
 
 <style scoped>

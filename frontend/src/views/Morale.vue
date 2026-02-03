@@ -194,257 +194,254 @@
   </div>
 </template>
 
-<script>
-import { api, getMorale, updateMorale } from "@/api"
+<script setup>
+import { ref, computed, onMounted } from "vue"
+import { useRouter } from "vue-router"
 import { message } from "ant-design-vue"
 import locale from "ant-design-vue/es/date-picker/locale/zh_CN"
 import dayjs from "dayjs"
 import "dayjs/locale/zh-cn"
 import * as XLSX from "xlsx"
+import { getMorale, updateMorale } from "@/api"
 
 dayjs.locale("zh-cn")
 
-export default {
-  name: "Morale",
-  data() {
-    return {
-      locale,
-      columns: [
-        {
-          title: "📅 时间",
-          key: "time",
-          dataIndex: "Time",
-          width: "40%",
-        },
-        {
-          title: "📊 类型",
-          key: "action",
-          dataIndex: "action",
-          width: "30%",
-          align: "center",
-        },
-        {
-          title: "💰 数量",
-          key: "num",
-          dataIndex: "morale",
-          width: "30%",
-          align: "right",
-        },
-      ],
-      filters: {
-        type: "day",
-        date: this.getTodayDate(),
-        action: "",
-      },
-      dateValue: null,
-      resultData: null,
-      isLoading: false,
-      isUpdating: false,
-    }
+const router = useRouter()
+
+const columns = [
+  {
+    title: "📅 时间",
+    key: "time",
+    dataIndex: "Time",
+    width: "40%",
   },
-  computed: {
-    filteredItems() {
-      if (!this.resultData || !this.resultData.items) {
-        return []
-      }
-      if (!this.filters.action) {
-        return this.resultData.items
-      }
-      return this.resultData.items.filter(item => item.action === this.filters.action)
-    },
-
-    // 根据筛选条件计算总收益
-    filteredTotalMorale() {
-      if (!this.filteredItems || this.filteredItems.length === 0) {
-        return 0
-      }
-      return this.filteredItems.reduce((total, item) => {
-        return total + (item.morale || 0)
-      }, 0)
-    },
+  {
+    title: "📊 类型",
+    key: "action",
+    dataIndex: "action",
+    width: "30%",
+    align: "center",
   },
-  mounted() {
-    this.dateValue = this.getTodayDate()
-    this.searchRecords()
+  {
+    title: "💰 数量",
+    key: "num",
+    dataIndex: "morale",
+    width: "30%",
+    align: "right",
   },
-  methods: {
-    goBack() {
-      this.$router.go(-1)
-    },
+]
 
-    getTodayDate() {
-      const today = new Date()
-      const year = today.getFullYear()
-      const month = String(today.getMonth() + 1).padStart(2, "0")
-      const day = String(today.getDate()).padStart(2, "0")
-      return `${year}-${month}-${day}`
-    },
-
-    onDateChange(date, dateString) {
-      // Ant Design 组件的日期变化回调
-      this.filters.date = dateString || ""
-    },
-
-    onTypeChange() {
-      // 当切换统计周期时，自动调整日期格式
-      const today = new Date()
-      const year = today.getFullYear()
-      const month = String(today.getMonth() + 1).padStart(2, "0")
-      const day = String(today.getDate()).padStart(2, "0")
-
-      if (this.filters.type === "day") {
-        this.dateValue = `${year}-${month}-${day}`
-        this.filters.date = `${year}-${month}-${day}`
-      } else if (this.filters.type === "month") {
-        this.dateValue = `${year}-${month}`
-        this.filters.date = `${year}-${month}`
-      } else if (this.filters.type === "year") {
-        this.dateValue = `${year}`
-        this.filters.date = `${year}`
-      }
-    },
-
-    async searchRecords() {
-      if (!this.filters.date) {
-        message.warning("请选择查询日期")
-        return
-      }
-
-      try {
-        this.isLoading = true
-
-        // 构建查询参数
-        const params = {
-          type: this.filters.type,
-          date: this.filters.date,
-        }
-
-        const response = await getMorale(params)
-        console.log("API返回数据:", response)
-        console.log("response.data:", response.data)
-
-        // 后端返回的是 { data: { target_date, total_morale, items } }
-        if (response.data && response.data.data) {
-          // 如果有嵌套的data字段
-          this.resultData = response.data.data
-        } else {
-          // 如果没有嵌套，直接使用
-          this.resultData = response.data
-        }
-        console.log("resultData:", this.resultData)
-
-        if (!this.resultData || !this.resultData.items || this.resultData.items.length === 0) {
-          message.info("该日期暂无摩拉记录")
-        }
-      } catch (error) {
-        console.error("查询摩拉记录失败:", error)
-        message.error("查询失败，请稍后重试")
-        this.resultData = null
-      } finally {
-        this.isLoading = false
-      }
-    },
-
-    resetFilters() {
-      this.filters = {
-        type: "day",
-        date: this.getTodayDate(),
-        action: "",
-      }
-      this.searchRecords()
-    },
-
-    formatTime(timeStr) {
-      if (!timeStr) return "-"
-      return timeStr.replace("T", " ").substring(0, 19)
-    },
-
-    async updateMoraleRecord() {
-      try {
-        this.isUpdating = true
-
-        // 显示加载提示
-        const loadingMessage = message.loading("正在更新摩拉记录，请耐心等待...", 0)
-
-        const response = await updateMorale()
-        console.log("更新摩拉记录返回:", response)
-
-        // 关闭加载提示
-        loadingMessage()
-
-        // 获取后端返回的消息
-        const messageText = response.data?.message || response.message
-
-        // 弹框提示，显示时间更长
-        message.success({
-          content: messageText,
-          duration: 10, // 增加到10秒
-        })
-
-        // 更新成功后自动刷新当前数据
-        await this.searchRecords()
-      } catch (error) {
-        console.error("更新摩拉记录失败:", error)
-        message.error({
-          content: "更新失败，请稍后重试",
-          duration: 5,
-        })
-      } finally {
-        this.isUpdating = false
-      }
-    },
-
-    exportToExcel() {
-      if (!this.resultData || !this.resultData.items || this.resultData.items.length === 0) {
-        message.warning("暂无数据可导出")
-        return
-      }
-
-      try {
-        // 准备Excel数据
-        const excelData = this.filteredItems.map((item, index) => ({
-          "序号": index + 1,
-          "时间": this.formatTime(item.Time),
-          "类型": item.action,
-          "数量": item.morale,
-        }))
-
-        // 添加汇总行
-        excelData.push({
-          "序号": "",
-          "时间": "",
-          "类型": "总计",
-          "数量": this.resultData.total_morale || 0,
-        })
-
-        // 创建工作簿
-        const ws = XLSX.utils.json_to_sheet(excelData)
-
-        // 设置列宽
-        ws["!cols"] = [
-          { wch: 8 }, // 序号
-          { wch: 20 }, // 时间
-          { wch: 18 }, // 类型
-          { wch: 15 }, // 数量
-        ]
-
-        const wb = XLSX.utils.book_new()
-        XLSX.utils.book_append_sheet(wb, ws, "摩拉收益统计")
-
-        // 生成文件名
-        const fileName = `摩拉收益统计_${this.resultData.target_date || this.filters.date}_${Date.now()}.xlsx`
-
-        // 导出文件
-        XLSX.writeFile(wb, fileName)
-
-        message.success("导出Excel成功！")
-      } catch (error) {
-        console.error("导出Excel失败:", error)
-        message.error("导出失败，请稍后重试")
-      }
-    },
-  },
+const getTodayDate = () => {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, "0")
+  const day = String(today.getDate()).padStart(2, "0")
+  return `${year}-${month}-${day}`
 }
+
+const filters = ref({
+  type: "day",
+  date: getTodayDate(),
+  action: "",
+})
+
+const dateValue = ref(null)
+const resultData = ref(null)
+const isLoading = ref(false)
+const isUpdating = ref(false)
+
+const filteredItems = computed(() => {
+  if (!resultData.value || !resultData.value.items) {
+    return []
+  }
+  if (!filters.value.action) {
+    return resultData.value.items
+  }
+  return resultData.value.items.filter(item => item.action === filters.value.action)
+})
+
+// 根据筛选条件计算总收益
+const filteredTotalMorale = computed(() => {
+  if (!filteredItems.value || filteredItems.value.length === 0) {
+    return 0
+  }
+  return filteredItems.value.reduce((total, item) => {
+    return total + (item.morale || 0)
+  }, 0)
+})
+
+const goBack = () => {
+  router.go(-1)
+}
+
+const onDateChange = (_date, dateString) => {
+  // Ant Design 组件的日期变化回调
+  filters.value.date = dateString || ""
+}
+
+const onTypeChange = () => {
+  // 当切换统计周期时，自动调整日期格式
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, "0")
+  const day = String(today.getDate()).padStart(2, "0")
+
+  if (filters.value.type === "day") {
+    dateValue.value = `${year}-${month}-${day}`
+    filters.value.date = `${year}-${month}-${day}`
+  } else if (filters.value.type === "month") {
+    dateValue.value = `${year}-${month}`
+    filters.value.date = `${year}-${month}`
+  } else if (filters.value.type === "year") {
+    dateValue.value = `${year}`
+    filters.value.date = `${year}`
+  }
+}
+
+const searchRecords = async () => {
+  if (!filters.value.date) {
+    message.warning("请选择查询日期")
+    return
+  }
+
+  try {
+    isLoading.value = true
+
+    // 构建查询参数
+    const params = {
+      type: filters.value.type,
+      date: filters.value.date,
+    }
+
+    const response = await getMorale(params)
+    console.log("API返回数据:", response)
+    console.log("response.data:", response.data)
+
+    // 后端返回的是 { data: { target_date, total_morale, items } }
+    if (response.data && response.data.data) {
+      // 如果有嵌套的data字段
+      resultData.value = response.data.data
+    } else {
+      // 如果没有嵌套，直接使用
+      resultData.value = response.data
+    }
+    console.log("resultData:", resultData.value)
+
+    if (!resultData.value || !resultData.value.items || resultData.value.items.length === 0) {
+      message.info("该日期暂无摩拉记录")
+    }
+  } catch (error) {
+    console.error("查询摩拉记录失败:", error)
+    message.error("查询失败，请稍后重试")
+    resultData.value = null
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const resetFilters = () => {
+  filters.value = {
+    type: "day",
+    date: getTodayDate(),
+    action: "",
+  }
+  searchRecords()
+}
+
+const formatTime = (timeStr) => {
+  if (!timeStr) return "-"
+  return timeStr.replace("T", " ").substring(0, 19)
+}
+
+const updateMoraleRecord = async () => {
+  try {
+    isUpdating.value = true
+
+    // 显示加载提示
+    const loadingMessage = message.loading("正在更新摩拉记录，请耐心等待...", 0)
+
+    const response = await updateMorale()
+    console.log("更新摩拉记录返回:", response)
+
+    // 关闭加载提示
+    loadingMessage()
+
+    // 获取后端返回的消息
+    const messageText = response.data?.message || response.message
+
+    // 弹框提示，显示时间更长
+    message.success({
+      content: messageText,
+      duration: 10, // 增加到10秒
+    })
+
+    // 更新成功后自动刷新当前数据
+    await searchRecords()
+  } catch (error) {
+    console.error("更新摩拉记录失败:", error)
+    message.error({
+      content: "更新失败，请稍后重试",
+      duration: 5,
+    })
+  } finally {
+    isUpdating.value = false
+  }
+}
+
+const exportToExcel = () => {
+  if (!resultData.value || !resultData.value.items || resultData.value.items.length === 0) {
+    message.warning("暂无数据可导出")
+    return
+  }
+
+  try {
+    // 准备Excel数据
+    const excelData = filteredItems.value.map((item, index) => ({
+      "序号": index + 1,
+      "时间": formatTime(item.Time),
+      "类型": item.action,
+      "数量": item.morale,
+    }))
+
+    // 添加汇总行
+    excelData.push({
+      "序号": "",
+      "时间": "",
+      "类型": "总计",
+      "数量": resultData.value.total_morale || 0,
+    })
+
+    // 创建工作簿
+    const ws = XLSX.utils.json_to_sheet(excelData)
+
+    // 设置列宽
+    ws["!cols"] = [
+      { wch: 8 }, // 序号
+      { wch: 20 }, // 时间
+      { wch: 18 }, // 类型
+      { wch: 15 }, // 数量
+    ]
+
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, "摩拉收益统计")
+
+    // 生成文件名
+    const fileName = `摩拉收益统计_${resultData.value.target_date || filters.value.date}_${Date.now()}.xlsx`
+
+    // 导出文件
+    XLSX.writeFile(wb, fileName)
+
+    message.success("导出Excel成功！")
+  } catch (error) {
+    console.error("导出Excel失败:", error)
+    message.error("导出失败，请稍后重试")
+  }
+}
+
+onMounted(() => {
+  dateValue.value = getTodayDate()
+  searchRecords()
+})
 </script>
 
 <style scoped>

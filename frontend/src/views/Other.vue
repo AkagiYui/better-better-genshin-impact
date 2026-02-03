@@ -10,7 +10,7 @@
         <div class="header-title-group">
           <h1>日志分析</h1>
         </div>
-        <button class="btn header-btn" @click="$router.push('/')">返回首页</button>
+        <button class="btn header-btn" @click="router.push('/')">返回首页</button>
       </div>
       <div class="header-divider" />
     </header>
@@ -277,365 +277,342 @@
   </div>
 </template>
 
-<script>
-import { api, getLogFiles, archive, logAnalysis2Page } from "@/api"
+<script setup>
+import { ref, watch, onMounted } from "vue"
+import { useRouter } from "vue-router"
+import { message } from "ant-design-vue"
+import { getLogFiles, archive, logAnalysis2Page } from "@/api"
 
-export default {
-  name: "Other",
-  data() {
-    return {
-      logFiles: [],
-      selectedFile: "",
-      analysisData: [],
-      loading: false,
-      expandedGroups: [], // 记录展开的配置组
-      bookmarkVisible: false, // 书签是否可见，默认折叠
-      currentActiveGroup: "", // 当前活跃的配置组
-      showErrorModal: false, // 控制错误提取弹框的显示
-      currentErrorGroup: null, // 当前正在提取错误的配置组
-      extractedErrors: [], // 提取到的错误信息
+// 获取路由实例
+const router = useRouter()
+
+// 数据声明
+const logFiles = ref([])
+const selectedFile = ref("")
+const analysisData = ref([])
+const loading = ref(false)
+const expandedGroups = ref([]) // 记录展开的配置组
+const bookmarkVisible = ref(false) // 书签是否可见，默认折叠
+const currentActiveGroup = ref("") // 当前活跃的配置组
+const showErrorModal = ref(false) // 控制错误提取弹框的显示
+const currentErrorGroup = ref(null) // 当前正在提取错误的配置组
+const extractedErrors = ref([]) // 提取到的错误信息
+
+// 监听 selectedFile 变化，自动加载分析数据
+watch(selectedFile, (newVal, oldVal) => {
+  if (newVal && newVal !== oldVal) {
+    loadAnalysisData()
+  }
+})
+
+// 加载日志文件列表
+const loadLogFiles = async () => {
+  try {
+    const response = await getLogFiles()
+    logFiles.value = response.files || []
+    if (logFiles.value.length > 0) {
+      selectedFile.value = logFiles.value[0] // 默认选择最新的文件
+      // 不再这里调用 loadAnalysisData，交由 watch 处理
     }
-  },
-  watch: {
-    // 监听 selectedFile 变化，自动加载分析数据
-    selectedFile(newVal, oldVal) {
-      if (newVal && newVal !== oldVal) {
-        this.loadAnalysisData()
-      }
-    },
-  },
-  async mounted() {
-    await this.loadLogFiles()
-  },
-  methods: {
-    // 加载日志文件列表
-    async loadLogFiles() {
-      try {
-        const response = await getLogFiles()
-        this.logFiles = response.files || []
-        if (this.logFiles.length > 0) {
-          this.selectedFile = this.logFiles[0] // 默认选择最新的文件
-          // 不再这里调用 loadAnalysisData，交由 watch 处理
-        }
-      } catch (error) {
-        console.error("加载日志文件列表失败:", error)
-        this.$message?.error("加载日志文件列表失败")
-      }
-    },
-
-    // 加载分析数据
-    async loadAnalysisData() {
-      if (!this.selectedFile) return
-
-      this.loading = true
-      try {
-
-        const response = await logAnalysis2Page(this.selectedFile)
-        this.analysisData = response.data || []
-        // 重置当前活跃组和展开状态
-        this.currentActiveGroup = ""
-        this.expandedGroups = []
-      } catch (error) {
-        console.error("加载分析数据失败:", error)
-        this.$message?.error("加载分析数据失败")
-      } finally {
-        this.loading = false
-      }
-    },
-
-    // 归档配置组
-    async archiveGroup(group) {
-
-      try {
-        const archiveItem = {
-          GroupName: group.GroupName,
-          Segments: group.Segments,
-        }
-
-        const response = await archive(archiveItem)
-        this.$message?.success(`归档成功: ${response}`)
-      } catch (error) {
-        console.error("归档失败:", error)
-        this.$message?.error("归档失败")
-      }
-    },
-
-    // 格式化映射数据
-    formatMap(mapData) {
-      if (!mapData || Object.keys(mapData).length === 0) {
-        return "(无记录)"
-      }
-      return Object.entries(mapData)
-        .map(([k, v]) => `- ${k}：${v}`)
-        .join("<br>")
-    },
-
-    // 格式化文件名显示
-    formatFileName(fileName) {
-      if (!fileName) return ""
-
-      // 如果文件名太长，显示省略号
-      if (fileName.length > 50) {
-        return `${fileName.substring(0, 47)}...`
-      }
-      return fileName
-    },
-
-    // 切换配置组详情展开/收起 - 手风琴效果
-    toggleGroupDetails(groupName) {
-      const index = this.expandedGroups.indexOf(groupName)
-      if (index > -1) {
-        // 如果当前组已展开，则收起
-        this.expandedGroups.splice(index, 1)
-      } else {
-        // 如果当前组未展开，则收起所有其他组，只展开当前组
-        this.expandedGroups = [groupName]
-      }
-    },
-
-    // 切换书签显示/隐藏
-    toggleBookmark() {
-
-      this.bookmarkVisible = !this.bookmarkVisible
-    },
-
-    // 滚动到指定配置组
-    scrollToGroup(groupName) {
-      // 点击导航时自动展开导航
-      this.bookmarkVisible = true
-      const element = document.getElementById(`group-${groupName}`)
-      if (element) {
-        element.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-          inline: "nearest",
-        })
-        // 设置当前活跃组
-        this.currentActiveGroup = groupName
-        // 可选：自动展开该组的详情
-        if (!this.expandedGroups.includes(groupName)) {
-          this.expandedGroups = [groupName]
-        }
-      }
-    },
-
-    // 格式化配置组名称
-    formatGroupName(groupName) {
-      if (!groupName) return ""
-
-      // 如果名称太长，显示省略号
-      if (groupName.length > 20) {
-        return `${groupName.substring(0, 17)}...`
-      }
-      return groupName
-    },
-
-    // 测试点击
-    testClick() {
-
-
-      // 使用更简单有效的方法
-      try {
-        // 方法1: 滚动到页面顶部元素
-        const pageHeader = document.querySelector(".page-header")
-        if (pageHeader) {
-          pageHeader.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          })
-        }
-
-        // 方法2: 直接设置滚动位置
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth",
-        })
-
-        // 方法3: 备用方案
-        document.documentElement.scrollTop = 0
-        document.body.scrollTop = 0
-
-      } catch (error) {
-        console.error("滚动失败:", error)
-      }
-    },
-
-    // 回到顶部
-    scrollToTop() {
-      console.log("回到顶部按钮被点击")
-      try {
-        // 方法1: 滚动到页面顶部元素
-        const pageHeader = document.querySelector(".page-header")
-        if (pageHeader) {
-          pageHeader.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          })
-        }
-
-        // 方法2: 直接设置滚动位置
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth",
-        })
-
-        // 方法3: 备用方案
-        document.documentElement.scrollTop = 0
-        document.body.scrollTop = 0
-
-      } catch (error) {
-        console.error("滚动到顶部失败:", error)
-      }
-    },
-    // 查询收入汇总
-    lookIncome() {
-      const incomeElements = document.querySelectorAll(".income")
-      incomeElements.forEach(el => {
-        if (el.style.display === "none") {
-          el.style.display = "block"
-        } else {
-          el.style.display = "none"
-        }
-      })
-    },
-    // 提取错误信息
-    extractErrors(group) {
-      this.currentErrorGroup = group // 设置当前正在提取错误的配置组
-      this.extractedErrors = [] // 清空之前提取的错误
-
-      // 从配置组中提取错误信息
-      const errors = []
-
-      // 从子任务中提取错误
-      if (group.LogAnalysis2Json && group.LogAnalysis2Json.length > 0) {
-        group.LogAnalysis2Json.forEach(subTask => {
-          if (subTask.Errors && Object.keys(subTask.Errors).length > 0) {
-            Object.entries(subTask.Errors).forEach(([errorName, errorCount]) => {
-              // 坐标提取逻辑 - 直接使用 ErrorsMark 的完整内容
-              let coordinates = "无坐标"
-
-              if (subTask.ErrorsMark && Object.keys(subTask.ErrorsMark).length > 0) {
-                // 将 ErrorsMark 对象转换为字符串格式
-                coordinates = Object.entries(subTask.ErrorsMark)
-                  .map(([key, value]) => `${key}: ${value}`)
-                  .join(", ")
-              }
-
-              // 添加调试信息
-              console.log("错误提取调试:", {
-                taskName: subTask.JsonName,
-                errorName: errorName,
-                errorsMark: subTask.ErrorsMark,
-                extractedCoordinates: coordinates,
-                ErrorTime: subTask.ErrorTime,
-              })
-
-              errors.push({
-                taskName: subTask.JsonName,
-                errorName: errorName,
-                coordinates: coordinates,
-                count: errorCount,
-                ErrorTime: subTask.ErrorTime,
-              })
-            })
-          }
-        })
-      }
-
-      // 从配置组级别的错误汇总中提取
-      if (group.ErrorSummary && Object.keys(group.ErrorSummary).length > 0) {
-        Object.entries(group.ErrorSummary).forEach(([errorName, errorCount]) => {
-          // 检查是否已经添加过相同的错误
-          const existingError = errors.find(err => err.errorName === errorName)
-          if (!existingError) {
-            errors.push({
-              taskName: "配置组级别",
-              errorName: errorName,
-              coordinates: "无坐标",
-              count: errorCount,
-            })
-          }
-        })
-      }
-
-      this.extractedErrors = errors
-      this.showErrorModal = true // 显示弹框
-
-      if (errors.length > 0) {
-        this.$message?.success(`成功提取到 ${errors.length} 条错误信息！`)
-      } else {
-        this.$message?.info("该配置组暂无错误信息")
-      }
-    },
-    // 关闭错误提取弹框
-    closeErrorModal() {
-      this.showErrorModal = false
-      this.currentErrorGroup = null
-      this.extractedErrors = []
-    },
-    // 复制全部错误信息
-    copyAllErrors() {
-      // 构建汇总信息
-      const summaryInfo = [
-        `配置组: ${this.currentErrorGroup?.GroupName || "未知配置组"}`,
-        `文件: ${this.selectedFile || "未知文件"}`,
-        `错误总数: ${this.extractedErrors.length}`,
-        `提取时间: ${new Date().toLocaleString()}`,
-        "======\n",
-      ].join("\n")
-
-      // 构建错误详情
-      const errorDetails = this.extractedErrors.map(err => {
-        return `子任务: ${err.taskName || "未知任务"}, 错误: ${err.errorName || "未知错误"}, 坐标: ${err.coordinates || "无坐标"}, 次数: ${err.count || 1}\n======`
-      }).join("\n")
-
-      // 组合完整信息
-      const fullText = summaryInfo + errorDetails
-      this.copyToClipboard(fullText)
-    },
-    // 复制单个错误信息
-    copySingleError(error, index) {
-      // 构建汇总信息
-      const summaryInfo = [
-        `配置组: ${this.currentErrorGroup?.GroupName || "未知配置组"}`,
-        `文件: ${this.selectedFile || "未知文件"}`,
-        `错误总数: ${this.extractedErrors.length}`,
-        `当前错误序号: ${index + 1}`,
-        `提取时间: ${new Date().toLocaleString()}`,
-        "",
-      ].join("\n")
-
-      // 构建单个错误详情
-      const errorDetail = `子任务: ${error.taskName || "未知任务"}, 错误: ${error.errorName || "未知错误"}, 坐标: ${error.coordinates || "无坐标"}, 次数: ${error.count || 1}`
-
-      // 组合完整信息
-      const fullText = summaryInfo + errorDetail
-      this.copyToClipboard(fullText)
-    },
-    // 复制到剪贴板
-    copyToClipboard(text) {
-      const textarea = document.createElement("textarea")
-      textarea.value = text
-      document.body.appendChild(textarea)
-      textarea.select()
-      document.execCommand("copy")
-      document.body.removeChild(textarea)
-      this.$message?.success("复制成功！（包含配置组、文件、错误总数等汇总信息）")
-    },
-    // 查看日志详情
-    viewLogDetail() {
-      if (!this.selectedFile) {
-        this.$message?.warning("请先选择一个日志文件")
-        return
-      }
-      // 跳转到日志详情页面，传递文件名参数
-      this.$router.push({
-        path: "/logDetail",
-        query: { file: this.selectedFile },
-      })
-    },
-  },
+  } catch (error) {
+    console.error("加载日志文件列表失败:", error)
+    message.error("加载日志文件列表失败")
+  }
 }
+
+// 加载分析数据
+const loadAnalysisData = async () => {
+  if (!selectedFile.value) return
+
+  loading.value = true
+  try {
+
+    const response = await logAnalysis2Page(selectedFile.value)
+    analysisData.value = response.data || []
+    // 重置当前活跃组和展开状态
+    currentActiveGroup.value = ""
+    expandedGroups.value = []
+  } catch (error) {
+    console.error("加载分析数据失败:", error)
+    message.error("加载分析数据失败")
+  } finally {
+    loading.value = false
+  }
+}
+
+// 归档配置组
+const archiveGroup = async (group) => {
+
+  try {
+    const archiveItem = {
+      GroupName: group.GroupName,
+      Segments: group.Segments,
+    }
+
+    const response = await archive(archiveItem)
+    message.success(`归档成功: ${response}`)
+  } catch (error) {
+    console.error("归档失败:", error)
+    message.error("归档失败")
+  }
+}
+
+// 格式化映射数据
+const formatMap = (mapData) => {
+  if (!mapData || Object.keys(mapData).length === 0) {
+    return "(无记录)"
+  }
+  return Object.entries(mapData)
+    .map(([k, v]) => `- ${k}：${v}`)
+    .join("<br>")
+}
+
+// 格式化文件名显示
+const formatFileName = (fileName) => {
+  if (!fileName) return ""
+
+  // 如果文件名太长，显示省略号
+  if (fileName.length > 50) {
+    return `${fileName.substring(0, 47)}...`
+  }
+  return fileName
+}
+
+// 切换配置组详情展开/收起 - 手风琴效果
+const toggleGroupDetails = (groupName) => {
+  const index = expandedGroups.value.indexOf(groupName)
+  if (index > -1) {
+    // 如果当前组已展开，则收起
+    expandedGroups.value.splice(index, 1)
+  } else {
+    // 如果当前组未展开，则收起所有其他组，只展开当前组
+    expandedGroups.value = [groupName]
+  }
+}
+
+// 切换书签显示/隐藏
+const toggleBookmark = () => {
+
+  bookmarkVisible.value = !bookmarkVisible.value
+}
+
+// 滚动到指定配置组
+const scrollToGroup = (groupName) => {
+  // 点击导航时自动展开导航
+  bookmarkVisible.value = true
+  const element = document.getElementById(`group-${groupName}`)
+  if (element) {
+    element.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+      inline: "nearest",
+    })
+    // 设置当前活跃组
+    currentActiveGroup.value = groupName
+    // 可选：自动展开该组的详情
+    if (!expandedGroups.value.includes(groupName)) {
+      expandedGroups.value = [groupName]
+    }
+  }
+}
+
+// 格式化配置组名称
+const formatGroupName = (groupName) => {
+  if (!groupName) return ""
+
+  // 如果名称太长，显示省略号
+  if (groupName.length > 20) {
+    return `${groupName.substring(0, 17)}...`
+  }
+  return groupName
+}
+
+// 回到顶部
+const scrollToTop = () => {
+  console.log("回到顶部按钮被点击")
+  try {
+    // 方法1: 滚动到页面顶部元素
+    const pageHeader = document.querySelector(".page-header")
+    if (pageHeader) {
+      pageHeader.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      })
+    }
+
+    // 方法2: 直接设置滚动位置
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    })
+
+    // 方法3: 备用方案
+    document.documentElement.scrollTop = 0
+    document.body.scrollTop = 0
+
+  } catch (error) {
+    console.error("滚动到顶部失败:", error)
+  }
+}
+
+// 查询收入汇总
+const lookIncome = () => {
+  const incomeElements = document.querySelectorAll(".income")
+  incomeElements.forEach(el => {
+    if (el.style.display === "none") {
+      el.style.display = "block"
+    } else {
+      el.style.display = "none"
+    }
+  })
+}
+
+// 提取错误信息
+const extractErrors = (group) => {
+  currentErrorGroup.value = group // 设置当前正在提取错误的配置组
+  extractedErrors.value = [] // 清空之前提取的错误
+
+  // 从配置组中提取错误信息
+  const errors = []
+
+  // 从子任务中提取错误
+  if (group.LogAnalysis2Json && group.LogAnalysis2Json.length > 0) {
+    group.LogAnalysis2Json.forEach(subTask => {
+      if (subTask.Errors && Object.keys(subTask.Errors).length > 0) {
+        Object.entries(subTask.Errors).forEach(([errorName, errorCount]) => {
+          // 坐标提取逻辑 - 直接使用 ErrorsMark 的完整内容
+          let coordinates = "无坐标"
+
+          if (subTask.ErrorsMark && Object.keys(subTask.ErrorsMark).length > 0) {
+            // 将 ErrorsMark 对象转换为字符串格式
+            coordinates = Object.entries(subTask.ErrorsMark)
+              .map(([key, value]) => `${key}: ${value}`)
+              .join(", ")
+          }
+
+          // 添加调试信息
+          console.log("错误提取调试:", {
+            taskName: subTask.JsonName,
+            errorName: errorName,
+            errorsMark: subTask.ErrorsMark,
+            extractedCoordinates: coordinates,
+            ErrorTime: subTask.ErrorTime,
+          })
+
+          errors.push({
+            taskName: subTask.JsonName,
+            errorName: errorName,
+            coordinates: coordinates,
+            count: errorCount,
+            ErrorTime: subTask.ErrorTime,
+          })
+        })
+      }
+    })
+  }
+
+  // 从配置组级别的错误汇总中提取
+  if (group.ErrorSummary && Object.keys(group.ErrorSummary).length > 0) {
+    Object.entries(group.ErrorSummary).forEach(([errorName, errorCount]) => {
+      // 检查是否已经添加过相同的错误
+      const existingError = errors.find(err => err.errorName === errorName)
+      if (!existingError) {
+        errors.push({
+          taskName: "配置组级别",
+          errorName: errorName,
+          coordinates: "无坐标",
+          count: errorCount,
+        })
+      }
+    })
+  }
+
+  extractedErrors.value = errors
+  showErrorModal.value = true // 显示弹框
+
+  if (errors.length > 0) {
+    message.success(`成功提取到 ${errors.length} 条错误信息！`)
+  } else {
+    message.info("该配置组暂无错误信息")
+  }
+}
+
+// 关闭错误提取弹框
+const closeErrorModal = () => {
+  showErrorModal.value = false
+  currentErrorGroup.value = null
+  extractedErrors.value = []
+}
+
+// 复制全部错误信息
+const copyAllErrors = () => {
+  // 构建汇总信息
+  const summaryInfo = [
+    `配置组: ${currentErrorGroup.value?.GroupName || "未知配置组"}`,
+    `文件: ${selectedFile.value || "未知文件"}`,
+    `错误总数: ${extractedErrors.value.length}`,
+    `提取时间: ${new Date().toLocaleString()}`,
+    "======\n",
+  ].join("\n")
+
+  // 构建错误详情
+  const errorDetails = extractedErrors.value.map(err => {
+    return `子任务: ${err.taskName || "未知任务"}, 错误: ${err.errorName || "未知错误"}, 坐标: ${err.coordinates || "无坐标"}, 次数: ${err.count || 1}\n======`
+  }).join("\n")
+
+  // 组合完整信息
+  const fullText = summaryInfo + errorDetails
+  copyToClipboard(fullText)
+}
+
+// 复制单个错误信息
+const copySingleError = (error, index) => {
+  // 构建汇总信息
+  const summaryInfo = [
+    `配置组: ${currentErrorGroup.value?.GroupName || "未知配置组"}`,
+    `文件: ${selectedFile.value || "未知文件"}`,
+    `错误总数: ${extractedErrors.value.length}`,
+    `当前错误序号: ${index + 1}`,
+    `提取时间: ${new Date().toLocaleString()}`,
+    "",
+  ].join("\n")
+
+  // 构建单个错误详情
+  const errorDetail = `子任务: ${error.taskName || "未知任务"}, 错误: ${error.errorName || "未知错误"}, 坐标: ${error.coordinates || "无坐标"}, 次数: ${error.count || 1}`
+
+  // 组合完整信息
+  const fullText = summaryInfo + errorDetail
+  copyToClipboard(fullText)
+}
+
+// 复制到剪贴板
+const copyToClipboard = (text) => {
+  const textarea = document.createElement("textarea")
+  textarea.value = text
+  document.body.appendChild(textarea)
+  textarea.select()
+  document.execCommand("copy")
+  document.body.removeChild(textarea)
+  message.success("复制成功！（包含配置组、文件、错误总数等汇总信息）")
+}
+
+// 查看日志详情
+const viewLogDetail = () => {
+  if (!selectedFile.value) {
+    message.warning("请先选择一个日志文件")
+    return
+  }
+  // 跳转到日志详情页面，传递文件名参数
+  router.push({
+    path: "/logDetail",
+    query: { file: selectedFile.value },
+  })
+}
+
+// 生命周期钩子
+onMounted(async () => {
+  await loadLogFiles()
+})
 </script>
 
 <style scoped>

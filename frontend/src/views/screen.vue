@@ -1,7 +1,7 @@
 <template>
   <div class="app">
     <header class="header">
-      <h1 @click="$router.go(-1)">屏幕共享----<span>返回</span></h1>
+      <h1 @click="router.go(-1)">屏幕共享----<span>返回</span></h1>
 
 
       <div class="status">
@@ -14,7 +14,7 @@
     <main class="main">
       <div class="video-container">
         <img
-          ref="videoElement"
+          ref="videoElementRef"
           :src="currentFrame"
           alt="屏幕画面"
           class="video-frame" />
@@ -45,90 +45,93 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount } from "vue"
+import { useRouter } from "vue-router"
 import { getStatus } from "@/api"
-export default {
-  name: "App",
-  data() {
-    return {
-      ws: null,
-      isConnected: false,
-      currentFrame: "",
-      fps: 0,
-      resolution: "1280x720",
-      frameCount: 0,
-      lastFpsTime: Date.now(),
 
+const router = useRouter()
+
+// 数据
+const ws = ref(null)
+const isConnected = ref(false)
+const currentFrame = ref("")
+const fps = ref(0)
+const resolution = ref("1280x720")
+const frameCount = ref(0)
+const lastFpsTime = ref(Date.now())
+const videoElementRef = ref(null)
+const statusTimer = ref(null)
+
+// 计算属性
+const connectionStatus = computed(() => {
+  return isConnected.value ? "connected" : "disconnected"
+})
+
+const statusText = computed(() => {
+  return isConnected.value ? "已连接" : "未连接"
+})
+
+// 方法
+const connectWebSocket = () => {
+  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
+  const wsUrl = `${protocol}//${window.location.host}/api/abgiScreen/ws`
+
+  ws.value = new WebSocket(wsUrl)
+  ws.value.binaryType = "blob" // 接收二进制流
+
+  ws.value.onopen = () => {
+    console.log("WebSocket连接已建立")
+    isConnected.value = true
+  }
+
+  ws.value.onmessage = (event) => {
+    const blob = event.data
+    const url = URL.createObjectURL(blob)
+    currentFrame.value = url
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
+
+    // FPS统计
+    const now = Date.now()
+    frameCount.value++
+    if (now - lastFpsTime.value >= 1000) {
+      fps.value = Math.round((frameCount.value * 1000) / (now - lastFpsTime.value))
+      frameCount.value = 0
+      lastFpsTime.value = now
     }
-  },
-  computed: {
-    connectionStatus() {
-      return this.isConnected ? "connected" : "disconnected"
-    },
-    statusText() {
-      return this.isConnected ? "已连接" : "未连接"
-    },
-  },
-  mounted() {
-    this.connectWebSocket()
+  }
 
-  },
-  beforeUnmount() {
-    if (this.ws) this.ws.close()
-    if (this.statusTimer) clearInterval(this.statusTimer)
-  },
-  methods: {
-    connectWebSocket() {
-      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
-      const wsUrl = `${protocol}//${window.location.host}/api/abgiScreen/ws`
+  ws.value.onclose = () => {
+    console.log("WebSocket连接已关闭")
+    isConnected.value = false
+    setTimeout(() => connectWebSocket(), 3000)
+  }
 
-      this.ws = new WebSocket(wsUrl)
-      this.ws.binaryType = "blob" // 接收二进制流
-
-      this.ws.onopen = () => {
-        console.log("WebSocket连接已建立")
-        this.isConnected = true
-      }
-
-      this.ws.onmessage = (event) => {
-        const blob = event.data
-        const url = URL.createObjectURL(blob)
-        this.currentFrame = url
-        setTimeout(() => URL.revokeObjectURL(url), 1000)
-
-        // FPS统计
-        const now = Date.now()
-        this.frameCount++
-        if (now - this.lastFpsTime >= 1000) {
-          this.fps = Math.round((this.frameCount * 1000) / (now - this.lastFpsTime))
-          this.frameCount = 0
-          this.lastFpsTime = now
-        }
-      }
-
-      this.ws.onclose = () => {
-        console.log("WebSocket连接已关闭")
-        this.isConnected = false
-        setTimeout(() => this.connectWebSocket(), 3000)
-      }
-
-      this.ws.onerror = (error) => {
-        console.error("WebSocket错误:", error)
-        this.isConnected = false
-      }
-    },
-    // 获取状态信息
-    async fetchStatus() {
-      try {
-        const response = await getStatus()
-        this.statusData = response.data || {}
-      } catch (error) {
-        console.error("获取状态信息失败:", error)
-      }
-    },
-  },
-
+  ws.value.onerror = (error) => {
+    console.error("WebSocket错误:", error)
+    isConnected.value = false
+  }
 }
+
+// 获取状态信息
+const fetchStatus = async () => {
+  try {
+    const response = await getStatus()
+    // this.statusData = response.data || {}
+  } catch (error) {
+    console.error("获取状态信息失败:", error)
+  }
+}
+
+// 生命周期
+onMounted(() => {
+  connectWebSocket()
+})
+
+onBeforeUnmount(() => {
+  if (ws.value) ws.value.close()
+  if (statusTimer.value) clearInterval(statusTimer.value)
+})
 </script>
 
 <style scoped>

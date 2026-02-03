@@ -26,7 +26,7 @@
       <!-- 日志内容展示区域 -->
       <section v-else-if="logContent" class="panel log-content-panel">
         <iframe
-          ref="logIframe"
+          ref="logIframeRef"
           class="log-iframe"
           :srcdoc="iframeContent"
           @load="onIframeLoad" />
@@ -40,107 +40,113 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted } from "vue"
+import { useRouter, useRoute } from "vue-router"
+import { message } from "ant-design-vue"
 import { api, getLogInfo } from "@/api"
 import indexHtmlContent from "@/assets/index.html?raw"
 
-export default {
-  name: "LogDetail",
-  data() {
-    return {
-      currentFileName: "",
-      logContent: "",
-      loading: false,
-      iframeContent: "",
-    }
-  },
-  async mounted() {
-    // 从路由参数获取文件名
-    this.currentFileName = this.$route.query.file || ""
-    if (this.currentFileName) {
-      await this.loadLogContent()
-    }
-  },
-  methods: {
-    // 加载日志内容
-    async loadLogContent() {
-      if (!this.currentFileName) return
+const router = useRouter()
+const route = useRoute()
 
-      this.loading = true
-      try {
-        // 调用接口获取日志内容
-        const response = await getLogInfo(this.currentFileName)
-        this.logContent = response || ""
+// 数据
+const currentFileName = ref("")
+const logContent = ref("")
+const loading = ref(false)
+const iframeContent = ref("")
 
-        // 加载 index.html 模板并注入日志内容
-        await this.loadIndexHtml()
-      } catch (error) {
-        console.error("加载日志内容失败:", error)
-        this.$message?.error("加载日志内容失败")
-        this.logContent = ""
-      } finally {
-        this.loading = false
-      }
-    },
+// ref
+const logIframeRef = ref(null)
 
-    // 加载 index.html 模板
-    async loadIndexHtml() {
-      try {
-        // 使用导入的 HTML 内容
-        const htmlContent = indexHtmlContent
+// 生命周期：组件挂载后执行
+onMounted(() => {
+  // 从路由参数获取文件名
+  currentFileName.value = route.query.file || ""
+  if (currentFileName.value) {
+    loadLogContent()
+  }
+})
 
-        // 转义日志内容以便安全地注入到 JavaScript 中
-        const escapedLogContent = this.logContent
-          .replace(/\\/g, "\\\\")
-          .replace(/`/g, "\\`")
-          .replace(/\$/g, "\\$")
+// 加载日志内容
+async function loadLogContent() {
+  if (!currentFileName.value) return
 
-        // 将日志内容注入到 HTML 中,直接调用 parseLog 函数处理
-        this.iframeContent = htmlContent.replace(
-          "</body>",
-          `<script>
+  loading.value = true
+  try {
+    // 调用接口获取日志内容
+    const response = await getLogInfo(currentFileName.value)
+    logContent.value = response || ""
+
+    // 加载 index.html 模板并注入日志内容
+    await loadIndexHtml()
+  } catch (error) {
+    console.error("加载日志内容失败:", error)
+    message.error("加载日志内容失败")
+    logContent.value = ""
+  } finally {
+    loading.value = false
+  }
+}
+
+// 加载 index.html 模板
+async function loadIndexHtml() {
+  try {
+    // 使用导入的 HTML 内容
+    const htmlContent = indexHtmlContent
+
+    // 转义日志内容以便安全地注入到 JavaScript 中
+    const escapedLogContent = logContent.value
+      .replace(/\\/g, "\\\\")
+      .replace(/`/g, "\\`")
+      .replace(/\$/g, "\\$")
+
+    // 将日志内容注入到 HTML 中,直接调用 parseLog 函数处理
+    iframeContent.value = htmlContent.replace(
+      "</body>",
+      `<script>
                         // 等待页面完全加载后直接处理日志内容
                         window.addEventListener('load', function() {
                             try {
                                 const logContent = \`${escapedLogContent}\`;
-                                const fileName = '${this.currentFileName}';
-                                
+                                const fileName = '${currentFileName.value}';
+
                                 // 重置解析上下文
                                 if (typeof parsingContext !== 'undefined') {
                                     parsingContext.activeGroups.clear();
                                     parsingContext.activeTasks.clear();
                                     parsingContext.allGroups = [];
                                 }
-                                
+
                                 // 重置时间追踪
                                 if (typeof resetTimeTracker === 'function') {
                                     resetTimeTracker();
                                 }
-                                
+
                                 const dropZone = document.getElementById('dropZone');
                                 if (dropZone && typeof parseLog === 'function' && typeof finalizeParsing === 'function' && typeof generateHTML === 'function') {
                                     // 显示加载状态
                                     dropZone.innerHTML = '<div class="loading">解析中...</div>';
                                     dropZone.className = 'has-content';
-                                    
+
                                     // 从文件名解析日期
                                     let fileDate = null;
                                     if (typeof parseDateFromFileName === 'function') {
                                         fileDate = parseDateFromFileName(fileName);
                                     }
-                                    
+
                                     // 直接解析日志内容
                                     parseLog(logContent, fileDate);
-                                    
+
                                     // 完成解析并生成HTML
                                     const result = finalizeParsing();
                                     dropZone.innerHTML = generateHTML(result);
-                                    
+
                                     // 设置弹窗和其他功能
                                     if (typeof setupCoordPopups === 'function') {
                                         setupCoordPopups();
                                     }
-                                    
+
                                     // 设置折叠功能
                                     document.querySelectorAll('.group-header').forEach((el, i) => {
                                         el.onclick = (e) => {
@@ -149,18 +155,18 @@ export default {
                                             const container = el.closest('.group-container');
                                             const headerRect = el.getBoundingClientRect();
                                             const isStickyAtTop = headerRect.top <= 15 && headerRect.top >= -10;
-                                            
+
                                             if (isStickyAtTop) {
                                                 const targetPosition = container.offsetTop - 40;
                                                 const currentPosition = dropZone.scrollTop;
                                                 const scrollDistance = Math.abs(targetPosition - currentPosition);
                                                 const scrollDuration = Math.min(2000, Math.max(200, scrollDistance)) + 50;
-                                                
+
                                                 dropZone.scrollTo({
                                                     top: targetPosition,
                                                     behavior: 'smooth'
                                                 });
-                                                
+
                                                 setTimeout(() => {
                                                     if (typeof toggleCollapseState === 'function') {
                                                         toggleCollapseState(el, content, arrow);
@@ -173,7 +179,7 @@ export default {
                                             }
                                         };
                                     });
-                                    
+
                                     // 应用初始显示状态
                                     if (typeof updateTimeColumnsVisibility === 'function') {
                                         updateTimeColumnsVisibility();
@@ -190,7 +196,7 @@ export default {
                                     if (typeof showQuickNavToggle === 'function') {
                                         showQuickNavToggle();
                                     }
-                                    
+
                                     // 标记已有日志数据
                                     if (typeof hasLogData !== 'undefined') {
                                         hasLogData = true;
@@ -206,37 +212,35 @@ export default {
                                 }
                             }
                         });
-                    <\/script>
+                    <\\/script>
                     </body>`,
-        )
-      } catch (error) {
-        console.error("加载 index.html 失败:", error)
-        this.$message?.error("加载页面模板失败")
-      }
-    },
+    )
+  } catch (error) {
+    console.error("加载 index.html 失败:", error)
+    message.error("加载页面模板失败")
+  }
+}
 
-    // iframe 加载完成回调
-    onIframeLoad() {
-      try {
-        const iframe = this.$refs.logIframe
-        if (iframe && iframe.contentWindow) {
-          // 向 iframe 传递日志数据
-          iframe.contentWindow.postMessage({
-            type: "LOG_DATA",
-            fileName: this.currentFileName,
-            content: this.logContent,
-          }, "*")
-        }
-      } catch (error) {
-        console.error("向 iframe 发送数据失败:", error)
-      }
-    },
+// iframe 加载完成回调
+function onIframeLoad() {
+  try {
+    const iframe = logIframeRef.value
+    if (iframe && iframe.contentWindow) {
+      // 向 iframe 传递日志数据
+      iframe.contentWindow.postMessage({
+        type: "LOG_DATA",
+        fileName: currentFileName.value,
+        content: logContent.value,
+      }, "*")
+    }
+  } catch (error) {
+    console.error("向 iframe 发送数据失败:", error)
+  }
+}
 
-    // 返回上一页
-    goBack() {
-      this.$router.back()
-    },
-  },
+// 返回上一页
+function goBack() {
+  router.back()
 }
 </script>
 
