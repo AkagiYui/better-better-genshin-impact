@@ -109,7 +109,7 @@ const fetchData = async () => {
     // 使用与原始HTML完全相同的API调用方式
     const url = `/api/getAutoArtifactsPro2?fileName=${fileName.value}&json=1`
     // 从 localStorage 读取 token 并加入请求头（与 api.js 保持一致的字段）
-    const token = localStorage.getItem('aBgiToken')
+    const token = localStorage.getItem('bbgi-token')
     const headers = {}
     if (token) {
       headers['Authorization'] = token

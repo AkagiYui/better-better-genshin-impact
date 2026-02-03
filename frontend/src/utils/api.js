@@ -40,7 +40,7 @@ api.interceptors.request.use(
     }
     
     // 从 localStorage 获取 token 并添加到 Authorization 头
-    const token = localStorage.getItem('aBgiToken')
+    const token = localStorage.getItem('bbgi-token')
     if (token) {
       config.headers.Authorization = `${token}`
     }
@@ -63,7 +63,7 @@ api.interceptors.response.use(
   error => {
     // 1. 处理 401 未授权错误
     if (error.response && error.response.status === 401) {
-      localStorage.removeItem('aBgiToken')
+      localStorage.removeItem('bbgi-token')
       console.warn('认证已过期，请重新登录')
       router.push('/login')
       return Promise.reject(error)
@@ -82,9 +82,9 @@ api.interceptors.response.use(
     // 如果 error.response 不存在，说明根本没有收到后端的响应
     if ( error.code === 'ERR_BAD_RESPONSE') {
             console.error('连接失败：后端未启动或网络异常', error.message)
-            var token = localStorage.getItem('aBgiToken')
+            var token = localStorage.getItem('bbgi-token')
             if (token==null) {
-              localStorage.removeItem('aBgiToken')
+              localStorage.removeItem('bbgi-token')
                 // 只有当前不在登录页时才跳转，防止重复跳转报错
             if (router.currentRoute._rawValue.path !== '/login') {
               router.push('/login')

@@ -183,12 +183,12 @@ const onFinish = async () => {
     if (response.code === 401 || response.error) {
       errorMessage.value = response.error || '登录失败，请检查用户名和密码'
       message.error('登录失败：' + (response.error || '未知错误'))
-    } else if (response.code === 200 && response.aBgiToken) {
-      localStorage.setItem('aBgiToken', response.aBgiToken)
+    } else if (response.code === 200 && response.bbgi-token) {
+      localStorage.setItem('bbgi-token', response.bbgi-token)
       message.success('登录成功！')
       router.push('/')
-    } else if (response.aBgiToken) {
-      localStorage.setItem('aBgiToken', response.aBgiToken)
+    } else if (response.bbgi-token) {
+      localStorage.setItem('bbgi-token', response.bbgi-token)
       message.success('登录成功！')
       router.push('/')
     } else {

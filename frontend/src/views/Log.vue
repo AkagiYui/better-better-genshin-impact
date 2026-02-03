@@ -235,7 +235,7 @@ const connectWebSocket = name => {
 // --- 数据加载 (保持原有) ---
 const loadLogFiles = async () => {
   try {
-    const token = localStorage.getItem('aBgiToken')
+    const token = localStorage.getItem('bbgi-token')
     const headers = token ? { 'Authorization': token } : {}
     const res = await fetch(getBaseURL()+'/api/logFiles', { headers })
     

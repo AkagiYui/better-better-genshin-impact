@@ -252,7 +252,7 @@ const screenshotContainer = ref(null)
 const isZoomed = ref(false)
 const zoomScale = ref(1)
 const isAutoRefresh = ref(true) // 是否自动刷新
-const token = localStorage.getItem('aBgiToken')
+const token = localStorage.getItem('bbgi-token')
 let screenshotTimer = null
 const SCREENSHOT_INTERVAL = 5000
 
@@ -438,7 +438,7 @@ const handleTouchEnd = () => {
 // --- 认证与基础 ---
 const handleLogout = () => {
   try {
-    localStorage.removeItem('aBgiToken')
+    localStorage.removeItem('bbgi-token')
     router.push('/login')
   } catch (err) {
     console.error(err)
@@ -545,7 +545,7 @@ const handleUploadBgiOk = async () => {
   xhr.addEventListener('error', () => { uploadBgiModal.loading = false; message.error('网络错误') })
   
   try {
-    const token = localStorage.getItem('aBgiToken')
+    const token = localStorage.getItem('bbgi-token')
     xhr.open('POST', '/api/UpdateBgi/Upload')
     if (token) xhr.setRequestHeader('Authorization', token)
     xhr.send(formData)

@@ -42,7 +42,7 @@ const router = createRouter({
 
 // 路由守卫 - 检查认证状态
 router.beforeEach((to, from) => {
-  const token = localStorage.getItem('aBgiToken')
+  const token = localStorage.getItem('bbgi-token')
   const requiresAuth = to.meta.requiresAuth
 
   // 如果路由需要认证但没有token，重定向到登录页

@@ -265,7 +265,7 @@ import { apiMethods } from '@/utils/api'
 import { Modal, notification } from 'ant-design-vue'
 
 function getToken() {
-  return localStorage.getItem('aBgiToken') || ''
+  return localStorage.getItem('bbgi-token') || ''
 }
 
 function getVideoStreamUrl(path) {
