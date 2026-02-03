@@ -4,6 +4,13 @@ import stylistic from "@stylistic/eslint-plugin"
 import importPlugin from "eslint-plugin-import"
 
 export default [
+  {
+    ignores: [
+      "dist/**/*",
+      "node_modules/**/*",
+      "public/**/*",
+    ],
+  },
   ...pluginVue.configs["flat/recommended"],
   {
     plugins: {
