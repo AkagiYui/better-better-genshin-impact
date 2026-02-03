@@ -10,7 +10,7 @@
         <div class="header-title-group">
           <h1>日志分析</h1>
         </div>
-        <button class="btn header-btn" @click="router.push('/')">返回首页</button>
+        <button class="btn header-btn" @click="router.push({ name: 'home' })">返回首页</button>
       </div>
       <div class="header-divider" />
     </header>
@@ -604,7 +604,7 @@ const viewLogDetail = () => {
   }
   // 跳转到日志详情页面，传递文件名参数
   router.push({
-    path: "/logDetail",
+    name: "log-detail",
     query: { file: selectedFile.value },
   })
 }

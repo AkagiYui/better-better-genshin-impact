@@ -37,7 +37,7 @@ const route = useRoute()
 const errorDetails = ref("")
 
 const goHome = () => {
-  router.push("/")
+  router.push({ name: "home" })
 }
 
 const refreshPage = () => {

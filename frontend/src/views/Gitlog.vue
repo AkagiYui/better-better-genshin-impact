@@ -223,7 +223,7 @@ export default {
     }
 
     const goHome = () => {
-      router.push("/")
+      router.push({ name: "home" })
     }
 
     const sortTable = (key) => {

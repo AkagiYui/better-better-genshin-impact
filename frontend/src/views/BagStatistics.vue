@@ -471,9 +471,9 @@ const loadData = async () => {
   }
 }
 
-const onHomeButtonClick = () => { router.push("/") }
-const onBagStatisticsTrendButtonClick = () => { router.push("/MaterialTrend") }
-const onMoralePageButtonClick = () => { router.push("/Morale") }
+const onHomeButtonClick = () => { router.push({ name: "home" }) }
+const onBagStatisticsTrendButtonClick = () => { router.push({ name: "material-trend" }) }
+const onMoralePageButtonClick = () => { router.push({ name: "morale" }) }
 
 // 修改：item 变为可选参数，支持按钮直接点击
 const onCheckBagButtonClick = async (item) => {

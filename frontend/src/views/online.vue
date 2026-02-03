@@ -351,7 +351,7 @@ const StartOnline = (typeKey) => {
 }
 
 const goHome = () => {
-  router.push("/")
+  router.push({ name: "home" })
 }
 
 onMounted(() => {

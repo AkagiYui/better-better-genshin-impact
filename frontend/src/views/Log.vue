@@ -96,7 +96,7 @@ let scrollRaf = 0
 
 // --- 核心逻辑 ---
 
-const goHome = () => router.push("/")
+const goHome = () => router.push({ name: "home" })
 
 const toggleTheme = () => {
   isHackerTheme.value = !isHackerTheme.value

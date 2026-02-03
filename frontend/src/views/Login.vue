@@ -156,7 +156,7 @@ const onFinish = async () => {
     } else if (response.status === 200 && response.data?.aBgiToken) {
       localStorage.setItem("bbgi-token", response.data.aBgiToken)
       message.success("登录成功！")
-      router.push("/")
+      router.push({ name: "home" })
     } else {
       console.debug("登录失败：", response)
       errorMessage.value = "登录失败，请重试"

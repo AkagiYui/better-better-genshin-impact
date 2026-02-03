@@ -393,7 +393,7 @@ export default {
       handleSearchInput,
       selectScript,
       formatDesc,
-      goHome: () => router.push("/"),
+      goHome: () => router.push({ name: "home" }),
     }
   },
 }

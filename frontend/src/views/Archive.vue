@@ -273,7 +273,7 @@ export default {
 
     // 返回首页
     const goHome = () => {
-      router.push("/")
+      router.push({ name: "home" })
     }
 
     // 全部删除归档记录（不改接口/字段/逻辑）

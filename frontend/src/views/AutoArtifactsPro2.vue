@@ -333,7 +333,7 @@ const renderChart = async (data, retryCount = 0) => {
 
 // 返回主页
 const goHome = () => {
-  router.push("/")
+  router.push({ name: "home" })
 }
 
 // 窗口大小变化时重新调整图表

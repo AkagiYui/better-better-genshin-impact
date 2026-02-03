@@ -474,7 +474,7 @@ const handleSubmit = async () => {
     await updateConfig(payload)
     message.success("保存成功！")
     setTimeout(() => {
-      router.push("/")
+      router.push({ name: "home" })
     }, 2000)
   } catch (error) {
     message.error(`保存失败: ${error.message}`)

@@ -76,8 +76,8 @@
           <div class="btn-grid">
             <button @click="openScreenshot">查看桌面</button>
             <button @click="sendImage">发送截图</button>
-            <button @click="router.push('/log')">实时日志</button>
-            <button @click="router.push('/autoLog')">ABGI日志查询</button>
+            <button @click="router.push({ name: 'log' })">实时日志</button>
+            <button @click="router.push({ name: 'auto-log' })">ABGI日志查询</button>
           </div>
         </div>
 
@@ -87,7 +87,7 @@
             <button
               v-for="(btn, index) in dataAnalysisButtons"
               :key="index"
-              @click="router.push(btn.route)">
+              @click="router.push({ name: btn.name })">
               {{ btn.text }}
             </button>
           </div>
@@ -99,7 +99,7 @@
             <button
               v-for="(btn, index) in automationButtons"
               :key="index"
-              @click="btn.action ? btn.action() : router.push(btn.route)">
+              @click="btn.action ? btn.action() : router.push({ name: btn.name })">
               {{ btn.text }}
             </button>
           </div>
@@ -111,7 +111,7 @@
             <button
               v-for="(btn, index) in bgiButtons"
               :key="index"
-              @click="btn.action ? btn.action() : router.push(btn.route)">
+              @click="btn.action ? btn.action() : router.push({ name: btn.name })">
               {{ btn.text }}
             </button>
           </div>
@@ -423,10 +423,10 @@ const handleTouchEnd = () => {
 const handleLogout = () => {
   try {
     localStorage.removeItem("bbgi-token")
-    router.push("/login")
+    router.push({ name: "login" })
   } catch (err) {
     console.error(err)
-    router.push("/login")
+    router.push({ name: "login" })
   }
 }
 
@@ -462,13 +462,13 @@ const statusData = reactive({
 
 // --- 按钮配置 (保持不变) ---
 const dataAnalysisButtons = ref([
-  { text: "查看狗粮日志", route: "/getAutoArtifactsPro" },
-  { text: "屑荧进村", route: "/logAnalysis" },
-  { text: "归档查询", route: "/archive" },
-  { text: "旅行者札记", route: "/BagStatistics" },
-  { text: "配置组运行情况", route: "/other" },
+  { text: "查看狗粮日志", name: "get-auto-artifacts-pro" },
+  { text: "屑荧进村", name: "log-analysis" },
+  { text: "归档查询", name: "archive" },
+  { text: "旅行者札记", name: "bag-statistics" },
+  { text: "配置组运行情况", name: "other" },
   // { text: 'CD管理自动采集', route: '/CDAwareAutoGather' },
-  { text: "采集管理", route: "/CollectionManagement" },
+  { text: "采集管理", name: "collection-management" },
 
 
 ])
@@ -599,24 +599,24 @@ const indexSXBtn = () => {
 const automationButtons = ref([
   { text: "一条龙启动", action: () => { oneLongModal.visible = true; handleOneLongLoad() } },
   { text: "关闭BGI和原神", action: handleCloseBgi },
-  { text: "调度圣坛", route: "/listGroups" },
+  { text: "调度圣坛", name: "list-groups" },
   { text: "备份 USER 文件", action: handleBackup },
-  { text: "脚本屋", route: "/jsNames" },
-  { text: "地图追踪", route: "/Pathing" },
-  { text: "联机管理", route: "/Online" },
-  { text: "ABGI定时任务", route: "/TaskCron" },
+  { text: "脚本屋", name: "js-names" },
+  { text: "地图追踪", name: "pathing" },
+  { text: "联机管理", name: "online" },
+  { text: "ABGI定时任务", name: "task-cron" },
 
 ])
 
 const bgiButtons = ref([
-  { text: "录屏管理", route: "/obsVideo" },
-  { text: "仓库管理", route: "/GitLog" },
+  { text: "录屏管理", name: "obs-video" },
+  { text: "仓库管理", name: "gitlog" },
   { text: "手动更新BGI", action: handleUploadBgiClick },
   { text: "米游社签到", action: mysSignIn },
-  { text: "ABGI设置", route: "/Config" },
+  { text: "ABGI设置", name: "config" },
 
-  { text: "BGI一条龙配置", route: "/BgiConfig" },
-  { text: "检查更新", action: () => router.push("/Update") },
+  { text: "BGI一条龙配置", name: "bgi-config" },
+  { text: "检查更新", action: () => router.push({ name: "update" }) },
   { text: "退出登录", action: handleLogout },
 ])
 

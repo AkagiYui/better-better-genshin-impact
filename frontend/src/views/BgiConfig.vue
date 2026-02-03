@@ -233,7 +233,7 @@ onMounted(() => {
 })
 
 const goHome = () => {
-  router.push("/")
+  router.push({ name: "home" })
 }
 </script>
 

@@ -322,8 +322,8 @@ const refresh = () => {
   fetchStatistics()
 }
 
-const goBackStatistics = () => {
-  router.push("/BagStatistics")
+const goBackwardStatistics = () => {
+  router.push({ name: "bag-statistics" })
 }
 
 const handleResize = () => {

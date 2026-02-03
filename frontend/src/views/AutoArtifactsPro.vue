@@ -124,7 +124,7 @@ export default {
 
     // 方法
     const goToHome = () => {
-      router.push("/")
+      router.push({ name: "home" })
     }
 
     setInterval(() => {
@@ -132,7 +132,7 @@ export default {
     }, 100)
 
     const getAutoArtifactsPro2Btn = (fileName) => {
-      router.push({ path: "/getAutoArtifactsPro2", query: { fileName } })
+      router.push({ name: "get-auto-artifacts-pro2", query: { fileName } })
     }
 
     const loadImages = async () => {

@@ -72,7 +72,7 @@
           </div>
 
           <div class="header-right">
-            <button class="btn ghost" @click="$router.push('/')">
+            <button class="btn ghost" @click="$router.push({ name: 'home' })">
               <span class="btn-icon">🏠</span>
               <span class="btn-text">主页</span>
             </button>

@@ -65,14 +65,14 @@ api.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       localStorage.removeItem("bbgi-token")
       console.warn("认证已过期，请重新登录")
-      router.push("/login")
+      router.push({ name: "login" })
       return Promise.reject(error)
     }
 
     //处理888错误，强制更新前端
     if (error.response && error.response.status === 888) {
       console.warn("等待重启中，请稍后...")
-      router.push("/")
+      router.push({ name: "home" })
       return Promise.reject("等待重启中，请稍后...")
     }
 
@@ -85,8 +85,8 @@ api.interceptors.response.use(
       if (token == null) {
         localStorage.removeItem("bbgi-token")
         // 只有当前不在登录页时才跳转，防止重复跳转报错
-        if (router.currentRoute._rawValue.path !== "/login") {
-          router.push("/login")
+        if (router.currentRoute._rawValue.name !== "login") {
+          router.push({ name: "login" })
           return
         }
       }
