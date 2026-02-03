@@ -42,7 +42,7 @@
 <script setup>
 import { ref, onMounted } from "vue"
 import { message } from "ant-design-vue"
-import { apiMethods } from "@/utils/api"
+import { apiMethods } from "@/api"
 
 const loading = ref(false)
 const selectedPeriod = ref("today")

@@ -184,7 +184,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue"
 import { message } from "ant-design-vue"
-import api, { apiMethods } from "@/utils/api"
+import api, { apiMethods } from "@/api"
 
 // 响应式数据
 const pageTitle = ref("配置组列表")

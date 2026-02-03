@@ -146,7 +146,7 @@
 <script setup>
 import { ref, reactive } from "vue"
 import { message } from "ant-design-vue"
-import { apiMethods } from "@/utils/api"
+import { apiMethods } from "@/api"
 
 const calculating = ref(false)
 const calculationResult = ref(null)

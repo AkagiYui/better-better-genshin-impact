@@ -376,7 +376,7 @@
 import { ref, onMounted, computed, onUnmounted } from "vue"
 import { message } from "ant-design-vue"
 import dayjs from "dayjs"
-import { apiMethods } from "@/utils/api"
+import { apiMethods } from "@/api"
 
 const loading = ref(false)
 const accountLoading = ref(false)

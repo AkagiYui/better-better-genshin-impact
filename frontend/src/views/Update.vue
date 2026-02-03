@@ -110,7 +110,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue"
 import { message } from "ant-design-vue"
-import { apiMethods } from "@/utils/api"
+import { apiMethods } from "@/api"
 
 // --- State Definitions ---
 const currentVersion = ref("加载中...")

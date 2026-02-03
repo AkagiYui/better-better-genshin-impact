@@ -199,7 +199,7 @@
 import { ref, computed, onMounted } from "vue"
 import { useRouter } from "vue-router"
 import { message, Modal } from "ant-design-vue"
-import { apiMethods } from "@/utils/api"
+import { apiMethods } from "@/api"
 
 export default {
   name: "Archive",

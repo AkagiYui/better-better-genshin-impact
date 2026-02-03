@@ -56,7 +56,7 @@ import { ref, onMounted, onUnmounted, nextTick } from "vue"
 import { useRouter } from "vue-router"
 import { Swiper } from "swiper/bundle"
 import "swiper/css/bundle"
-import { getBaseURL } from "@/utils/api"
+import { getBaseURL } from "@/api"
 
 const router = useRouter()
 

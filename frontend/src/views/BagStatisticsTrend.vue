@@ -110,7 +110,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { message } from "ant-design-vue"
 import * as echarts from "echarts"
 import { useRouter } from "vue-router"
-import { apiMethods } from "@/utils/api"
+import { apiMethods } from "@/api"
 
 const loading = ref(false)
 const statistics = ref([])

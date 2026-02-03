@@ -119,7 +119,7 @@
 <script setup>
 import { ref, onMounted } from "vue"
 import { Cascader as ACascader, message, Modal } from "ant-design-vue"
-import { apiMethods } from "@/utils/api"
+import { apiMethods } from "@/api"
 
 
 const pathingList = ref([])

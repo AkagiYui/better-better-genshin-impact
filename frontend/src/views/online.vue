@@ -144,7 +144,7 @@
 import { ref, reactive, onMounted, onUnmounted } from "vue"
 import { message, Modal } from "ant-design-vue"
 import { useRouter } from "vue-router"
-import api, { apiMethods } from "@/utils/api"
+import api, { apiMethods } from "@/api"
 
 const isDebugMode = ref(false)
 const detailList = ref([])

@@ -49,15 +49,15 @@ export default defineConfig({
         entryFileNames: "js/[name]-[hash].js",
         chunkFileNames: "js/[name]-[hash].js",
         assetFileNames: (chunkInfo) => {
-          console.log("chunkInfo:", chunkInfo.names)
-          if (chunkInfo.name.endsWith(".css")) {
+          const name = chunkInfo.names[0]
+          if (name.endsWith(".css")) {
             return "css/[name]-[hash][extname]"
           }
-          if (chunkInfo.name.endsWith(".js")) {
+          if (name.endsWith(".js")) {
             return "js/[name]-[hash][extname]"
           }
           const imgExts = [".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".ico"]
-          if (imgExts.some((ext) => chunkInfo.name.endsWith(ext))) {
+          if (imgExts.some((ext) => name.endsWith(ext))) {
             return "img/[name]-[hash][extname]"
           }
           return "assets/[name]-[hash][extname]"

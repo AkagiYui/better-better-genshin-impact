@@ -104,7 +104,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue"
-import { apiMethods } from "../utils/api.js"
+import { apiMethods } from "@/api"
 
 // 响应式数据
 const loading = ref(false)

@@ -289,8 +289,8 @@
 
 <script>
 import { Modal, message } from "ant-design-vue"
-import { apiMethods } from "@/utils/api"
-import api from "@/utils/api"
+import { apiMethods } from "@/api"
+import api from "@/api"
 
 export default {
   name: "BagStatistics",

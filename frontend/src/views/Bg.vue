@@ -91,7 +91,6 @@
 import { ref, reactive, onMounted } from "vue"
 import { message } from "ant-design-vue"
 import { InboxOutlined } from "@ant-design/icons-vue"
-import { apiMethods } from "@/utils/api"
 
 const activeTab = ref("wallpaper")
 const currentWallpaper = ref("")

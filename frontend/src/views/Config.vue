@@ -281,7 +281,7 @@ import { message } from "ant-design-vue"
 import { QuestionCircleOutlined, PlusOutlined, DeleteOutlined } from "@ant-design/icons-vue"
 import { useRouter } from "vue-router"
 // 假设这是你的API路径，保持不变
-import { apiMethods } from "@/utils/api"
+import { apiMethods } from "@/api"
 
 const router = useRouter()
 const formRef = ref()

@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import api from "@/utils/api"
+import api from "@/api"
 import indexHtmlContent from "@/assets/index.html?raw"
 
 export default {

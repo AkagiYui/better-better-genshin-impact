@@ -278,7 +278,7 @@
 </template>
 
 <script>
-import api from "@/utils/api"
+import api from "@/api"
 
 export default {
   name: "Other",

@@ -233,7 +233,7 @@ import {
   PlayCircleOutlined,
   PauseCircleOutlined,
 } from "@ant-design/icons-vue"
-import { apiMethods } from "@/utils/api"
+import { apiMethods } from "@/api"
 
 // --- 逻辑部分保持原样 ---
 

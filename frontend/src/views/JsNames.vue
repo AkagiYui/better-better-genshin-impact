@@ -168,7 +168,7 @@
 <script>
 import { ref, computed, onMounted, onUnmounted, reactive, nextTick } from "vue"
 import { useRouter } from "vue-router"
-import { apiMethods } from "@/utils/api"
+import { apiMethods } from "@/api"
 
 export default {
   name: "JsNamesAnimeTheme",

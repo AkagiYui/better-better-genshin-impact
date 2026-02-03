@@ -165,9 +165,7 @@ import { ref, computed, onMounted, reactive } from "vue"
 import { marked } from "marked"
 import DOMPurify from "dompurify"
 import { useRouter } from "vue-router"
-import { apiMethods } from "../utils/api"
-// import '../assets/markdown.css'
-import api from "@/utils/api"
+import { apiMethods } from "@/api"
 
 export default {
   name: "JsNames",

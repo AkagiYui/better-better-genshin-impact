@@ -124,7 +124,7 @@
 <script>
 import { ref, computed, onMounted } from "vue"
 import { Modal, message } from "ant-design-vue"
-import { apiMethods } from "../utils/api.js"
+import { apiMethods } from "@/api"
 
 export default {
   name: "LogAnalysis",

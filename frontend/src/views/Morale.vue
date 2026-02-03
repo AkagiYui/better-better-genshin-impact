@@ -195,7 +195,7 @@
 </template>
 
 <script>
-import api from "@/utils/api"
+import api from "@/api"
 import { message } from "ant-design-vue"
 import locale from "ant-design-vue/es/date-picker/locale/zh_CN"
 import dayjs from "dayjs"

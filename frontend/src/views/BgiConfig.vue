@@ -121,7 +121,7 @@
 import { ref, reactive, onMounted } from "vue"
 import { message } from "ant-design-vue"
 import { useRouter } from "vue-router"
-import { apiMethods } from "@/utils/api"
+import { apiMethods } from "@/api"
 
 const configList = ref([])
 const currentName = ref("")

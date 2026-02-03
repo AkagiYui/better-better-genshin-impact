@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { apiMethods } from "@/utils/api"
+import { apiMethods } from "@/api"
 export default {
   name: "App",
   data() {

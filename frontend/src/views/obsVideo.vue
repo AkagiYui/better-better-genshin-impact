@@ -250,7 +250,7 @@
 import { ref, onMounted, reactive, computed } from "vue"
 import dayjs from "dayjs"
 import { Modal, notification } from "ant-design-vue"
-import { apiMethods } from "@/utils/api"
+import { apiMethods } from "@/api"
 
 function getToken() {
   return localStorage.getItem("bbgi-token") || ""

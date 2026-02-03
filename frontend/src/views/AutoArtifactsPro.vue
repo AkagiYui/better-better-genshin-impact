@@ -105,7 +105,7 @@ import { useRouter } from "vue-router"
 import { Swiper } from "swiper"
 import "swiper/css"
 import "swiper/css/effect-fade"
-import { apiMethods } from "@/utils/api"
+import { apiMethods } from "@/api"
 
 export default {
   name: "AutoArtifactsPro",

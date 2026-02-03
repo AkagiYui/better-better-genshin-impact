@@ -315,7 +315,7 @@ import {
   SyncOutlined,
 } from "@ant-design/icons-vue"
 // 请确保路径正确
-import { apiMethods } from "@/utils/api"
+import { apiMethods } from "@/api"
 
 // 设置 dayjs 为中文
 dayjs.locale("zh-cn")
