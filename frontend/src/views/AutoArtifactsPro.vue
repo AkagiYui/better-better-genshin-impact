@@ -128,7 +128,7 @@ export default {
     }
 
     setInterval(() => {
-      debugger
+      //debugger
     }, 100)
 
     const getAutoArtifactsPro2Btn = (fileName) => {

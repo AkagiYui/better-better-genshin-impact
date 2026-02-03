@@ -222,7 +222,7 @@ export default {
     })
 
     setInterval(() => {
-      debugger
+      //debugger
     }, 100)
 
     // 排序方法（不改逻辑）
