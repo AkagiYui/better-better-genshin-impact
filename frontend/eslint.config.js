@@ -19,7 +19,7 @@ export default [
     },
     rules: {
       semi: ["warn", "never"], // 禁止分号
-      camelcase: ["off", { allow: ["dead_code", "keep_classnames", "keep_fnames"] }], // 强制驼峰命名
+      camelcase: ["warn", { allow: ["dead_code", "keep_classnames", "keep_fnames"] }], // 强制驼峰命名
       eqeqeq: ["warn", "smart"], // 智能禁止使用 == 和 !=，要求使用 === 和 !==
       "no-multi-str": ["warn"], // 禁止使用多行字符串
       "prefer-template": ["warn"], // 优先使用模板字符串
@@ -68,13 +68,13 @@ export default [
       "import/order": ["warn"], // import排序
 
       "vue/component-api-style": [
-        "off",
+        "warn",
         ["script-setup", "composition"], // "script-setup", "composition", "composition-vue2", or "options"
       ], // vue组件api风格
       "vue/no-unused-vars": ["warn"], // vue模板中未使用的变量
       "vue/max-attributes-per-line": ["warn", { singleline: { max: Infinity }, multiline: { max: 1 } }], // 每行最多的属性数量
       "vue/no-unused-components": ["warn"], // 未使用的组件
-      "vue/no-v-model-argument": ["off"], // v-model 指令禁止使用参数，vue2.7中可使用
+      "vue/no-v-model-argument": ["warn"], // v-model 指令禁止使用参数，vue2.7中可使用
       "vue/multi-word-component-names": ["off", { ignores: [] }], // 组件名必须由多个单词组成
       "vue/order-in-components": ["warn"], // 组件属性顺序
       "vue/block-order": ["warn"], // 块顺序
