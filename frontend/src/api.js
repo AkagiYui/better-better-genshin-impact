@@ -1,5 +1,5 @@
 import axios from 'axios'
-import router from '../router'
+import router from './router'
 
 // 获取当前baseURL的函数
 export const getBaseURL = () => {
@@ -58,7 +58,7 @@ api.interceptors.response.use(
     if (process.env.NODE_ENV !== 'production') {
       console.log('API响应:', response.status, response.config.url)
     }
-    return response.data
+    return response
   },
   error => {
     // 1. 处理 401 未授权错误

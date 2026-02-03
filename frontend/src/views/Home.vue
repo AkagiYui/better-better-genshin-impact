@@ -235,7 +235,7 @@ import { ref, reactive, onMounted, onUnmounted, computed, watch, h } from 'vue'
 import { message, Modal, Select } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 // 假设这里有您的API工具，如果报错请保留您原来的引入方式
-import { apiMethods,getBaseURL } from '@/utils/api' 
+import { apiMethods,getBaseURL } from '@/api' 
 
 const router = useRouter()
 

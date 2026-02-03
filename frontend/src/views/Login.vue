@@ -96,7 +96,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
-import { apiMethods } from '../utils/api'
+import { apiMethods } from '@/api'
 
 const router = useRouter()
 const formRef = ref(null)
@@ -109,9 +109,6 @@ const formState = ref({
   password: ''
 })
 
-// 在 script setup 顶部添加定义
-const isUniappReady = ref(false) //
-
 // 页面挂载时获取系统配置
 onMounted(async () => {
   try {
@@ -122,27 +119,6 @@ onMounted(async () => {
   } catch (error) {
     console.error('获取系统配置失败:', error)
   }
-
-
-
-// const initUniBridge = () => {
-//     isUniappReady.value = true;
-//     console.log('✨ UniApp Bridge 已就绪');
-//     // 自动握手一次
-//     if (window.uni && window.uni.postMessage) {
-//       // window.uni.postMessage({ data: { type: '思姐真可爱', msg: 'abgi已经连接' } });
-//       console.log('✨ 已向 UniApp 发送握手消息');
-//     }
-//   };
-
-//   // 2. 同时尝试两种检查方式
-//   if (window.UniAppJSBridgeReady) {
-//     initUniBridge();
-//   } else {
-//     document.addEventListener('UniAppJSBridgeReady', initUniBridge);
-//   }
-
-
 })
 
 const handleEnter = () => {
@@ -180,18 +156,15 @@ const onFinish = async () => {
       formState.value.password
     )
 
-    if (response.code === 401 || response.error) {
+    if (response.status === 401 || response.error) {
       errorMessage.value = response.error || '登录失败，请检查用户名和密码'
       message.error('登录失败：' + (response.error || '未知错误'))
-    } else if (response.code === 200 && response.bbgi-token) {
-      localStorage.setItem('bbgi-token', response.bbgi-token)
+    } else if (response.status === 200 && response.data?.aBgiToken) {
+      localStorage.setItem('bbgi-token', response.data.aBgiToken)
       message.success('登录成功！')
       router.push('/')
-    } else if (response.bbgi-token) {
-      localStorage.setItem('bbgi-token', response.bbgi-token)
-      message.success('登录成功！')
-      router.push('/')
-    } else {
+    }  else {
+      console.debug("登录失败：", response)
       errorMessage.value = '登录失败，请重试'
       message.error('登录失败，请重试')
     }
