@@ -41,22 +41,22 @@ const router = createRouter({
 })
 
 // 路由守卫 - 检查认证状态
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, from) => {
   const token = localStorage.getItem('aBgiToken')
   const requiresAuth = to.meta.requiresAuth
 
   // 如果路由需要认证但没有token，重定向到登录页
   if (requiresAuth && !token) {
-    next('/login')
+    return { path: '/login' }
   }
+
   // 如果已登录且尝试访问登录页，重定向到首页
-  else if (to.path === '/login' && token) {
-    next('/')
+  if (to.path === '/login' && token) {
+    return { path: '/' }
   }
+
   // 其他情况正常导航
-  else {
-    next()
-  }
+  return true
 })
 
 export default router
