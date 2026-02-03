@@ -171,7 +171,7 @@ import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 import { useRouter } from 'vue-router'
 import { apiMethods } from '../utils/api'
-import '../assets/markdown.css' 
+// import '../assets/markdown.css' 
 import api from '@/utils/api'
 
 export default {

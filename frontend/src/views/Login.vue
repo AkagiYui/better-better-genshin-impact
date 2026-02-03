@@ -212,7 +212,7 @@ const onFinishFailed = (errorInfo) => {
 </script>
 
 <style scoped>
-@import '../assets/css2.css';
+/* @import '../assets/css2.css'; */
 
 /* ========== 全局容器与背景 ========== */
 .login-container {

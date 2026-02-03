@@ -644,7 +644,7 @@ function formatModifiedTime(ts) {
 </script>
 
 <style scoped>
-@import '../assets/css2.css';
+/* @import '../assets/css2.css'; */
 
 :root {
   --pink-light: #fff0f5;

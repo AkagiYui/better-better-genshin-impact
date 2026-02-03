@@ -401,7 +401,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-@import '../assets/fonts3.css';
+/* @import '../assets/fonts3.css'; */
 
 /* 全局容器：樱花背景 */
 .anime-container {

@@ -349,7 +349,7 @@ html, body {
 </style>
 
 <style scoped>
-@import '../assets/css2.css';
+/* @import '../assets/css2.css'; */
 
 /* --- 全局变量 --- */
 .app-container {
