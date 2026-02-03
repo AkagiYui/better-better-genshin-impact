@@ -1,13 +1,13 @@
 import pluginVue from "eslint-plugin-vue"
 import globals from "globals"
-import stylisticJs from "@stylistic/eslint-plugin-js"
+import stylistic from "@stylistic/eslint-plugin"
 import importPlugin from "eslint-plugin-import"
 
 export default [
   ...pluginVue.configs["flat/recommended"],
   {
     plugins: {
-      "@stylistic/js": stylisticJs,
+      "@stylistic": stylistic,
       import: importPlugin,
     },
     rules: {
@@ -31,24 +31,24 @@ export default [
         "ignoreReadBeforeAssign": false,
       }], // 优先使用 const
 
-      "@stylistic/js/max-len": ["warn", { code: 8000 }], // 单行最大长度
-      "@stylistic/js/no-trailing-spaces": ["warn"], // 禁止行尾空格
-      "@stylistic/js/linebreak-style": ["warn", "unix"], // 换行符风格
-      "@stylistic/js/no-multiple-empty-lines": ["warn", { max: 2, maxEOF: 1, maxBOF: 0 }], // 空行数量
-      "@stylistic/js/quotes": ["warn", "double", { avoidEscape: true }], // 引号
-      "@stylistic/js/brace-style": ["warn", "1tbs", { allowSingleLine: true }], // 大括号风格
-      "@stylistic/js/comma-dangle": ["warn", "always-multiline"], // 逗号后面必须有空格
-      "@stylistic/js/eol-last": ["warn", "always"], // 文件末尾必须有换行符
-      "@stylistic/js/template-curly-spacing": ["warn", "never"], // 模板字符串中花括号内的空格
-      "@stylistic/js/object-curly-spacing": ["warn", "always"], // 对象字面量中花括号内的空格
-      "@stylistic/js/space-infix-ops": ["warn", { int32Hint: false }], // 运算符周围的空格
-      "@stylistic/js/keyword-spacing": ["warn", { before: true, after: true }], // 关键字周围的空格
-      "@stylistic/js/arrow-spacing": ["warn"], // 箭头函数的箭头前后的空格
-      "@stylistic/js/space-before-blocks": ["warn", { functions: "always", keywords: "always", classes: "always" }], // 块语句大括号前的空格
-      "@stylistic/js/no-multi-spaces": ["warn"], // 禁止使用多个空格
-      "@stylistic/js/comma-spacing": ["warn", { before: false, after: true }], // 逗号周围的空格
-      "@stylistic/js/semi-spacing": ["warn", { before: false, after: true }], // 分号周围的空格
-      "@stylistic/js/indent": [
+      "@stylistic/max-len": ["warn", { code: 8000 }], // 单行最大长度
+      "@stylistic/no-trailing-spaces": ["warn"], // 禁止行尾空格
+      "@stylistic/linebreak-style": ["warn", "unix"], // 换行符风格
+      "@stylistic/no-multiple-empty-lines": ["warn", { max: 2, maxEOF: 1, maxBOF: 0 }], // 空行数量
+      "@stylistic/quotes": ["warn", "double", { avoidEscape: true }], // 引号
+      "@stylistic/brace-style": ["warn", "1tbs", { allowSingleLine: true }], // 大括号风格
+      "@stylistic/comma-dangle": ["warn", "always-multiline"], // 逗号后面必须有空格
+      "@stylistic/eol-last": ["warn", "always"], // 文件末尾必须有换行符
+      "@stylistic/template-curly-spacing": ["warn", "never"], // 模板字符串中花括号内的空格
+      "@stylistic/object-curly-spacing": ["warn", "always"], // 对象字面量中花括号内的空格
+      "@stylistic/space-infix-ops": ["warn", { int32Hint: false }], // 运算符周围的空格
+      "@stylistic/keyword-spacing": ["warn", { before: true, after: true }], // 关键字周围的空格
+      "@stylistic/arrow-spacing": ["warn"], // 箭头函数的箭头前后的空格
+      "@stylistic/space-before-blocks": ["warn", { functions: "always", keywords: "always", classes: "always" }], // 块语句大括号前的空格
+      "@stylistic/no-multi-spaces": ["warn"], // 禁止使用多个空格
+      "@stylistic/comma-spacing": ["warn", { before: false, after: true }], // 逗号周围的空格
+      "@stylistic/semi-spacing": ["warn", { before: false, after: true }], // 分号周围的空格
+      "@stylistic/indent": [
         "warn",
         2, // 默认缩进2个空格
         {
