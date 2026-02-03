@@ -87,7 +87,7 @@
                 <div class="group-main-info">
                   <h3 class="group-name">{{ group.GroupName }}</h3>
 
-                  <div v-for="(seg,index) in group.Segments" :key="index">
+                  <div v-for="(seg,i) in group.Segments" :key="i">
                     <div class="group-time-info">
                       <span class="time-badge start">{{ seg.StartTime }}</span>
                       <span class="duration-arrow">→</span>

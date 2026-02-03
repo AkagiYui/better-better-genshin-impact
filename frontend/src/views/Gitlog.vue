@@ -286,8 +286,8 @@ export default {
 
       if (selectedGroup.value) {
         logs = logs.filter(item => {
-          if (selectedGroup.value == "pathing") return item.TypeName?.toLowerCase().includes("pathing")
-          if (selectedGroup.value == "js") return item.TypeName?.toLowerCase().includes("js")
+          if (selectedGroup.value === "pathing") return item.TypeName?.toLowerCase().includes("pathing")
+          if (selectedGroup.value === "js") return item.TypeName?.toLowerCase().includes("js")
           if (selectedGroup.value === "combat") return item.TypeName?.toLowerCase().includes("combat")
           return false
         })

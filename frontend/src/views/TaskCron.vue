@@ -248,7 +248,7 @@ import {
 
 const formState = reactive({
   id: 0,
-  entry_id: 0,
+  entryId: 0,
   name: "",
   spec: "",
   data: "",
@@ -321,7 +321,7 @@ const handleSubmitTask = async () => {
   try {
     const payload = {
       id: formState.id,
-      entry_id: formState.entry_id,
+      entryId: formState.entryId,
       name: formState.name,
       spec: formState.spec.trim(),
       data: formState.data?.trim() || "",
@@ -355,7 +355,7 @@ const handleSubmitTask = async () => {
 const resetForm = () => {
   editingTaskId.value = null
   formState.id = 0
-  formState.entry_id = 0
+  formState.entryId = 0
   formState.name = ""
   formState.spec = ""
   formState.data = ""
@@ -366,7 +366,7 @@ const resetForm = () => {
 const startEdit = (record) => {
   editingTaskId.value = record.id
   formState.id = record.id
-  formState.entry_id = record.entry_id
+  formState.entryId = record.entryId
   formState.name = record.name
   formState.spec = record.spec
   formState.data = record.data || ""
@@ -387,7 +387,7 @@ const confirmRemove = (record) => {
     cancelText: "再想想",
     okButtonProps: { danger: true },
     centered: true,
-    onOk: () => removeTask(record.id, record.entry_id),
+    onOk: () => removeTask(record.id, record.entryId),
   })
 }
 
@@ -423,9 +423,9 @@ const AtOnceRunTask = (type, data) => {
 //   }
 // }
 
-const removeTask = async (id, entry_id) => {
+const removeTask = async (id, entryId) => {
   try {
-    const res = await removeTaskCron(id, entry_id)
+    const res = await removeTaskCron(id, entryId)
     const msg = typeof res === "string" ? res : "任务已删除"
     message.success(msg)
     fetchTaskList()
@@ -468,13 +468,13 @@ const togglePause = async (record) => {
 
 const normalizeTaskCron = (item) => {
   const id = Number(item?.id) || 0
-  const entry_id = item?.entry_id
+  const entryId = item?.entryId
   const statusNum = Number(item?.status)
   const paused = !(statusNum === 1 && id > 0)
   return {
     ...item,
     id,
-    entry_id,
+    entryId,
     status: statusNum,
     paused,
   }
