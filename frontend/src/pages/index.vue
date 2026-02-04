@@ -1,31 +1,7 @@
 <template>
   <div class="home-container">
-    <canvas ref="animeCanvas" class="anime-canvas" />
-
-    <div class="side-carousel">
-      <div class="carousel-wrapper">
-        <transition-group name="fade">
-          <img
-            v-if="currentImage"
-            :key="currentImage"
-            :src="currentImage"
-            class="carousel-img"
-            alt="Character" />
-        </transition-group>
-      </div>
-    </div>
-
     <div class="main-content">
       <header class="page-header">
-        <div class="header-carousel">
-          <div
-            v-for="(img, index) in headerCarouselImages"
-            :key="index"
-            class="carousel-slide"
-            :class="{ active: index === headerCurrentImageIndex }">
-            <img :src="img" alt="Header BG">
-          </div>
-        </div>
         <div class="header-content">
           <h1 class="header-title">✨ Better-BGI 控制台 ✨</h1>
           <p class="header-subtitle">Better-BGI Dashboard</p>
@@ -144,11 +120,11 @@
       v-model:open="screenshotModal.visible"
       title="🖥️ 桌面实时监控"
       :footer="null"
-      :width="isMobile ? '98vw' : '80vw'"
+      :width="isMobile ? '98vw' : '98vw'"
       :after-close="closeScreenshot"
       centered
       class="anime-modal">
-      <div ref="screenshotContainer" class="screenshot-view">
+      <div class="screenshot-view">
         <div
           v-if="screenshotModal.url"
           class="image-wrapper"
@@ -162,7 +138,6 @@
           @touchmove="handleTouchMove"
           @touchend="handleTouchEnd">
           <img
-            ref="imageRef"
             :src="screenshotModal.url"
             :style="{
               transform: `scale(${zoomScale}) translate(${imagePosition.x}px, ${imagePosition.y}px)`,
@@ -216,22 +191,16 @@
 
 <script setup>
 import { ref, reactive, onMounted, onUnmounted, computed, watch, h } from "vue"
-import { message, Modal, Select } from "ant-design-vue"
+import { message, Modal } from "ant-design-vue"
 import { useRouter } from "vue-router"
 import { mysSignIn as mysSignInApi, getBaseURL, closeBgi, backup, sendImage as sendImageApi, indexSX, getOneLongAllName, startOneLong, getStatus, GetAppInfo } from "@/api"
+import { useIsMobile } from "@/hooks"
 
 const router = useRouter()
-
-// --- 移动端检测 ---
-const isMobile = ref(window.innerWidth <= 576)
-const handleResizeForMobile = () => {
-  isMobile.value = window.innerWidth <= 576
-}
-window.addEventListener("resize", handleResizeForMobile)
+const { isMobile } = useIsMobile()
 
 // --- 截图功能 ---
 const screenshotModal = reactive({ visible: false, url: "" })
-const screenshotContainer = ref(null)
 const isZoomed = ref(false)
 const zoomScale = ref(1)
 const isAutoRefresh = ref(true) // 是否自动刷新
@@ -248,7 +217,6 @@ const autoRefreshButtonText = computed(() => {
 const isDragging = ref(false)
 const dragStart = ref({ x: 0, y: 0 })
 const imagePosition = ref({ x: 0, y: 0 })
-const imageRef = ref(null)
 
 const refreshScreenshot = () => {
   const ts = Date.now()
@@ -698,44 +666,10 @@ const refreshStatus = async () => {
   } catch(e) { console.error(e) }
 }
 
-const getImages = async () => {
-  // try {
-  //     const res = await fetch('/api/images')
-  //     const data = await res.json()
-  //     carouselImages.value = data.images || []
-  //     if(carouselImages.value.length) startCarousel()
-  // } catch(e) {
-  //     carouselImages.value = ['/img/bd.jpg', '/img/ff.png'] // Fallback
-  //     startCarousel()
-  // }
-}
-const startCarousel = () => {
-  setInterval(() => {
-    currentImageIndex.value = (currentImageIndex.value + 1) % carouselImages.value.length
-  }, 10000)
-}
 
-const getHeaderImages = async () => {
-  // try {
-  //     const res = await fetch('/api/images') // Or separate API
-  //     const data = await res.json()
-  //     headerCarouselImages.value = data.images || []
-  //     if(headerCarouselImages.value.length) startHeaderCarousel()
-  // } catch(e) {
-  //     headerCarouselImages.value = ['/img/bd.jpg']
-  //     startHeaderCarousel()
-  // }
-}
-const startHeaderCarousel = () => {
-  headerCarouselInterval = setInterval(() => {
-    headerCurrentImageIndex.value = (headerCurrentImageIndex.value + 1) % headerCarouselImages.value.length
-  }, 6000)
-}
 
 onMounted(() => {
   const cleanup = initSakuraAnimation()
-  getImages()
-  getHeaderImages()
   refreshStatus()
   statusInterval = setInterval(refreshStatus, 3000)
 
@@ -745,23 +679,6 @@ onMounted(() => {
     if (headerCarouselInterval) clearInterval(headerCarouselInterval)
   })
 
-  //给app发送信息
-  const SendAppInfo = async () => {
-    isUniappReady.value = true
-    console.log("✨ UniApp Bridge 已就绪")
-    // 自动握手一次
-    if (window.uni && window.uni.postMessage) {
-      const res = await GetAppInfo()
-      window.uni.postMessage({ data: res })
-      console.log("✨ 已向 UniApp 发送握手消息", JSON.stringify(res))
-    }
-  }
-
-  if (window.UniAppJSBridgeReady) {
-    SendAppInfo()
-  } else {
-    document.addEventListener("UniAppJSBridgeReady", SendAppInfo)
-  }
 })
 </script>
 

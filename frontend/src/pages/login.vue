@@ -3,16 +3,6 @@
     <div class="bg-layer" />
     <div class="grid-pattern" />
 
-    <div class="bg-decoration">
-      <div class="floating-shape shape-1" />
-      <div class="floating-shape shape-2" />
-      <div class="floating-shape shape-3" />
-      <div class="star star-1">✨</div>
-      <div class="star star-2">⭐</div>
-      <div class="star star-3">✨</div>
-      <div class="star star-4">🌟</div>
-    </div>
-
     <div class="login-card-wrapper">
       <div class="card-ribbon">🎀</div>
 
@@ -23,49 +13,23 @@
         </div>
       </div>
 
-      <a-form
-        ref="formRef"
-        :model="formState"
-        :label-col="{ span: 0 }"
-        :wrapper-col="{ span: 24 }"
-        class="login-form"
-        @finish="onFinish"
-        @finish-failed="onFinishFailed">
-        <a-form-item
-          name="username"
-          :rules="[{ required: true, message: '请输入用户名哦~' }]">
+      <a-form ref="formRef" :model="formState" :label-col="{ span: 0 }" :wrapper-col="{ span: 24 }" class="login-form" @finish="onFinish" @finish-failed="onFinishFailed">
+        <a-form-item name="username" :rules="[{ required: true, message: '请输入用户名哦~' }]">
           <div class="input-group">
             <span class="input-icon">👤</span>
-            <a-input
-              v-model:value="formState.username"
-              placeholder="请输入用户名..."
-              class="kawaii-input"
-              :bordered="false"
-              @keyup.enter="handleEnter" />
+            <a-input v-model:value="formState.username" placeholder="请输入用户名..." class="kawaii-input" :bordered="false" @keyup.enter="handleEnter" />
           </div>
         </a-form-item>
 
-        <a-form-item
-          name="password"
-          :rules="[{ required: true, message: '请输入密码哦~' }]">
+        <a-form-item name="password" :rules="[{ required: true, message: '请输入密码哦~' }]">
           <div class="input-group">
             <span class="input-icon">🔐</span>
-            <a-input-password
-              v-model:value="formState.password"
-              placeholder="请输入密码..."
-              class="kawaii-input"
-              :bordered="false"
-              @keyup.enter="handleEnter" />
+            <a-input-password v-model:value="formState.password" placeholder="请输入密码..." class="kawaii-input" :bordered="false" @keyup.enter="handleEnter" />
           </div>
         </a-form-item>
 
         <a-form-item>
-          <a-button
-            type="primary"
-            html-type="submit"
-            :loading="loading"
-            block
-            class="kawaii-button">
+          <a-button type="primary" html-type="submit" :loading="loading" block class="kawaii-button">
             {{ loading ? '少女祈祷中...✨' : '进入异世界 →' }}
           </a-button>
         </a-form-item>
@@ -76,12 +40,6 @@
           </div>
         </transition>
       </a-form>
-
-      <div class="card-footer">
-        <div class="footer-divider" />
-        <p class="footer-text" @click="aaa">嘿~这是一个神秘的地方呢🎀</p>
-        <div class="contact-pill">qq群：215053644</div>
-      </div>
     </div>
   </div>
 </template>
@@ -116,29 +74,9 @@ onMounted(async () => {
 })
 
 const handleEnter = () => {
-  if (formRef.value) {
-    formRef.value.submit()
-  }
+  formRef.value?.submit()
 }
 
-
-const aaa = () => {
-  console.log("Check Uni Object:", window.uni)
-
-  // 在 Uniapp WebView 中，官方 SDK 会挂载 window.uni
-  if (window.uni && window.uni.postMessage) {
-    window.uni.postMessage({
-      data: {
-        action: "思姐真可爱",
-        content: "来自神秘地方的数据🎀",
-      },
-    })
-    message.success("已向异世界发送信号✨")
-  } else {
-    console.error("【提示】当前不在 UniApp 环境，或 SDK 尚未加载。")
-    message.warning("咒语失效了，请在 App 中尝试哦~")
-  }
-}
 
 const onFinish = async () => {
   loading.value = true
@@ -173,13 +111,9 @@ const onFinish = async () => {
 const onFinishFailed = (errorInfo) => {
   console.log("Failed:", errorInfo)
 }
-
-
 </script>
 
 <style scoped>
-/* @import '../assets/css2.css'; */
-
 /* ========== 全局容器与背景 ========== */
 .login-container {
   display: flex;
@@ -194,7 +128,10 @@ const onFinishFailed = (errorInfo) => {
 /* 渐变底层 */
 .bg-layer {
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: linear-gradient(120deg, #fccb90 0%, #d57eeb 100%);
   opacity: 0.6;
   z-index: -2;
@@ -203,7 +140,10 @@ const onFinishFailed = (errorInfo) => {
 /* 波点网格 */
 .grid-pattern {
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-image:
     radial-gradient(#ffffff 2px, transparent 2px),
     linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
@@ -230,16 +170,20 @@ const onFinishFailed = (errorInfo) => {
 }
 
 .shape-1 {
-  width: 300px; height: 300px;
+  width: 300px;
+  height: 300px;
   background: #ff9a9e;
-  top: -50px; left: -50px;
+  top: -50px;
+  left: -50px;
   opacity: 0.5;
 }
 
 .shape-2 {
-  width: 400px; height: 400px;
+  width: 400px;
+  height: 400px;
   background: #a18cd1;
-  bottom: -100px; right: -100px;
+  bottom: -100px;
+  right: -100px;
   opacity: 0.4;
   animation-delay: -5s;
 }
@@ -249,18 +193,55 @@ const onFinishFailed = (errorInfo) => {
   font-size: 24px;
   animation: twinkle 3s infinite alternate;
 }
-.star-1 { top: 15%; left: 10%; animation-delay: 0s; }
-.star-2 { top: 25%; right: 20%; animation-delay: 1s; font-size: 18px; }
-.star-3 { bottom: 20%; left: 15%; animation-delay: 2s; }
-.star-4 { bottom: 10%; right: 10%; animation-delay: 1.5s; font-size: 30px;}
+
+.star-1 {
+  top: 15%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.star-2 {
+  top: 25%;
+  right: 20%;
+  animation-delay: 1s;
+  font-size: 18px;
+}
+
+.star-3 {
+  bottom: 20%;
+  left: 15%;
+  animation-delay: 2s;
+}
+
+.star-4 {
+  bottom: 10%;
+  right: 10%;
+  animation-delay: 1.5s;
+  font-size: 30px;
+}
 
 @keyframes float {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(20px, 30px); }
+
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  50% {
+    transform: translate(20px, 30px);
+  }
 }
+
 @keyframes twinkle {
-  0% { transform: scale(1) rotate(0deg); opacity: 0.6; }
-  100% { transform: scale(1.2) rotate(15deg); opacity: 1; }
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.6;
+  }
+
+  100% {
+    transform: scale(1.2) rotate(15deg);
+    opacity: 1;
+  }
 }
 
 /* ========== 卡片核心 ========== */
@@ -282,8 +263,15 @@ const onFinishFailed = (errorInfo) => {
 }
 
 @keyframes cardEnter {
-  from { opacity: 0; transform: translateY(50px) scale(0.9); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .card-ribbon {
@@ -292,31 +280,39 @@ const onFinishFailed = (errorInfo) => {
   left: 50%;
   transform: translateX(-50%);
   font-size: 40px;
-  filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1));
+  filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.1));
   z-index: 20;
 }
 
 /* ========== 头部修改区域 (重点) ========== */
 .card-header {
-  display: flex;             /* 启用Flex布局 */
-  flex-direction: column;    /* 垂直排列：上标题，下副标题 */
-  align-items: center;       /* 水平居中 */
+  display: flex;
+  /* 启用Flex布局 */
+  flex-direction: column;
+  /* 垂直排列：上标题，下副标题 */
+  align-items: center;
+  /* 水平居中 */
   justify-content: center;
   margin-bottom: 35px;
   width: 100%;
 }
 
 .system-title {
-  display: block;            /* 块级元素 */
-  width: 100%;               /* 占满整行宽度 */
-  text-align: center;        /* 文字居中 */
-  margin: 0 0 15px 0;        /* 底部留出间距，与副标题分开 */
+  display: block;
+  /* 块级元素 */
+  width: 100%;
+  /* 占满整行宽度 */
+  text-align: center;
+  /* 文字居中 */
+  margin: 0 0 15px 0;
+  /* 底部留出间距，与副标题分开 */
   font-size: 26px;
   font-weight: 800;
   color: #5c5c8a;
   letter-spacing: 2px;
   text-shadow: 2px 2px 0px #fff;
-  line-height: 1.4;          /* 优化行高 */
+  line-height: 1.4;
+  /* 优化行高 */
 }
 
 .subtitle-badge {
@@ -381,6 +377,7 @@ const onFinishFailed = (errorInfo) => {
 :deep(.ant-input-password-icon) {
   color: #ffb7d6 !important;
 }
+
 :deep(.ant-input-password-icon:hover) {
   color: #ff85b3 !important;
 }
@@ -394,7 +391,7 @@ const onFinishFailed = (errorInfo) => {
   font-size: 16px;
   font-weight: bold;
   color: #fff;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
   box-shadow: 0 6px 20px rgba(255, 154, 158, 0.4);
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   margin-top: 10px;
@@ -430,13 +427,23 @@ const onFinishFailed = (errorInfo) => {
 .bounce-enter-active {
   animation: bounce-in 0.5s;
 }
+
 .bounce-leave-active {
   animation: bounce-in 0.5s reverse;
 }
+
 @keyframes bounce-in {
-  0% { transform: scale(0); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(0);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* ========== 底部 ========== */
@@ -447,13 +454,11 @@ const onFinishFailed = (errorInfo) => {
 
 .footer-divider {
   height: 2px;
-  background: repeating-linear-gradient(
-    90deg,
-    #ffb7d6 0,
-    #ffb7d6 6px,
-    transparent 6px,
-    transparent 12px
-  );
+  background: repeating-linear-gradient(90deg,
+      #ffb7d6 0,
+      #ffb7d6 6px,
+      transparent 6px,
+      transparent 12px);
   margin-bottom: 15px;
   opacity: 0.5;
 }
@@ -490,6 +495,8 @@ const onFinishFailed = (errorInfo) => {
     font-size: 15px;
   }
 
-  .star-4 { display: none; }
+  .star-4 {
+    display: none;
+  }
 }
 </style>

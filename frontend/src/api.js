@@ -34,10 +34,7 @@ api.interceptors.request.use(
       config.baseURL = dynamicBaseURL
     }
 
-    if (process.env.NODE_ENV !== "production") {
-      console.log("API请求:", config.method?.toUpperCase(), config.url)
-      console.log("BaseURL:", config.baseURL || "Vite代理")
-    }
+    console.debug("API请求:", config.method?.toUpperCase(), config.url, "BaseURL:", config.baseURL || "Vite代理")
 
     // 从 localStorage 获取 token 并添加到 Authorization 头
     const token = localStorage.getItem("bbgi-token")
@@ -76,8 +73,6 @@ api.interceptors.response.use(
       return Promise.reject("等待重启中，请稍后...")
     }
 
-
-    // 2. 【新增】处理网络错误、后端未启动、连接超时等情况
     // 如果 error.response 不存在，说明根本没有收到后端的响应
     if (error.code === "ERR_BAD_RESPONSE") {
       console.error("连接失败：后端未启动或网络异常", error.message)
@@ -91,7 +86,6 @@ api.interceptors.response.use(
         }
       }
 
-
       return Promise.reject(error)
     }
 
@@ -100,9 +94,8 @@ api.interceptors.response.use(
   },
 )
 
-// 认证相关
-export const login = (username, password) => api.post("/api/auth/login", { username, password })
-export const getSystemConfig = () => api.get("/api/auth/getSystemConfig")
+export const login = (username, password) => api.post("/api/auth/login", { username, password }) // 登录
+export const getSystemConfig = () => api.get("/api/auth/getSystemConfig") // 获取系统配置
 
 // 获取系统状态
 export const getStatus = () => api.get("/api/index")
@@ -291,9 +284,6 @@ export const downloadBgi = () =>
     },
   )
 export const getBgiDownloadStatus = () => api.get("/api/UpdateBgi/DownloadStatus")
-
-// 导出 axios 实例供直接使用
-export { api }
 
 // 其他未在上方定义的 API 方法
 export const getLogInfo = (fileName) => api.get(`/api/logInfo?fileName=${encodeURIComponent(fileName)}`)
