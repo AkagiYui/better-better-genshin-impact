@@ -27,8 +27,8 @@
           </div>
         </div>
         <div class="header-content">
-          <h1 class="header-title">✨ BGI 控制台 ✨</h1>
-          <p class="header-subtitle">Auto-BGI Animation Dashboard</p>
+          <h1 class="header-title">✨ Better-BGI 控制台 ✨</h1>
+          <p class="header-subtitle">Better-BGI Dashboard</p>
         </div>
       </header>
 
@@ -218,7 +218,6 @@
 import { ref, reactive, onMounted, onUnmounted, computed, watch, h } from "vue"
 import { message, Modal, Select } from "ant-design-vue"
 import { useRouter } from "vue-router"
-// 假设这里有您的API工具，如果报错请保留您原来的引入方式
 import { mysSignIn as mysSignInApi, getBaseURL, closeBgi, backup, sendImage as sendImageApi, indexSX, getOneLongAllName, startOneLong, getStatus, GetAppInfo } from "@/api"
 
 const router = useRouter()
