@@ -19,7 +19,7 @@
             <span class="label">🧩 执行配置组:</span>
             <span class="value">{{ statusData.group }}</span>
             <div class="ExpectedToEnd">
-              <pre>{{ statusData.ExpectedToEnd=="" ? '没有归档记录' : statusData.ExpectedToEnd }}</pre>
+              <pre>{{ statusData.ExpectedToEnd == "" ? '没有归档记录' : statusData.ExpectedToEnd }}</pre>
             </div>
           </div>
 
@@ -60,10 +60,7 @@
         <div class="button-group glass-panel">
           <h2 class="group-title">📊 数据分析</h2>
           <div class="btn-grid">
-            <button
-              v-for="(btn, index) in dataAnalysisButtons"
-              :key="index"
-              @click="router.push({ name: btn.name })">
+            <button v-for="(btn, index) in dataAnalysisButtons" :key="index" @click="router.push({ name: btn.name })">
               {{ btn.text }}
             </button>
           </div>
@@ -72,10 +69,7 @@
         <div class="button-group glass-panel">
           <h2 class="group-title">🚀 自动化控制</h2>
           <div class="btn-grid">
-            <button
-              v-for="(btn, index) in automationButtons"
-              :key="index"
-              @click="btn.action ? btn.action() : router.push({ name: btn.name })">
+            <button v-for="(btn, index) in automationButtons" :key="index" @click="btn.action ? btn.action() : router.push({ name: btn.name })">
               {{ btn.text }}
             </button>
           </div>
@@ -84,10 +78,7 @@
         <div class="button-group glass-panel">
           <h2 class="group-title">🧭 提瓦特指挥所</h2>
           <div class="btn-grid">
-            <button
-              v-for="(btn, index) in bgiButtons"
-              :key="index"
-              @click="btn.action ? btn.action() : router.push({ name: btn.name })">
+            <button v-for="(btn, index) in bgiButtons" :key="index" @click="btn.action ? btn.action() : router.push({ name: btn.name })">
               {{ btn.text }}
             </button>
           </div>
@@ -95,20 +86,9 @@
       </div>
     </div>
 
-    <a-modal
-      v-model:open="oneLongModal.visible"
-      title="🌸 选择启动的一条龙 🌸"
-      :confirm-loading="oneLongModal.loading"
-      ok-text="启动"
-      cancel-text="取消"
-      class="anime-modal"
-      @ok="handleOneLongOk"
-      @cancel="handleOneLongCancel">
+    <a-modal v-model:open="oneLongModal.visible" title="🌸 选择启动的一条龙 🌸" :confirm-loading="oneLongModal.loading" ok-text="启动" cancel-text="取消" class="anime-modal" @ok="handleOneLongOk" @cancel="handleOneLongCancel">
       <div style="padding: 20px 0;">
-        <a-select
-          v-model:value="oneLongModal.selectedValue"
-          style="width: 100%"
-          placeholder="请选择配置">
+        <a-select v-model:value="oneLongModal.selectedValue" style="width: 100%" placeholder="请选择配置">
           <a-select-option v-for="item in oneLongModal.options" :key="item" :value="item">
             {{ item }}
           </a-select-option>
@@ -119,22 +99,9 @@
     <!-- 桌面实时监控组件 -->
     <DesktopMonitor v-model:visible="desktopMonitorVisible" />
 
-    <a-modal
-      v-model:open="uploadBgiModal.visible"
-      title="📦 上传 BGI 更新包"
-      :confirm-loading="uploadBgiModal.loading"
-      ok-text="开始上传"
-      cancel-text="取消"
-      class="anime-modal"
-      @ok="handleUploadBgiOk"
-      @cancel="handleUploadBgiCancel">
+    <a-modal v-model:open="uploadBgiModal.visible" title="📦 上传 BGI 更新包" :confirm-loading="uploadBgiModal.loading" ok-text="开始上传" cancel-text="取消" class="anime-modal" @ok="handleUploadBgiOk" @cancel="handleUploadBgiCancel">
       <div class="upload-area">
-        <input
-          ref="bgiFileInput"
-          type="file"
-          accept=".zip,.7z"
-          style="display: none"
-          @change="handleBgiFileSelect" />
+        <input ref="bgiFileInput" type="file" accept=".zip,.7z" style="display: none" @change="handleBgiFileSelect" />
         <a-button size="large" @click="$refs.bgiFileInput.click()">
           📂 选择压缩包 (.zip / .7z)
         </a-button>
@@ -143,7 +110,7 @@
           <p>大小: {{ (uploadBgiModal.selectedFile.size / 1024 / 1024).toFixed(2) }} MB</p>
         </div>
         <div v-if="uploadBgiModal.uploadProgress > 0" class="progress-bar">
-          <div class="progress-fill" :style="{width: uploadBgiModal.uploadProgress + '%'}">
+          <div class="progress-fill" :style="{ width: uploadBgiModal.uploadProgress + '%' }">
             {{ uploadBgiModal.uploadProgress }}%
           </div>
         </div>
@@ -180,7 +147,7 @@ const carouselImages = ref([])
 const currentImageIndex = ref(0)
 const headerCarouselImages = ref([])
 const headerCurrentImageIndex = ref(0)
-let headerCarouselInterval = null
+const headerCarouselInterval = null
 let statusInterval = null
 let petals = []
 let animationId = null
@@ -211,10 +178,8 @@ const dataAnalysisButtons = ref([
   { text: "归档查询", name: "archive" },
   { text: "旅行者札记", name: "bag-statistics" },
   { text: "配置组运行情况", name: "other" },
-  // { text: 'CD管理自动采集', route: '/CDAwareAutoGather' },
+  { text: "CD管理自动采集", name: "/cd-aware-auto-gather" },
   { text: "采集管理", name: "collection-management" },
-
-
 ])
 
 // --- BGI上传逻辑 ---
@@ -226,11 +191,6 @@ const handleUploadBgiClick = () => {
   uploadBgiModal.uploadProgress = 0
   uploadBgiModal.visible = true
 }
-
-// setInterval(() => {
-//   debugger
-// }, 100)
-
 
 const handleBgiFileSelect = (event) => {
   const file = event.target.files?.[0]
@@ -292,7 +252,7 @@ const mysSignIn = () => {
       try {
         const res = await mysSignInApi()
         Modal.info({ title: "结果", content: res.message || "发送成功" })
-      } catch(e) { message.error("失败") }
+      } catch (e) { message.error("失败") }
     },
   })
 }
@@ -301,7 +261,7 @@ const handleCloseBgi = () => {
   Modal.confirm({
     title: "确认关闭？", content: "是否关闭【BGI和原神】？",
     onOk: async () => {
-      try { await closeBgi(); message.success("已发送关闭指令") } catch(e) { message.error("失败") }
+      try { await closeBgi(); message.success("已发送关闭指令") } catch (e) { message.error("失败") }
     },
   })
 }
@@ -317,7 +277,7 @@ const handleBackup = () => {
       try {
         await backup()
         message.success("备份成功")
-      } catch(e) {
+      } catch (e) {
         message.error("备份失败")
       }
     },
@@ -328,7 +288,7 @@ const sendImage = () => {
   Modal.confirm({
     title: "发送截图", content: "确认发送当前截图？",
     onOk: async () => {
-      try { const res = await sendImageApi(); Modal.info({ content: res.data || "成功" }) } catch(e) { message.error("失败") }
+      try { const res = await sendImageApi(); Modal.info({ content: res.data || "成功" }) } catch (e) { message.error("失败") }
     },
   })
 }
@@ -372,7 +332,7 @@ const handleOneLongLoad = async () => {
     const res = await getOneLongAllName()
     oneLongModal.options = res.data.data || []
     if (oneLongModal.options.length) oneLongModal.selectedValue = oneLongModal.options[0]
-  } catch(e) { message.error("加载列表失败") } finally { oneLongModal.loading = false }
+  } catch (e) { message.error("加载列表失败") } finally { oneLongModal.loading = false }
 }
 const handleOneLongOk = async () => {
   if (!oneLongModal.selectedValue) return
@@ -381,7 +341,7 @@ const handleOneLongOk = async () => {
     await startOneLong(oneLongModal.selectedValue)
     message.success(`启动 ${oneLongModal.selectedValue}`)
     oneLongModal.visible = false
-  } catch(e) { message.error("启动失败") } finally { oneLongModal.loading = false }
+  } catch (e) { message.error("启动失败") } finally { oneLongModal.loading = false }
 }
 const handleOneLongCancel = () => { oneLongModal.visible = false }
 
@@ -440,9 +400,8 @@ const refreshStatus = async () => {
   try {
     const res = await getStatus()
     Object.assign(statusData, res.data || res)
-  } catch(e) { console.error(e) }
+  } catch (e) { console.error(e) }
 }
-
 
 
 onMounted(() => {
@@ -455,7 +414,6 @@ onMounted(() => {
     if (statusInterval) clearInterval(statusInterval)
     if (headerCarouselInterval) clearInterval(headerCarouselInterval)
   })
-
 })
 </script>
 
@@ -474,8 +432,10 @@ onMounted(() => {
 
 .anime-canvas {
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   z-index: 5;
   pointer-events: none;
 }
@@ -488,17 +448,20 @@ onMounted(() => {
   width: 45vw;
   max-width: 500px;
   height: auto;
-  z-index: 0; /* 最底层 */
-  pointer-events: none; /* 点击穿透 */
+  z-index: 0;
+  /* 最底层 */
+  pointer-events: none;
+  /* 点击穿透 */
 }
 
 .carousel-wrapper {
   position: relative;
   width: 100%;
-  padding-bottom: 120%; /* Aspect Ratio placeholder */
+  padding-bottom: 120%;
+  /* Aspect Ratio placeholder */
 }
 
-.ExpectedToEnd{
+.ExpectedToEnd {
   background: rgb(252, 207, 230);
   position: absolute;
   opacity: 0;
@@ -507,7 +470,7 @@ onMounted(() => {
   border-radius: 5px;
 }
 
-.group-name:hover .ExpectedToEnd{
+.group-name:hover .ExpectedToEnd {
   opacity: 1;
   display: block;
   visibility: visible;
@@ -526,13 +489,21 @@ onMounted(() => {
   -webkit-mask-image: linear-gradient(to top, black 70%, transparent 100%);
 }
 
-.fade-enter-active, .fade-leave-active { transition: opacity 1s; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 1s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
 
 /* ==== 主内容区域 ==== */
 .main-content {
   position: relative;
-  z-index: 10; /* 保证在轮播图之上 */
+  z-index: 10;
+  /* 保证在轮播图之上 */
   width: 92%;
   max-width: 650px;
   margin: 0 auto;
@@ -558,20 +529,29 @@ onMounted(() => {
   border-radius: 0 0 30px 30px;
   overflow: hidden;
   margin-bottom: 25px;
-  box-shadow: 0 5px 15px rgba(255,105,180,0.3);
+  box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3);
 }
 
 .header-carousel {
   position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .carousel-slide {
   position: absolute;
-  width: 100%; height: 100%;
-  opacity: 0; transition: opacity 1s;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1s;
 }
-.carousel-slide.active { opacity: 1; }
+
+.carousel-slide.active {
+  opacity: 1;
+}
+
 .carousel-slide img {
   width: 100%;
   height: 250%;
@@ -583,7 +563,7 @@ onMounted(() => {
   z-index: 2;
   text-align: center;
   padding-top: 50px;
-  text-shadow: 0 2px 4px rgba(255,255,255,0.8);
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8);
 }
 
 .header-title {
@@ -592,10 +572,11 @@ onMounted(() => {
   margin: 0;
   font-weight: 800;
 }
+
 .header-subtitle {
   color: #ff66a3;
   font-size: 1rem;
-  background: rgba(255,255,255,0.7);
+  background: rgba(255, 255, 255, 0.7);
   display: inline-block;
   padding: 4px 12px;
   border-radius: 12px;
@@ -610,11 +591,19 @@ onMounted(() => {
   border-bottom: 2px dashed #ffb6c1;
   padding-bottom: 10px;
 }
-.card-header h2 { margin: 0; color: #ff3385; font-size: 1.2rem; }
+
+.card-header h2 {
+  margin: 0;
+  color: #ff3385;
+  font-size: 1.2rem;
+}
+
 .refresh-btn {
-  background: #ffecf5; color: #ff3385;
+  background: #ffecf5;
+  color: #ff3385;
   border: 1px solid #ff99cc;
-  padding: 4px 12px; border-radius: 15px;
+  padding: 4px 12px;
+  border-radius: 15px;
   cursor: pointer;
   width: auto;
 }
@@ -624,16 +613,34 @@ onMounted(() => {
   grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
+
 .status-item {
-  background: rgba(255,255,255,0.5);
+  background: rgba(255, 255, 255, 0.5);
   padding: 8px;
   border-radius: 12px;
   font-size: 14px;
 }
-.full-width { grid-column: span 2; }
-.label { color: #ff80ab; font-weight: bold; margin-right: 5px; }
-.value { color: #d81b60; font-weight: bold; word-break: break-all; }
-.value.highlight { font-size: 1.1em; color: #c2185b; }
+
+.full-width {
+  grid-column: span 2;
+}
+
+.label {
+  color: #ff80ab;
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.value {
+  color: #d81b60;
+  font-weight: bold;
+  word-break: break-all;
+}
+
+.value.highlight {
+  font-size: 1.1em;
+  color: #c2185b;
+}
 
 /* 按钮组样式 */
 .group-title {
@@ -646,7 +653,8 @@ onMounted(() => {
 
 .btn-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* 强制两列 */
+  grid-template-columns: 1fr 1fr;
+  /* 强制两列 */
   gap: 12px;
 }
 
@@ -664,19 +672,27 @@ button {
   transition: all 0.2s;
   position: relative;
   overflow: hidden;
-  text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 }
 
-button:active { transform: scale(0.95); }
+button:active {
+  transform: scale(0.95);
+}
+
 button::after {
   content: '';
   position: absolute;
-  top: 0; left: -100%;
-  width: 100%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
   transition: 0.5s;
 }
-button:hover::after { left: 100%; }
+
+button:hover::after {
+  left: 100%;
+}
 
 /* 模态框美化 */
 .anime-modal :deep(.ant-modal-content) {
@@ -684,10 +700,12 @@ button:hover::after { left: 100%; }
   border: 3px solid #ffcce6;
   background: #fff0f5;
 }
+
 .anime-modal :deep(.ant-modal-header) {
   background: transparent;
   border-bottom: 2px dashed #ffb6c1;
 }
+
 .anime-modal :deep(.ant-modal-title) {
   color: #ff3385;
   text-align: center;
@@ -703,7 +721,8 @@ button:hover::after { left: 100%; }
   align-items: center;
   overflow: hidden;
   margin-bottom: 10px;
-  max-height: 75vh; /* 限制最大高度 */
+  max-height: 75vh;
+  /* 限制最大高度 */
   width: 100%;
   position: relative;
 }
@@ -724,18 +743,22 @@ button:hover::after { left: 100%; }
   max-height: 75vh;
   width: auto;
   height: auto;
-  object-fit: contain; /* 保持宽高比 */
+  object-fit: contain;
+  /* 保持宽高比 */
   transition: transform 0.3s ease;
   will-change: transform;
 }
+
 .modal-tools {
   display: flex;
   gap: 14px;
   justify-content: center;
   align-items: center;
   flex-wrap: nowrap;
-    align-items: center; /* 垂直居中 */
+  align-items: center;
+  /* 垂直居中 */
 }
+
 .modal-tools button {
   padding: 8px 14px;
   font-size: 20px;
@@ -743,12 +766,15 @@ button:hover::after { left: 100%; }
 }
 
 
-.loading-placeholder { color: #ff66a3; }
+.loading-placeholder {
+  color: #ff66a3;
+}
 
 /* ==== 移动端适配特别处理 ==== */
 @media (max-width: 576px) {
   .side-carousel {
-    width: 120vw; /* 移动端轮播图变大一点作为背景 */
+    width: 120vw;
+    /* 移动端轮播图变大一点作为背景 */
     opacity: 0.8;
   }
 
@@ -760,10 +786,11 @@ button:hover::after { left: 100%; }
     font-size: 12px;
   }
 
-    .modal-tools button {
+  .modal-tools button {
     font-size: 15px;
     padding: 6px 10px;
   }
+
   /* 确保按钮在移动端清晰且不拥挤 */
   button {
     font-size: 12px;
