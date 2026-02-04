@@ -141,24 +141,9 @@ const handleLogout = () => {
   }
 }
 
-// --- 动画与轮播 ---
-const animeCanvas = ref(null)
-const carouselImages = ref([])
-const currentImageIndex = ref(0)
-const headerCarouselImages = ref([])
-const headerCurrentImageIndex = ref(0)
-const headerCarouselInterval = null
-let statusInterval = null
-let petals = []
-let animationId = null
-const isUniappReady = ref(false) //
 
-const currentImage = computed(() => {
-  if (carouselImages.value.length > 0) {
-    return carouselImages.value[currentImageIndex.value]
-  }
-  return null // 或者默认图片
-})
+let statusInterval = null
+
 
 // --- 状态数据 ---
 const statusData = reactive({
@@ -178,7 +163,7 @@ const dataAnalysisButtons = ref([
   { text: "归档查询", name: "archive" },
   { text: "旅行者札记", name: "bag-statistics" },
   { text: "配置组运行情况", name: "other" },
-  { text: "CD管理自动采集", name: "/cd-aware-auto-gather" },
+  { text: "CD管理自动采集", name: "cd-aware-auto-gather" },
   { text: "采集管理", name: "collection-management" },
 ])
 
@@ -295,7 +280,6 @@ const sendImage = () => {
 
 const indexSXBtn = () => {
   indexSX()
-  refreshStatus()
   message.success("正在重启中····")
 }
 
@@ -345,56 +329,6 @@ const handleOneLongOk = async () => {
 }
 const handleOneLongCancel = () => { oneLongModal.visible = false }
 
-// --- 樱花动画类 ---
-class Petal {
-  constructor(canvas) {
-    this.canvas = canvas
-    this.x = Math.random() * canvas.width
-    this.y = Math.random() * canvas.height * -1 - 100
-    this.size = Math.random() * 8 + 5
-    this.speed = Math.random() * 2 + 0.5
-    this.angle = Math.random() * 360
-    this.spin = Math.random() * 5 - 2.5
-    this.color = ["#ffcce6", "#ffd1e0", "#ff9ecd"][Math.floor(Math.random() * 3)]
-  }
-  update() {
-    this.y += this.speed
-    this.x += Math.sin(this.angle * Math.PI / 180) * 0.5
-    this.angle += this.spin
-    if (this.y > this.canvas.height) {
-      this.y = -20
-      this.x = Math.random() * this.canvas.width
-    }
-  }
-  draw(ctx) {
-    ctx.save()
-    ctx.translate(this.x, this.y)
-    ctx.rotate(this.angle * Math.PI / 180)
-    ctx.fillStyle = this.color
-    ctx.beginPath()
-    ctx.arc(0, 0, this.size / 2, 0, Math.PI * 2)
-    ctx.fill()
-    ctx.restore()
-  }
-}
-
-// --- 初始化与生命周期 ---
-const initSakuraAnimation = () => {
-  const canvas = animeCanvas.value
-  if (!canvas) return
-  const ctx = canvas.getContext("2d")
-  const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight }
-  resize()
-  window.addEventListener("resize", resize)
-  petals = Array.from({ length: 40 }, () => new Petal(canvas))
-  const animate = () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-    petals.forEach(p => { p.update(); p.draw(ctx) })
-    animationId = requestAnimationFrame(animate)
-  }
-  animate()
-  return () => { window.removeEventListener("resize", resize); cancelAnimationFrame(animationId) }
-}
 
 const refreshStatus = async () => {
   try {
@@ -405,14 +339,11 @@ const refreshStatus = async () => {
 
 
 onMounted(() => {
-  const cleanup = initSakuraAnimation()
   refreshStatus()
   statusInterval = setInterval(refreshStatus, 3000)
 
   onUnmounted(() => {
-    cleanup && cleanup()
     if (statusInterval) clearInterval(statusInterval)
-    if (headerCarouselInterval) clearInterval(headerCarouselInterval)
   })
 })
 </script>
@@ -430,36 +361,6 @@ onMounted(() => {
   background-size: 20px 20px;
 }
 
-.anime-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 5;
-  pointer-events: none;
-}
-
-/* ==== 轮播图 (左下角) ==== */
-.side-carousel {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 45vw;
-  max-width: 500px;
-  height: auto;
-  z-index: 0;
-  /* 最底层 */
-  pointer-events: none;
-  /* 点击穿透 */
-}
-
-.carousel-wrapper {
-  position: relative;
-  width: 100%;
-  padding-bottom: 120%;
-  /* Aspect Ratio placeholder */
-}
 
 .ExpectedToEnd {
   background: rgb(252, 207, 230);
@@ -476,18 +377,6 @@ onMounted(() => {
   visibility: visible;
 }
 
-.carousel-img {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: auto;
-  max-height: 80vh;
-  object-fit: contain;
-  object-position: bottom left;
-  mask-image: linear-gradient(to top, black 70%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to top, black 70%, transparent 100%);
-}
 
 .fade-enter-active,
 .fade-leave-active {
@@ -532,31 +421,6 @@ onMounted(() => {
   box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3);
 }
 
-.header-carousel {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.carousel-slide {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: opacity 1s;
-}
-
-.carousel-slide.active {
-  opacity: 1;
-}
-
-.carousel-slide img {
-  width: 100%;
-  height: 250%;
-  object-fit: cover;
-}
 
 .header-content {
   position: relative;
@@ -772,12 +636,6 @@ button:hover::after {
 
 /* ==== 移动端适配特别处理 ==== */
 @media (max-width: 576px) {
-  .side-carousel {
-    width: 120vw;
-    /* 移动端轮播图变大一点作为背景 */
-    opacity: 0.8;
-  }
-
   .main-content {
     width: 95%;
   }
