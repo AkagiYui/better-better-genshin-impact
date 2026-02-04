@@ -50,7 +50,7 @@
         <div class="button-group glass-panel">
           <h2 class="group-title">🔍 实时监测</h2>
           <div class="btn-grid">
-            <button @click="openScreenshot">查看桌面</button>
+            <button @click="desktopMonitorVisible = true">查看桌面</button>
             <button @click="sendImage">发送截图</button>
             <button @click="router.push({ name: 'log' })">实时日志</button>
             <button @click="router.push({ name: 'auto-log' })">ABGI日志查询</button>
@@ -116,45 +116,8 @@
       </div>
     </a-modal>
 
-    <a-modal
-      v-model:open="screenshotModal.visible"
-      title="🖥️ 桌面实时监控"
-      :footer="null"
-      :width="isMobile ? '98vw' : '98vw'"
-      :after-close="closeScreenshot"
-      centered
-      class="anime-modal">
-      <div class="screenshot-view">
-        <div
-          v-if="screenshotModal.url"
-          class="image-wrapper"
-          :style="{ cursor: isZoomed ? (isDragging ? 'grabbing' : 'grab') : 'default' }"
-          @mousedown="startDrag"
-          @mousemove="doDrag"
-          @mouseup="stopDrag"
-          @mouseleave="stopDrag"
-          @wheel="handleWheel"
-          @touchstart="handleTouchStart"
-          @touchmove="handleTouchMove"
-          @touchend="handleTouchEnd">
-          <img
-            :src="screenshotModal.url"
-            :style="{
-              transform: `scale(${zoomScale}) translate(${imagePosition.x}px, ${imagePosition.y}px)`,
-              transformOrigin: 'center center'
-            }"
-            class="live-img"
-            @load="onScreenshotLoad" />
-        </div>
-        <div v-else class="loading-placeholder">Waiting for signal...</div>
-      </div>
-      <div class="modal-tools">
-        <button @click="toggleAutoRefresh">{{ autoRefreshButtonText }}</button>
-        <button @click="zoomOut">缩小</button>
-        <button @click="zoomIn">放大</button>
-        <button @click="fitImage">适应</button>
-      </div>
-    </a-modal>
+    <!-- 桌面实时监控组件 -->
+    <DesktopMonitor v-model:visible="desktopMonitorVisible" />
 
     <a-modal
       v-model:open="uploadBgiModal.visible"
@@ -194,197 +157,11 @@ import { ref, reactive, onMounted, onUnmounted, computed, watch, h } from "vue"
 import { message, Modal } from "ant-design-vue"
 import { useRouter } from "vue-router"
 import { mysSignIn as mysSignInApi, getBaseURL, closeBgi, backup, sendImage as sendImageApi, indexSX, getOneLongAllName, startOneLong, getStatus, GetAppInfo } from "@/api"
-import { useIsMobile } from "@/hooks"
+
+import DesktopMonitor from "@/components/DesktopMonitor.vue"
 
 const router = useRouter()
-const { isMobile } = useIsMobile()
-
-// --- 截图功能 ---
-const screenshotModal = reactive({ visible: false, url: "" })
-const isZoomed = ref(false)
-const zoomScale = ref(1)
-const isAutoRefresh = ref(true) // 是否自动刷新
-const token = localStorage.getItem("bbgi-token")
-let screenshotTimer = null
-const SCREENSHOT_INTERVAL = 5000
-
-// 计算属性：按钮显示文本
-const autoRefreshButtonText = computed(() => {
-  return isAutoRefresh.value ? "⏸️ 暂停 (自动刷新中)" : "▶️ 继续 (已暂停)"
-})
-
-// 拖动查看相关状态
-const isDragging = ref(false)
-const dragStart = ref({ x: 0, y: 0 })
-const imagePosition = ref({ x: 0, y: 0 })
-
-const refreshScreenshot = () => {
-  const ts = Date.now()
-  screenshotModal.url = `${getBaseURL()}/api/aBgiJt?t=${ts}&tk=${token}`
-}
-
-const openScreenshot = () => {
-  if (screenshotTimer) clearInterval(screenshotTimer)
-  refreshScreenshot()
-  screenshotModal.visible = true
-  // 每次打开时都开启自动刷新
-  isAutoRefresh.value = true
-  startAutoRefresh()
-}
-
-const startAutoRefresh = () => {
-  if (screenshotTimer) clearInterval(screenshotTimer)
-  screenshotTimer = setInterval(() => {
-    console.log("自动刷新截图...")
-    refreshScreenshot()
-  }, SCREENSHOT_INTERVAL)
-}
-
-const toggleAutoRefresh = () => {
-  isAutoRefresh.value = !isAutoRefresh.value
-  if (isAutoRefresh.value) {
-    startAutoRefresh()
-    message.success("已开启自动刷新")
-  } else {
-    stopScreenshotTimer()
-    message.success("已暂停自动刷新")
-  }
-}
-
-const stopScreenshotTimer = () => {
-  if (screenshotTimer) {
-    clearInterval(screenshotTimer)
-    screenshotTimer = null
-  }
-}
-
-const closeScreenshot = () => {
-  screenshotModal.visible = false
-  stopScreenshotTimer()
-  // 重置自动刷新状态
-  isAutoRefresh.value = true
-}
-
-// 监听键盘事件，支持按R键手动刷新
-const handleKeyDown = (event) => {
-  // 只在截图模态框打开时处理
-  if (!screenshotModal.visible) return
-
-  if (event.key === "r" || event.key === "R") {
-    event.preventDefault()
-    refreshScreenshot()
-    message.info("已手动刷新截图")
-  }
-}
-
-// 在组件挂载时添加键盘事件监听
-onMounted(() => {
-  window.addEventListener("keydown", handleKeyDown)
-})
-
-// 在组件卸载时移除键盘事件监听
-onUnmounted(() => {
-  window.removeEventListener("keydown", handleKeyDown)
-})
-
-const onScreenshotLoad = () => {
-  fitImage()
-  // 重置位置
-  imagePosition.value = { x: 0, y: 0 }
-}
-
-const zoomIn = () => {
-  isZoomed.value = true
-  zoomScale.value = Math.min(zoomScale.value + 0.2, 6)
-}
-
-const zoomOut = () => {
-  if (!isZoomed.value) return
-  zoomScale.value = Math.max(zoomScale.value - 0.2, 0.2)
-  // 如果缩小到1倍以下，重置位置
-  if (zoomScale.value <= 1) {
-    fitImage()
-  }
-}
-
-const fitImage = () => {
-  isZoomed.value = false
-  zoomScale.value = 1
-  imagePosition.value = { x: 0, y: 0 }
-}
-
-// 鼠标滚轮缩放
-const handleWheel = (event) => {
-  if (!isZoomed.value) return
-
-  event.preventDefault()
-  const delta = event.deltaY > 0 ? -0.2 : 0.2
-  const newScale = Math.max(0.2, Math.min(6, zoomScale.value + delta))
-
-  // 计算鼠标位置相对于图片中心的偏移
-  const rect = event.currentTarget.getBoundingClientRect()
-  const mouseX = event.clientX - rect.left - rect.width / 2
-  const mouseY = event.clientY - rect.top - rect.height / 2
-
-  // 计算缩放后的位置调整
-  const scaleRatio = newScale / zoomScale.value
-  imagePosition.value.x = imagePosition.value.x * scaleRatio + mouseX * (1 - scaleRatio)
-  imagePosition.value.y = imagePosition.value.y * scaleRatio + mouseY * (1 - scaleRatio)
-
-  zoomScale.value = newScale
-}
-
-// 拖动功能
-const startDrag = (event) => {
-  if (!isZoomed.value) return
-  event.preventDefault()
-  isDragging.value = true
-  dragStart.value = {
-    x: event.clientX - imagePosition.value.x,
-    y: event.clientY - imagePosition.value.y,
-  }
-}
-
-const doDrag = (event) => {
-  if (!isDragging.value || !isZoomed.value) return
-  event.preventDefault()
-
-  imagePosition.value = {
-    x: event.clientX - dragStart.value.x,
-    y: event.clientY - dragStart.value.y,
-  }
-}
-
-const stopDrag = () => {
-  isDragging.value = false
-}
-
-// 触摸事件处理
-const handleTouchStart = (event) => {
-  if (!isZoomed.value) return
-  event.preventDefault()
-  if (event.touches.length === 1) {
-    isDragging.value = true
-    dragStart.value = {
-      x: event.touches[0].clientX - imagePosition.value.x,
-      y: event.touches[0].clientY - imagePosition.value.y,
-    }
-  }
-}
-
-const handleTouchMove = (event) => {
-  if (!isDragging.value || !isZoomed.value || event.touches.length !== 1) return
-  event.preventDefault()
-
-  imagePosition.value = {
-    x: event.touches[0].clientX - dragStart.value.x,
-    y: event.touches[0].clientY - dragStart.value.y,
-  }
-}
-
-const handleTouchEnd = () => {
-  isDragging.value = false
-}
+const desktopMonitorVisible = ref(false)
 
 // --- 认证与基础 ---
 const handleLogout = () => {
@@ -857,15 +634,6 @@ onMounted(() => {
 .label { color: #ff80ab; font-weight: bold; margin-right: 5px; }
 .value { color: #d81b60; font-weight: bold; word-break: break-all; }
 .value.highlight { font-size: 1.1em; color: #c2185b; }
-
-.screenshot-toolbar {
-  margin-top: 15px;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-.tool-label { color: #ff3385; font-weight: bold; width: 100%; margin-bottom: 5px; }
 
 /* 按钮组样式 */
 .group-title {
