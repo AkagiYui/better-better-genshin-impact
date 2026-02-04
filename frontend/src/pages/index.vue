@@ -626,7 +626,7 @@ const handleOneLongLoad = async () => {
   try {
     oneLongModal.loading = true
     const res = await getOneLongAllName()
-    oneLongModal.options = res.data || []
+    oneLongModal.options = res.data.data || []
     if (oneLongModal.options.length) oneLongModal.selectedValue = oneLongModal.options[0]
   } catch(e) { message.error("加载列表失败") } finally { oneLongModal.loading = false }
 }
