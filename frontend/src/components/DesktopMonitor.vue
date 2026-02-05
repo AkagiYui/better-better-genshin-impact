@@ -1,26 +1,7 @@
 <template>
-  <a-modal
-    :open="visible"
-    title="🖥️ 桌面实时监控"
-    :footer="null"
-    :width="isMobile ? '98vw' : '98vw'"
-    :after-close="handleClose"
-    centered
-    class="anime-modal"
-    @update:open="handleVisibleChange">
+  <a-modal :open="visible" title="🖥️ 桌面实时监控" :footer="null" :width="isMobile ? '98vw' : '98vw'" centered class="anime-modal" @update:open="handleVisibleChange">
     <div class="screenshot-view">
-      <div
-        v-if="screenshotUrl"
-        class="image-wrapper"
-        :style="{ cursor: isZoomed ? (isDragging ? 'grabbing' : 'grab') : 'default' }"
-        @mousedown="startDrag"
-        @mousemove="doDrag"
-        @mouseup="stopDrag"
-        @mouseleave="stopDrag"
-        @wheel="handleWheel"
-        @touchstart="handleTouchStart"
-        @touchmove="handleTouchMove"
-        @touchend="handleTouchEnd">
+      <div v-if="screenshotUrl" class="image-wrapper" :style="{ cursor: isZoomed ? (isDragging ? 'grabbing' : 'grab') : 'default' }" @mousedown="startDrag" @mousemove="doDrag" @mouseup="stopDrag" @mouseleave="stopDrag" @wheel="handleWheel" @touchstart="handleTouchStart" @touchmove="handleTouchMove" @touchend="handleTouchEnd">
         <img
           :src="screenshotUrl"
           :style="{
@@ -33,7 +14,7 @@
       <div v-else class="loading-placeholder">Waiting for signal...</div>
     </div>
     <div class="modal-tools">
-      <button @click="toggleAutoRefresh">{{ autoRefreshButtonText }}</button>
+      <button @click="userWantAutoRefresh = !userWantAutoRefresh">{{ autoRefreshButtonText }}</button>
       <button @click="zoomOut">缩小</button>
       <button @click="zoomIn">放大</button>
       <button @click="fitImage">适应</button>
@@ -45,7 +26,7 @@
 import { ref, reactive, computed, onMounted, onUnmounted, watch } from "vue"
 import { message } from "ant-design-vue"
 import { getBaseURL } from "@/api"
-import { useIsMobile } from "@/hooks"
+import { useIsMobile, useWindowEvent, useInterval } from "@/hooks"
 
 const props = defineProps({
   visible: {
@@ -54,7 +35,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(["update:visible", "close"])
+const emit = defineEmits(["update:visible"])
 
 const { isMobile } = useIsMobile()
 
@@ -62,14 +43,21 @@ const { isMobile } = useIsMobile()
 const screenshotUrl = ref("")
 const isZoomed = ref(false)
 const zoomScale = ref(1)
-const isAutoRefresh = ref(true) // 是否自动刷新
 const token = typeof window !== "undefined" ? localStorage.getItem("bbgi-token") : ""
-let screenshotTimer = null
-const SCREENSHOT_INTERVAL = 5000
 
-// 计算属性：按钮显示文本
-const autoRefreshButtonText = computed(() => {
-  return isAutoRefresh.value ? "⏸️ 暂停 (自动刷新中)" : "▶️ 继续 (已暂停)"
+// 自动刷新
+const userWantAutoRefresh = ref(true) // 用户是否希望自动刷新
+const autoRefreshButtonText = computed(() => userWantAutoRefresh.value ? "⏸️ 点击暂停刷新" : "▶️ 点击继续刷新")
+const isAutoRefresh = computed(() => userWantAutoRefresh.value && props.visible)
+const refreshScreenshot = () => {
+  const ts = Date.now()
+  screenshotUrl.value = `${getBaseURL()}/api/aBgiJt?t=${ts}&tk=${token}`
+}
+useInterval(refreshScreenshot, 5000, isAutoRefresh)
+watch(() => props.visible, (val) => {
+  if (val) {
+    refreshScreenshot()
+  }
 })
 
 // 拖动查看相关状态
@@ -77,36 +65,6 @@ const isDragging = ref(false)
 const dragStart = ref({ x: 0, y: 0 })
 const imagePosition = ref({ x: 0, y: 0 })
 
-const refreshScreenshot = () => {
-  const ts = Date.now()
-  screenshotUrl.value = `${getBaseURL()}/api/aBgiJt?t=${ts}&tk=${token}`
-}
-
-const startAutoRefresh = () => {
-  if (screenshotTimer) clearInterval(screenshotTimer)
-  screenshotTimer = setInterval(() => {
-    console.log("自动刷新截图...")
-    refreshScreenshot()
-  }, SCREENSHOT_INTERVAL)
-}
-
-const stopScreenshotTimer = () => {
-  if (screenshotTimer) {
-    clearInterval(screenshotTimer)
-    screenshotTimer = null
-  }
-}
-
-const toggleAutoRefresh = () => {
-  isAutoRefresh.value = !isAutoRefresh.value
-  if (isAutoRefresh.value) {
-    startAutoRefresh()
-    message.success("已开启自动刷新")
-  } else {
-    stopScreenshotTimer()
-    message.success("已暂停自动刷新")
-  }
-}
 
 const onScreenshotLoad = () => {
   fitImage()
@@ -218,48 +176,12 @@ const handleKeyDown = (event) => {
     message.info("已手动刷新截图")
   }
 }
-
-// 处理关闭
-const handleClose = () => {
-  stopScreenshotTimer()
-  // 重置自动刷新状态
-  isAutoRefresh.value = true
-  emit("close")
-}
+useWindowEvent("keydown", handleKeyDown)
 
 // 处理 visible 变化
 const handleVisibleChange = (val) => {
   emit("update:visible", val)
 }
-
-// 打开截图模态框
-const open = () => {
-  if (screenshotTimer) clearInterval(screenshotTimer)
-  refreshScreenshot()
-  // 每次打开时都开启自动刷新
-  isAutoRefresh.value = true
-  startAutoRefresh()
-}
-
-// 监听 visible 变化，当变为 true 时打开
-watch(() => props.visible, (newVal) => {
-  if (newVal) {
-    open()
-  } else {
-    stopScreenshotTimer()
-  }
-})
-
-// 在组件挂载时添加键盘事件监听
-onMounted(() => {
-  window.addEventListener("keydown", handleKeyDown)
-})
-
-// 在组件卸载时移除键盘事件监听
-onUnmounted(() => {
-  window.removeEventListener("keydown", handleKeyDown)
-  stopScreenshotTimer()
-})
 </script>
 
 <style scoped>
@@ -269,10 +191,12 @@ onUnmounted(() => {
   border: 3px solid #ffcce6;
   background: #fff0f5;
 }
+
 .anime-modal :deep(.ant-modal-header) {
   background: transparent;
   border-bottom: 2px dashed #ffb6c1;
 }
+
 .anime-modal :deep(.ant-modal-title) {
   color: #ff3385;
   text-align: center;
@@ -288,7 +212,8 @@ onUnmounted(() => {
   align-items: center;
   overflow: hidden;
   margin-bottom: 10px;
-  max-height: 75vh; /* 限制最大高度 */
+  max-height: 75vh;
+  /* 限制最大高度 */
   width: 100%;
   position: relative;
 }
@@ -309,18 +234,22 @@ onUnmounted(() => {
   max-height: 75vh;
   width: auto;
   height: auto;
-  object-fit: contain; /* 保持宽高比 */
+  object-fit: contain;
+  /* 保持宽高比 */
   transition: transform 0.3s ease;
   will-change: transform;
 }
+
 .modal-tools {
   display: flex;
   gap: 14px;
   justify-content: center;
   align-items: center;
   flex-wrap: nowrap;
-    align-items: center; /* 垂直居中 */
+  align-items: center;
+  /* 垂直居中 */
 }
+
 .modal-tools button {
   padding: 8px 14px;
   font-size: 20px;
@@ -328,11 +257,13 @@ onUnmounted(() => {
 }
 
 
-.loading-placeholder { color: #ff66a3; }
+.loading-placeholder {
+  color: #ff66a3;
+}
 
 /* ==== 移动端适配特别处理 ==== */
 @media (max-width: 576px) {
-    .modal-tools button {
+  .modal-tools button {
     font-size: 15px;
     padding: 6px 10px;
   }
@@ -357,17 +288,25 @@ button {
   transition: all 0.2s;
   position: relative;
   overflow: hidden;
-  text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 }
 
-button:active { transform: scale(0.95); }
+button:active {
+  transform: scale(0.95);
+}
+
 button::after {
   content: '';
   position: absolute;
-  top: 0; left: -100%;
-  width: 100%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
   transition: 0.5s;
 }
-button:hover::after { left: 100%; }
+
+button:hover::after {
+  left: 100%;
+}
 </style>
