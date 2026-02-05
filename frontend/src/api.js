@@ -99,7 +99,7 @@ export const getSystemConfig = () => api.get("/api/auth/getSystemConfig") // 获
 
 // 获取系统状态
 export const getStatus = () => api.get("/api/index")
-export const indexSX = () => api.get("/api/indexSX")
+export const restartBetterBgi = () => api.get("/api/indexSX")
 export const updateABgi = () => api.post("/api/updateABgi")
 
 // 获取轮播图图片列表

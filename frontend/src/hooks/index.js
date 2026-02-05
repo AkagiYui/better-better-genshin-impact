@@ -26,7 +26,7 @@ export const useWindowEvent = (event, handler) => {
   })
 }
 
-export const useInterval = (callback, interval, isActive) => {
+export const useInterval = (callback, interval, isActive = true) => {
   let timerId = null
 
   watch(isActive, (active) => {

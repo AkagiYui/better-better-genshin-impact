@@ -11,7 +11,7 @@
       <div class="status-card glass-panel">
         <div class="card-header">
           <h2>🖥️ 运行状态监控</h2>
-          <button class="refresh-btn" @click="indexSXBtn">🔄 重启</button>
+          <button class="refresh-btn" @click="onRestartBbgiButtonClicked">🔄 重启Better-BGI</button>
         </div>
 
         <div class="status-grid">
@@ -39,7 +39,7 @@
             <span class="label">⚙️ 状态:</span>
             <span class="value">{{ statusData.running }}</span>
           </div>
-          <div class="status-item full-width">
+          <div class="status-item">
             <span class="label">✨ JS进度:</span>
             <span class="value">{{ statusData.jsProgress }}</span>
           </div>
@@ -50,7 +50,7 @@
         <div class="button-group glass-panel">
           <h2 class="group-title">🔍 实时监测</h2>
           <div class="btn-grid">
-            <button @click="desktopMonitorVisible = true">查看桌面</button>
+            <button @click="desktopMonitorVisible = true">桌面监控</button>
             <button @click="sendImage">发送截图</button>
             <button @click="router.push({ name: 'log' })">实时日志</button>
             <button @click="router.push({ name: 'auto-log' })">ABGI日志查询</button>
@@ -123,27 +123,19 @@
 import { ref, reactive, onMounted, onUnmounted, computed, watch, h } from "vue"
 import { message, Modal } from "ant-design-vue"
 import { useRouter } from "vue-router"
-import { mysSignIn as mysSignInApi, getBaseURL, closeBgi, backup, sendImage as sendImageApi, indexSX, getOneLongAllName, startOneLong, getStatus, GetAppInfo } from "@/api"
+import { mysSignIn as mysSignInApi, getBaseURL, closeBgi, backup, sendImage as sendImageApi, restartBetterBgi, getOneLongAllName, startOneLong, getStatus, GetAppInfo } from "@/api"
 
 import DesktopMonitor from "@/components/DesktopMonitor.vue"
+import { useInterval } from "@/hooks"
 
 const router = useRouter()
 const desktopMonitorVisible = ref(false)
 
 // --- 认证与基础 ---
 const handleLogout = () => {
-  try {
-    localStorage.removeItem("bbgi-token")
-    router.push({ name: "login" })
-  } catch (err) {
-    console.error(err)
-    router.push({ name: "login" })
-  }
+  localStorage.removeItem("bbgi-token")
+  router.push({ name: "login" })
 }
-
-
-let statusInterval = null
-
 
 // --- 状态数据 ---
 const statusData = reactive({
@@ -155,6 +147,17 @@ const statusData = reactive({
   jsProgress: "...",
   scriptName: "...",
 })
+const refreshStatus = async () => {
+  try {
+    const res = await getStatus()
+    Object.assign(statusData, res.data)
+  } catch (e) { console.error(e) }
+}
+useInterval(refreshStatus, 3000)
+onMounted(() => {
+  refreshStatus()
+})
+
 
 // --- 按钮配置 (保持不变) ---
 const dataAnalysisButtons = ref([
@@ -278,8 +281,8 @@ const sendImage = () => {
   })
 }
 
-const indexSXBtn = () => {
-  indexSX()
+const onRestartBbgiButtonClicked = () => {
+  restartBetterBgi()
   message.success("正在重启中····")
 }
 
@@ -330,22 +333,6 @@ const handleOneLongOk = async () => {
 const handleOneLongCancel = () => { oneLongModal.visible = false }
 
 
-const refreshStatus = async () => {
-  try {
-    const res = await getStatus()
-    Object.assign(statusData, res.data || res)
-  } catch (e) { console.error(e) }
-}
-
-
-onMounted(() => {
-  refreshStatus()
-  statusInterval = setInterval(refreshStatus, 3000)
-
-  onUnmounted(() => {
-    if (statusInterval) clearInterval(statusInterval)
-  })
-})
 </script>
 
 <style scoped>
