@@ -39,6 +39,10 @@ const emit = defineEmits(["update:visible"])
 
 const { isMobile } = useIsMobile()
 
+const handleVisibleChange = (val) => {
+  emit("update:visible", val)
+}
+
 // --- 截图功能 ---
 const screenshotUrl = ref("")
 const isZoomed = ref(false)
@@ -166,22 +170,14 @@ const handleTouchEnd = () => {
 }
 
 // 监听键盘事件，支持按R键手动刷新
-const handleKeyDown = (event) => {
-  // 只在截图模态框打开时处理
-  if (!props.visible) return
-
+useWindowEvent("keydown", (event) => {
+  if (!props.visible) return // 只在截图模态框打开时处理
   if (event.key === "r" || event.key === "R") {
     event.preventDefault()
     refreshScreenshot()
     message.info("已手动刷新截图")
   }
-}
-useWindowEvent("keydown", handleKeyDown)
-
-// 处理 visible 变化
-const handleVisibleChange = (val) => {
-  emit("update:visible", val)
-}
+})
 </script>
 
 <style scoped>
