@@ -11,7 +11,9 @@
       <div class="status-card glass-panel">
         <div class="card-header">
           <h2>🖥️ 运行状态监控</h2>
-          <button class="refresh-btn" @click="onRestartBbgiButtonClicked">🔄 重启Better-BGI</button>
+          <button class="refresh-btn" @click="onRestartBbgiButtonClicked">
+            <SyncOutlined /> 重启Better-BGI
+          </button>
         </div>
 
         <div class="status-grid">
@@ -113,6 +115,7 @@
 import { ref, reactive, onMounted, onUnmounted, computed, watch, h } from "vue"
 import { message, Modal } from "ant-design-vue"
 import { useRouter } from "vue-router"
+import { SyncOutlined } from "@ant-design/icons-vue"
 import { mysSignIn as mysSignInApi, getBaseURL, closeBgi, backup, sendImage as sendImageApi, restartBetterBgi, getStatus, GetAppInfo } from "@/api"
 
 import DesktopMonitor from "@/components/DesktopMonitor.vue"
