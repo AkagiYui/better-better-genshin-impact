@@ -101,12 +101,6 @@ onMounted(() => {
   refreshStatus()
 })
 
-
-const handleUploadBgiClick = () => {
-  uploadBgiModalVisible.value = true
-}
-
-
 const onRestartBbgiButtonClicked = () => {
   restartBetterBgi()
   message.success("正在重启中····")
@@ -150,15 +144,17 @@ const buttonGroups = ref([
     "buttons": [
       { text: "一条龙启动", action: () => { oneLongModalVisible.value = true } },
       {
-        text: "关闭BGI和原神", action: Modal.confirm({
-          title: "确认关闭？", content: "是否关闭【BGI】和【原神】？",
-          centered: true,
-          cancelText: "取消",
-          maskClosable: true,
-          onOk: async () => {
-            try { await closeBgi(); message.success("已发送关闭指令") } catch (e) { message.error("失败") }
-          },
-        }),
+        text: "关闭BGI和原神", action: () => {
+          Modal.confirm({
+            title: "确认关闭？", content: "是否关闭【BGI】和【原神】？",
+            centered: true,
+            cancelText: "取消",
+            maskClosable: true,
+            onOk: async () => {
+              try { await closeBgi(); message.success("已发送关闭指令") } catch (e) { message.error("失败") }
+            },
+          })
+        },
       },
       { text: "调度圣坛", route: { name: "list-groups" } },
       {
@@ -184,7 +180,7 @@ const buttonGroups = ref([
     "buttons": [
       { text: "录屏管理", route: { name: "obs-video" } },
       { text: "仓库管理", route: { name: "gitlog" } },
-      { text: "手动更新BGI", action: handleUploadBgiClick },
+      { text: "手动更新BGI", action: () => uploadBgiModalVisible.value = true },
       {
         text: "米游社签到", action: () => {
           Modal.confirm({
