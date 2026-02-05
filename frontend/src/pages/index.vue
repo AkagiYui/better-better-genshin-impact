@@ -55,7 +55,6 @@ import { message, Modal } from "ant-design-vue"
 import { useRouter } from "vue-router"
 import { SyncOutlined } from "@ant-design/icons-vue"
 import { mysSignIn as mysSignInApi, getBaseURL, closeBgi, backup, sendImage as sendImageApi, restartBetterBgi, getStatus, GetAppInfo } from "@/api"
-
 import DesktopMonitor from "@/components/DesktopMonitor.vue"
 import OneLongModal from "@/components/OneLongModal.vue"
 import UploadBgiModal from "@/components/UploadBgiModal.vue"
@@ -65,12 +64,6 @@ const router = useRouter()
 const desktopMonitorVisible = ref(false)
 const oneLongModalVisible = ref(false)
 const uploadBgiModalVisible = ref(false)
-
-// 退出登录
-const handleLogout = () => {
-  localStorage.removeItem("bbgi-token")
-  router.push({ name: "login" })
-}
 
 // 状态数据
 const statusData = reactive({
@@ -195,7 +188,12 @@ const buttonGroups = ref([
       { text: "ABGI设置", route: { name: "config" } },
       { text: "BGI一条龙配置", route: { name: "bgi-config" } },
       { text: "检查更新", route: { name: "update" } },
-      { text: "退出", action: handleLogout },
+      {
+        text: "退出", action: () => {
+          localStorage.removeItem("bbgi-token")
+          router.push({ name: "login" })
+        },
+      },
     ],
   },
 ])
