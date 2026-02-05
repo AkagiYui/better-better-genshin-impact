@@ -17,34 +17,15 @@
         </div>
 
         <div class="status-grid">
-          <div class="status-item group-name">
-            <span class="label">🧩 执行配置组:</span>
-            <span class="value">{{ statusData.group }}</span>
-            <div class="ExpectedToEnd">
-              <pre>{{ statusData.ExpectedToEnd == "" ? '没有归档记录' : statusData.ExpectedToEnd }}</pre>
+          <template v-for="(item, index) in overviewData" :key="index">
+            <div :class="['status-item', item.hover ? 'group-name' : '']">
+              <span class="label">{{ item.label }}</span>
+              <span class="value">{{ item.value }}</span>
+              <div v-if="item.hover" class="ExpectedToEnd">
+                <pre>{{ item.hover }}</pre>
+              </div>
             </div>
-          </div>
-
-          <div class="status-item">
-            <span class="label">📜 运行路线:</span>
-            <span class="value">{{ statusData.line }}</span>
-          </div>
-          <div class="status-item">
-            <span class="label">📜 运行脚本:</span>
-            <span class="value">{{ statusData.scriptName }}</span>
-          </div>
-          <div class="status-item">
-            <span class="label">🗺️ 进度:</span>
-            <span class="value">{{ statusData.progress }}</span>
-          </div>
-          <div class="status-item">
-            <span class="label">⚙️ 状态:</span>
-            <span class="value">{{ statusData.running }}</span>
-          </div>
-          <div class="status-item">
-            <span class="label">✨ JS进度:</span>
-            <span class="value">{{ statusData.jsProgress }}</span>
-          </div>
+          </template>
         </div>
       </div>
 
@@ -116,6 +97,14 @@ const statusData = reactive({
   jsProgress: "...",
   scriptName: "...",
 })
+const overviewData = computed(() => [
+  { label: "🧩 执行配置组:", value: statusData.group, hover: statusData.ExpectedToEnd },
+  { label: "📜 运行路线:", value: statusData.line },
+  { label: "📜 运行脚本:", value: statusData.scriptName },
+  { label: "🗺️ 进度:", value: statusData.progress },
+  { label: "⚙️ 状态:", value: statusData.running },
+  { label: "✨ JS进度:", value: statusData.jsProgress },
+])
 const refreshStatus = async () => {
   try {
     const res = await getStatus()
