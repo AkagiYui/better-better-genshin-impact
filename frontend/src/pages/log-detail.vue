@@ -44,7 +44,7 @@
 import { ref, onMounted } from "vue"
 import { useRouter, useRoute } from "vue-router"
 import { message } from "ant-design-vue"
-import { api, getLogInfo } from "@/api"
+import { getLogInfo } from "@/api"
 import indexHtmlContent from "@/assets/index.html?raw"
 
 const router = useRouter()
@@ -246,212 +246,217 @@ function goBack() {
 
 <style scoped>
 :root {
-    --primary-color: #ff6eb4;
-    --background-light: #fff6fb;
-    --text-color: #ff6eb4;
-    --border-color: #ffc0da;
-    --hover-color: rgba(255, 192, 218, 0.3);
+  --primary-color: #ff6eb4;
+  --background-light: #fff6fb;
+  --text-color: #ff6eb4;
+  --border-color: #ffc0da;
+  --hover-color: rgba(255, 192, 218, 0.3);
 }
 
 .log-detail-page {
-    min-height: 100vh;
-    background-color: var(--background-light);
-    color: var(--text-color);
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="20" cy="20" r="5" fill="%23ffd6eb" opacity="0.6"/><circle cx="70" cy="70" r="7" fill="%23ffc0da" opacity="0.5"/></svg>');
-    padding-bottom: 0;
-    overflow: hidden; /* 防止滚动条 */
+  min-height: 100vh;
+  background-color: var(--background-light);
+  color: var(--text-color);
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="20" cy="20" r="5" fill="%23ffd6eb" opacity="0.6"/><circle cx="70" cy="70" r="7" fill="%23ffc0da" opacity="0.5"/></svg>');
+  padding-bottom: 0;
+  overflow: hidden;
+  /* 防止滚动条 */
 }
 
 .page-header {
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 30px 0 10px;
-    text-align: center;
-    height: 100px;
-    box-shadow: 0 0 20px var(--primary-color);
-    border-radius: 0 0 30px 30px;
-    position: sticky;
-    top: 0;
-    z-index: 10;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 30px 0 10px;
+  text-align: center;
+  height: 100px;
+  box-shadow: 0 0 20px var(--primary-color);
+  border-radius: 0 0 30px 30px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .page-header.enhanced-header {
-    position: relative;
-    background: linear-gradient(90deg, #fff6fb 60%, #ff9ecf 100%);
-    box-shadow: 0 8px 32px rgba(255, 110, 180, 0.15), 0 2px 8px rgba(255, 110, 180, 0.08);
-    border-radius: 0 0 24px 24px;
-    padding: 0;
-    margin-bottom: 8px;
-    overflow: hidden;
-    z-index: 10;
+  position: relative;
+  background: linear-gradient(90deg, #fff6fb 60%, #ff9ecf 100%);
+  box-shadow: 0 8px 32px rgba(255, 110, 180, 0.15), 0 2px 8px rgba(255, 110, 180, 0.08);
+  border-radius: 0 0 24px 24px;
+  padding: 0;
+  margin-bottom: 8px;
+  overflow: hidden;
+  z-index: 10;
 }
 
 .header-bg {
-    position: absolute;
+  position: absolute;
 
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: radial-gradient(circle at 20% 40%, #e9a0d1 0%, #ecccde 60%, transparent 100%);
-    opacity: 0.7;
-    z-index: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 20% 40%, #e9a0d1 0%, #ecccde 60%, transparent 100%);
+  opacity: 0.7;
+  z-index: 0;
 }
 
 .header-content {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    padding: 20px 20px 12px 20px;
-    z-index: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px 20px 12px 20px;
+  z-index: 1;
 }
 
 .header-logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
 }
 
 .logo-icon {
-    font-size: 1.8rem;
-    background: linear-gradient(45deg, #ff6eb4, #ff9ecf);
-    border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(255, 110, 180, 0.18);
-    padding: 6px 10px;
-    color: #fff;
-    border: 2px solid #ffc0da;
+  font-size: 1.8rem;
+  background: linear-gradient(45deg, #ff6eb4, #ff9ecf);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(255, 110, 180, 0.18);
+  padding: 6px 10px;
+  color: #fff;
+  border: 2px solid #ffc0da;
 }
 
 .header-title-group {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  flex: 1;
 }
 
 .page-header.enhanced-header h1 {
-    color: #ff6eb4;
-    font-size: 1.4rem;
-    font-weight: bold;
-    margin: 0;
-    text-shadow: 0 2px 12px #ffc0da;
-    letter-spacing: 1px;
+  color: #ff6eb4;
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin: 0;
+  text-shadow: 0 2px 12px #ffc0da;
+  letter-spacing: 1px;
 }
 
 .current-file {
-    color: #666;
-    font-size: 0.75rem;
-    margin: 0;
-    font-weight: normal;
+  color: #666;
+  font-size: 0.75rem;
+  margin: 0;
+  font-weight: normal;
 }
 
 .header-btn {
-    margin-top: 0;
-    font-size: 0.85rem;
-    padding: 6px 16px;
-    border-radius: 20px;
-    box-shadow: 0 2px 8px #ffc0da;
-    background: linear-gradient(45deg, #fff, #ffe3f3);
-    color: #ff6eb4;
-    border: 2px solid #ff6eb4;
-    font-weight: bold;
-    transition: all 0.3s;
+  margin-top: 0;
+  font-size: 0.85rem;
+  padding: 6px 16px;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px #ffc0da;
+  background: linear-gradient(45deg, #fff, #ffe3f3);
+  color: #ff6eb4;
+  border: 2px solid #ff6eb4;
+  font-weight: bold;
+  transition: all 0.3s;
 }
 
 .header-btn:hover {
-    background: linear-gradient(45deg, #ff6eb4, #ff9ecf);
-    color: #fff;
-    box-shadow: 0 4px 16px #ff9ecf;
-    transform: scale(1.07);
+  background: linear-gradient(45deg, #ff6eb4, #ff9ecf);
+  color: #fff;
+  box-shadow: 0 4px 16px #ff9ecf;
+  transform: scale(1.07);
 }
 
 .header-divider {
-    width: 80%;
-    height: 4px;
-    margin: 0 auto 0 auto;
-    background: linear-gradient(90deg, #ff6eb4 0%, #ff9ecf 100%);
-    border-radius: 2px;
-    box-shadow: 0 2px 8px #ffc0da;
-    opacity: 0.25;
-    margin-bottom: 2px;
+  width: 80%;
+  height: 4px;
+  margin: 0 auto 0 auto;
+  background: linear-gradient(90deg, #ff6eb4 0%, #ff9ecf 100%);
+  border-radius: 2px;
+  box-shadow: 0 2px 8px #ffc0da;
+  opacity: 0.25;
+  margin-bottom: 2px;
 }
 
 .container {
-    max-width: 100%;
-    margin: 0;
-    padding: 0;
-    height: 100vh;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
 }
 
 .panel {
-    background: rgba(255, 255, 255, 0.8);
-    box-shadow: 0 0 15px #ffcce6;
-    border-radius: 20px;
-    padding: 20px 25px;
-    margin-bottom: 30px;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 15px #ffcce6;
+  border-radius: 20px;
+  padding: 20px 25px;
+  margin-bottom: 30px;
 }
 
 .log-content-panel {
-    padding: 0;
-    overflow: hidden;
-    height: 100vh;
-    border-radius: 0;
-    margin-bottom: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100vh;
+  border-radius: 0;
+  margin-bottom: 0;
 }
 
 .log-iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    border-radius: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 0;
 }
 
-.loading-text, .no-data-text {
-    text-align: center;
-    color: var(--primary-color);
-    font-size: 1.2rem;
-    padding: 40px 20px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 245, 252, 0.8));
-    border-radius: 15px;
-    border: 2px dashed var(--border-color);
+.loading-text,
+.no-data-text {
+  text-align: center;
+  color: var(--primary-color);
+  font-size: 1.2rem;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 245, 252, 0.8));
+  border-radius: 15px;
+  border: 2px dashed var(--border-color);
 }
 
 /* 移动端适配 */
 @media (max-width: 600px) {
-    .header-content {
-        flex-direction: column;
-        gap: 15px;
-        padding: 20px;
-    }
+  .header-content {
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+  }
 
-    .header-title-group {
-        align-items: center;
-        text-align: center;
-    }
+  .header-title-group {
+    align-items: center;
+    text-align: center;
+  }
 
-    .page-header.enhanced-header h1 {
-        font-size: 1.2rem;
-    }
+  .page-header.enhanced-header h1 {
+    font-size: 1.2rem;
+  }
 
-    .current-file {
-        font-size: 0.7rem;
-        text-align: center;
-        word-break: break-all;
-    }
+  .current-file {
+    font-size: 0.7rem;
+    text-align: center;
+    word-break: break-all;
+  }
 
-    .logo-icon {
-        font-size: 1.4rem;
-        padding: 5px 8px;
-    }
+  .logo-icon {
+    font-size: 1.4rem;
+    padding: 5px 8px;
+  }
 
-    .header-btn {
-        font-size: 0.75rem;
-        padding: 5px 12px;
-    }
+  .header-btn {
+    font-size: 0.75rem;
+    padding: 5px 12px;
+  }
 
-    .log-content-panel {
-        height: calc(100vh - 180px);
-        min-height: 400px;
-    }
+  .log-content-panel {
+    height: calc(100vh - 180px);
+    min-height: 400px;
+  }
 }
 </style>
