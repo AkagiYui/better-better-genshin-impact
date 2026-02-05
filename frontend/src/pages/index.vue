@@ -178,55 +178,6 @@ const handleUploadBgiOk = async () => {
 }
 
 
-// --- 其他功能按钮逻辑 ---
-const mysSignIn = () => {
-  Modal.confirm({
-    title: "确认签到？", content: "是否要米游社签到？", okText: "确定", cancelText: "取消",
-    onOk: async () => {
-      try {
-        const res = await mysSignInApi()
-        Modal.info({ title: "结果", content: res.message || "发送成功" })
-      } catch (e) { message.error("失败") }
-    },
-  })
-}
-
-const handleCloseBgi = () => {
-  Modal.confirm({
-    title: "确认关闭？", content: "是否关闭【BGI和原神】？",
-    onOk: async () => {
-      try { await closeBgi(); message.success("已发送关闭指令") } catch (e) { message.error("失败") }
-    },
-  })
-}
-
-const handleBackup = () => {
-  Modal.confirm({
-    title: "确认备份？",
-    content: "是否确认备份当前的 USER 文件？",
-    okText: "确定",
-    cancelText: "取消",
-    centered: true, // 居中显示
-    onOk: async () => {
-      try {
-        await backup()
-        message.success("备份成功")
-      } catch (e) {
-        message.error("备份失败")
-      }
-    },
-  })
-}
-
-const sendImage = () => {
-  Modal.confirm({
-    title: "发送截图", content: "确认发送当前截图？",
-    onOk: async () => {
-      try { const res = await sendImageApi(); Modal.info({ content: res.data || "成功" }) } catch (e) { message.error("失败") }
-    },
-  })
-}
-
 const onRestartBbgiButtonClicked = () => {
   restartBetterBgi()
   message.success("正在重启中····")
@@ -238,7 +189,17 @@ const buttonGroups = ref([
     "title": "🔍 实时监测",
     "buttons": [
       { text: "桌面监控", action: () => desktopMonitorVisible.value = true },
-      { text: "发送截图", action: sendImage },
+      {
+        text: "发送截图", action: () => {
+          Modal.confirm({
+            title: "发送截图", content: "确认发送当前截图？",
+            centered: true,
+            cancelText: "取消",
+            maskClosable: true,
+            onOk: async () => { try { const res = await sendImageApi(); Modal.info({ content: res.data || "成功" }) } catch (e) { message.error("失败") } },
+          })
+        },
+      },
       { text: "实时日志", route: { name: "log" } },
       { text: "ABGI日志查询", route: { name: "auto-log" } },
     ],
@@ -259,9 +220,30 @@ const buttonGroups = ref([
     "title": "🚀 自动化控制",
     "buttons": [
       { text: "一条龙启动", action: () => { oneLongModalVisible.value = true } },
-      { text: "关闭BGI和原神", action: handleCloseBgi },
+      {
+        text: "关闭BGI和原神", action: Modal.confirm({
+          title: "确认关闭？", content: "是否关闭【BGI】和【原神】？",
+          centered: true,
+          cancelText: "取消",
+          maskClosable: true,
+          onOk: async () => {
+            try { await closeBgi(); message.success("已发送关闭指令") } catch (e) { message.error("失败") }
+          },
+        }),
+      },
       { text: "调度圣坛", route: { name: "list-groups" } },
-      { text: "备份 USER 文件", action: handleBackup },
+      {
+        text: "备份 USER 文件", action: () => {
+          Modal.confirm({
+            title: "确认备份？",
+            content: "是否确认备份当前的 USER 文件？",
+            okText: "确定",
+            cancelText: "取消",
+            centered: true,
+            onOk: async () => { try { await backup(); message.success("备份成功") } catch (e) { message.error("备份失败") } },
+          })
+        },
+      },
       { text: "脚本屋", route: { name: "js-names" } },
       { text: "地图追踪", route: { name: "pathing" } },
       { text: "联机管理", route: { name: "online" } },
@@ -274,7 +256,17 @@ const buttonGroups = ref([
       { text: "录屏管理", route: { name: "obs-video" } },
       { text: "仓库管理", route: { name: "gitlog" } },
       { text: "手动更新BGI", action: handleUploadBgiClick },
-      { text: "米游社签到", action: mysSignIn },
+      {
+        text: "米游社签到", action: () => {
+          Modal.confirm({
+            title: "确认签到？",
+            content: "是否要米游社签到？",
+            cancelText: "取消",
+            centered: true,
+            onOk: async () => { try { const res = await mysSignInApi(); Modal.info({ title: "结果", content: res.message || "发送成功" }) } catch (e) { message.error("失败") } },
+          })
+        },
+      },
       { text: "ABGI设置", route: { name: "config" } },
       { text: "BGI一条龙配置", route: { name: "bgi-config" } },
       { text: "检查更新", route: { name: "update" } },
