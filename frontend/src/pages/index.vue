@@ -46,7 +46,7 @@
     <OneLongModal v-model:visible="oneLongModalVisible" />
     <DesktopMonitor v-model:visible="desktopMonitorVisible" />
 
-    <a-modal v-model:open="uploadBgiModal.visible" title="📦 上传 BGI 更新包" :confirm-loading="uploadBgiModal.loading" ok-text="开始上传" cancel-text="取消" class="anime-modal" @ok="handleUploadBgiOk" @cancel="handleUploadBgiCancel">
+    <a-modal v-model:open="uploadBgiModal.visible" title="📦 上传 BGI 更新包" :confirm-loading="uploadBgiModal.loading" ok-text="开始上传" cancel-text="取消" class="anime-modal" @ok="handleUploadBgiOk">
       <div class="upload-area">
         <input ref="bgiFileInput" type="file" accept=".zip,.7z" style="display: none" @change="handleBgiFileSelect" />
         <a-button size="large" @click="$refs.bgiFileInput.click()">
@@ -177,7 +177,6 @@ const handleUploadBgiOk = async () => {
   }
 }
 
-const handleUploadBgiCancel = () => { uploadBgiModal.visible = false }
 
 // --- 其他功能按钮逻辑 ---
 const mysSignIn = () => {
