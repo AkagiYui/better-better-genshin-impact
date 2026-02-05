@@ -45,24 +45,7 @@
 
     <OneLongModal v-model:visible="oneLongModalVisible" />
     <DesktopMonitor v-model:visible="desktopMonitorVisible" />
-
-    <a-modal v-model:open="uploadBgiModal.visible" title="📦 上传 BGI 更新包" :confirm-loading="uploadBgiModal.loading" ok-text="开始上传" cancel-text="取消" class="anime-modal" @ok="handleUploadBgiOk">
-      <div class="upload-area">
-        <input ref="bgiFileInput" type="file" accept=".zip,.7z" style="display: none" @change="handleBgiFileSelect" />
-        <a-button size="large" @click="$refs.bgiFileInput.click()">
-          📂 选择压缩包 (.zip / .7z)
-        </a-button>
-        <div v-if="uploadBgiModal.selectedFile" class="file-info">
-          <p>已选: {{ uploadBgiModal.selectedFile.name }}</p>
-          <p>大小: {{ (uploadBgiModal.selectedFile.size / 1024 / 1024).toFixed(2) }} MB</p>
-        </div>
-        <div v-if="uploadBgiModal.uploadProgress > 0" class="progress-bar">
-          <div class="progress-fill" :style="{ width: uploadBgiModal.uploadProgress + '%' }">
-            {{ uploadBgiModal.uploadProgress }}%
-          </div>
-        </div>
-      </div>
-    </a-modal>
+    <UploadBgiModal v-model:visible="uploadBgiModalVisible" />
   </div>
 </template>
 
@@ -75,11 +58,13 @@ import { mysSignIn as mysSignInApi, getBaseURL, closeBgi, backup, sendImage as s
 
 import DesktopMonitor from "@/components/DesktopMonitor.vue"
 import OneLongModal from "@/components/OneLongModal.vue"
+import UploadBgiModal from "@/components/UploadBgiModal.vue"
 import { useInterval } from "@/hooks"
 
 const router = useRouter()
 const desktopMonitorVisible = ref(false)
 const oneLongModalVisible = ref(false)
+const uploadBgiModalVisible = ref(false)
 
 // 退出登录
 const handleLogout = () => {
@@ -117,64 +102,8 @@ onMounted(() => {
 })
 
 
-// --- BGI上传逻辑 ---
-const uploadBgiModal = reactive({ visible: false, loading: false, selectedFile: null, uploadProgress: 0 })
-const bgiFileInput = ref(null)
-
 const handleUploadBgiClick = () => {
-  uploadBgiModal.selectedFile = null
-  uploadBgiModal.uploadProgress = 0
-  uploadBgiModal.visible = true
-}
-
-const handleBgiFileSelect = (event) => {
-  const file = event.target.files?.[0]
-  if (!file) return
-  if (!file.name.endsWith(".zip") && !file.name.endsWith(".7z")) {
-    message.error("只能选择 .zip 或 .7z！")
-    return
-  }
-  if (file.size > 500 * 1024 * 1024) {
-    message.error("文件过大！")
-    return
-  }
-  uploadBgiModal.selectedFile = file
-}
-
-const handleUploadBgiOk = async () => {
-  if (!uploadBgiModal.selectedFile) return message.warning("请先选择文件")
-  uploadBgiModal.loading = true
-
-  const formData = new FormData()
-  formData.append("file", uploadBgiModal.selectedFile)
-  const xhr = new XMLHttpRequest()
-
-  xhr.upload.addEventListener("progress", (e) => {
-    if (e.lengthComputable) {
-      uploadBgiModal.uploadProgress = Math.round((e.loaded / e.total) * 100)
-    }
-  })
-
-  xhr.addEventListener("load", () => {
-    uploadBgiModal.loading = false
-    if (xhr.status === 200) {
-      message.success("更新成功，请重启")
-      uploadBgiModal.visible = false
-    } else {
-      message.error("更新失败")
-    }
-  })
-
-  xhr.addEventListener("error", () => { uploadBgiModal.loading = false; message.error("网络错误") })
-
-  try {
-    const token = localStorage.getItem("bbgi-token")
-    xhr.open("POST", "/api/UpdateBgi/Upload")
-    if (token) xhr.setRequestHeader("Authorization", token)
-    xhr.send(formData)
-  } catch (e) {
-    uploadBgiModal.loading = false
-  }
+  uploadBgiModalVisible.value = true
 }
 
 
