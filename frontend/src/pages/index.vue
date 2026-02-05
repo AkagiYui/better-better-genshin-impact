@@ -86,17 +86,7 @@
       </div>
     </div>
 
-    <a-modal v-model:open="oneLongModal.visible" title="🌸 选择启动的一条龙 🌸" :confirm-loading="oneLongModal.loading" ok-text="启动" cancel-text="取消" class="anime-modal" @ok="handleOneLongOk" @cancel="handleOneLongCancel">
-      <div style="padding: 20px 0;">
-        <a-select v-model:value="oneLongModal.selectedValue" style="width: 100%" placeholder="请选择配置">
-          <a-select-option v-for="item in oneLongModal.options" :key="item" :value="item">
-            {{ item }}
-          </a-select-option>
-        </a-select>
-      </div>
-    </a-modal>
-
-    <!-- 桌面实时监控组件 -->
+    <OneLongModal v-model:visible="oneLongModalVisible" />
     <DesktopMonitor v-model:visible="desktopMonitorVisible" />
 
     <a-modal v-model:open="uploadBgiModal.visible" title="📦 上传 BGI 更新包" :confirm-loading="uploadBgiModal.loading" ok-text="开始上传" cancel-text="取消" class="anime-modal" @ok="handleUploadBgiOk" @cancel="handleUploadBgiCancel">
@@ -123,13 +113,15 @@
 import { ref, reactive, onMounted, onUnmounted, computed, watch, h } from "vue"
 import { message, Modal } from "ant-design-vue"
 import { useRouter } from "vue-router"
-import { mysSignIn as mysSignInApi, getBaseURL, closeBgi, backup, sendImage as sendImageApi, restartBetterBgi, getOneLongAllName, startOneLong, getStatus, GetAppInfo } from "@/api"
+import { mysSignIn as mysSignInApi, getBaseURL, closeBgi, backup, sendImage as sendImageApi, restartBetterBgi, getStatus, GetAppInfo } from "@/api"
 
 import DesktopMonitor from "@/components/DesktopMonitor.vue"
+import OneLongModal from "@/components/OneLongModal.vue"
 import { useInterval } from "@/hooks"
 
 const router = useRouter()
 const desktopMonitorVisible = ref(false)
+const oneLongModalVisible = ref(false)
 
 // --- 认证与基础 ---
 const handleLogout = () => {
@@ -288,7 +280,7 @@ const onRestartBbgiButtonClicked = () => {
 
 // --- 按钮定义 ---
 const automationButtons = ref([
-  { text: "一条龙启动", action: () => { oneLongModal.visible = true; handleOneLongLoad() } },
+  { text: "一条龙启动", action: () => { oneLongModalVisible.value = true } },
   { text: "关闭BGI和原神", action: handleCloseBgi },
   { text: "调度圣坛", name: "list-groups" },
   { text: "备份 USER 文件", action: handleBackup },
@@ -310,28 +302,6 @@ const bgiButtons = ref([
   { text: "检查更新", action: () => router.push({ name: "update" }) },
   { text: "退出登录", action: handleLogout },
 ])
-
-// --- 一条龙逻辑 ---
-const oneLongModal = reactive({ visible: false, loading: false, options: [], selectedValue: "" })
-const handleOneLongLoad = async () => {
-  try {
-    oneLongModal.loading = true
-    const res = await getOneLongAllName()
-    oneLongModal.options = res.data.data || []
-    if (oneLongModal.options.length) oneLongModal.selectedValue = oneLongModal.options[0]
-  } catch (e) { message.error("加载列表失败") } finally { oneLongModal.loading = false }
-}
-const handleOneLongOk = async () => {
-  if (!oneLongModal.selectedValue) return
-  try {
-    oneLongModal.loading = true
-    await startOneLong(oneLongModal.selectedValue)
-    message.success(`启动 ${oneLongModal.selectedValue}`)
-    oneLongModal.visible = false
-  } catch (e) { message.error("启动失败") } finally { oneLongModal.loading = false }
-}
-const handleOneLongCancel = () => { oneLongModal.visible = false }
-
 
 </script>
 
