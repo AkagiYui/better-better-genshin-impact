@@ -83,10 +83,7 @@ const onFinish = async () => {
   errorMessage.value = ""
 
   try {
-    const response = await login(
-      formState.value.username,
-      formState.value.password,
-    )
+    const response = await login(formState.value.username, formState.value.password)
 
     if (response.status === 401 || response.error) {
       errorMessage.value = response.error || "登录失败，请检查用户名和密码"

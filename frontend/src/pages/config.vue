@@ -8,7 +8,7 @@
     <div class="content-wrapper">
       <h1 class="page-title">
         <span class="title-icon">🌸</span>
-        配置设置
+        BetterBGI 配置设置
         <span class="title-icon">🌸</span>
       </h1>
 
@@ -41,7 +41,7 @@
         </a-card>
 
         <a-row :gutter="24">
-          <!-- <a-col :xs="24" :lg="12">
+          <a-col :xs="24" :lg="24">
             <a-card title="背包统计" class="config-card">
               <template #extra>
                 <div class="card-extra">
@@ -56,16 +56,16 @@
                   <a-input v-model:value="formData.bagKeywords[index]" placeholder="输入材料名称" class="enhanced-input">
                     <template #prefix>💎</template>
                   </a-input>
-                  <a-button type="primary" danger shape="circle" @click="removeBagKeyword(index)" v-if="formData.bagKeywords.length > 1" class="icon-btn">
+                  <a-button v-if="formData.bagKeywords.length > 1" type="primary" danger shape="circle" class="icon-btn" @click="removeBagKeyword(index)">
                     <DeleteOutlined />
                   </a-button>
                 </div>
-                <a-button type="dashed" block @click="addBagKeyword" class="add-btn">
+                <a-button type="dashed" block class="add-btn" @click="addBagKeyword">
                   <PlusOutlined /> 添加材料
                 </a-button>
               </div>
             </a-card>
-          </a-col> -->
+          </a-col>
 
           <a-col :xs="24" :lg="24">
             <a-card title="关注关键字" class="config-card">
@@ -279,15 +279,12 @@
 import { ref, reactive, onMounted } from "vue"
 import { message } from "ant-design-vue"
 import { QuestionCircleOutlined, PlusOutlined, DeleteOutlined } from "@ant-design/icons-vue"
-import { useRouter } from "vue-router"
-// 假设这是你的API路径，保持不变
-import { getOneLongAllName, mysPush, updateConfig } from "@/api"
+import { getConfig, getOneLongAllName, mysPush, updateConfig } from "@/api"
 
-const router = useRouter()
+
 const formRef = ref()
 const loading = ref(false)
 const mysPushLoading = ref(false)
-const configOptions = ref([])
 
 // 表单数据 - 保持你的原始结构不变
 const formData = reactive({
@@ -357,18 +354,6 @@ const formData = reactive({
   },
 })
 
-// 获取配置选项
-const fetchConfigOptions = async () => {
-  try {
-    const response = await getOneLongAllName()
-    configOptions.value = response.data?.map(item => ({
-      label: item.replace(".json", ""),
-      value: item,
-    })) || []
-  } catch (error) {
-    console.error("获取配置选项失败:", error)
-  }
-}
 
 // 动态数组操作
 const addBagKeyword = () => { formData.bagKeywords.push("") }
@@ -385,7 +370,7 @@ const removeLogKeyword = (index) => {
 const loadConfig = async () => {
   try {
     const response = await getConfig()
-    const data = response.data
+    const data = response.data.data
     console.log(data)
 
     if (data) {
@@ -473,9 +458,6 @@ const handleSubmit = async () => {
     console.log("提交的配置:", payload)
     await updateConfig(payload)
     message.success("保存成功！")
-    setTimeout(() => {
-      router.push({ name: "home" })
-    }, 2000)
   } catch (error) {
     message.error(`保存失败: ${error.message}`)
   } finally {
@@ -504,7 +486,6 @@ const handleMysPush = async () => {
 }
 
 onMounted(() => {
-  fetchConfigOptions()
   loadConfig()
 })
 </script>
@@ -522,8 +503,12 @@ onMounted(() => {
 /* 装饰性背景元素 */
 .floating-elements {
   position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  pointer-events: none; z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .floating-heart {
@@ -533,12 +518,35 @@ onMounted(() => {
   opacity: 0.6;
 }
 
-.floating-heart:nth-child(1) { top: 10%; left: 10%; }
-.floating-heart:nth-child(2) { top: 20%; right: 15%; }
-.floating-heart:nth-child(3) { top: 60%; left: 5%; }
-.floating-heart:nth-child(4) { top: 80%; right: 10%; }
-.floating-heart:nth-child(5) { top: 40%; left: 80%; }
-.floating-heart:nth-child(6) { top: 70%; right: 5%; }
+.floating-heart:nth-child(1) {
+  top: 10%;
+  left: 10%;
+}
+
+.floating-heart:nth-child(2) {
+  top: 20%;
+  right: 15%;
+}
+
+.floating-heart:nth-child(3) {
+  top: 60%;
+  left: 5%;
+}
+
+.floating-heart:nth-child(4) {
+  top: 80%;
+  right: 10%;
+}
+
+.floating-heart:nth-child(5) {
+  top: 40%;
+  left: 80%;
+}
+
+.floating-heart:nth-child(6) {
+  top: 70%;
+  right: 5%;
+}
 
 .floating-star {
   position: absolute;
@@ -546,19 +554,51 @@ onMounted(() => {
   animation: floatStar 8s ease-in-out infinite;
   opacity: 0.5;
 }
-.floating-star:nth-child(1) { top: 15%; left: 20%; }
-.floating-star:nth-child(2) { top: 45%; right: 20%; }
-.floating-star:nth-child(3) { top: 75%; left: 15%; }
-.floating-star:nth-child(4) { top: 25%; right: 5%; }
+
+.floating-star:nth-child(1) {
+  top: 15%;
+  left: 20%;
+}
+
+.floating-star:nth-child(2) {
+  top: 45%;
+  right: 20%;
+}
+
+.floating-star:nth-child(3) {
+  top: 75%;
+  left: 15%;
+}
+
+.floating-star:nth-child(4) {
+  top: 25%;
+  right: 5%;
+}
 
 @keyframes floatHeart {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-25px) rotate(15deg); }
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-25px) rotate(15deg);
+  }
 }
 
 @keyframes floatStar {
-  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.5; }
-  50% { transform: scale(1.3) rotate(180deg); opacity: 0.9; }
+
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: scale(1.3) rotate(180deg);
+    opacity: 0.9;
+  }
 }
 
 /* 内容区域 */
@@ -578,12 +618,23 @@ onMounted(() => {
   text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.8);
   animation: titlePulse 2s infinite ease-in-out;
 }
+
 @keyframes titlePulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
 }
 
-.title-icon { margin: 0 10px; font-size: 28px; }
+.title-icon {
+  margin: 0 10px;
+  font-size: 28px;
+}
 
 /* 卡片样式 */
 .config-card {
@@ -614,22 +665,29 @@ onMounted(() => {
 }
 
 /* 输入框增强 */
-.enhanced-input, .enhanced-textarea, .enhanced-select :deep(.ant-select-selector) {
+.enhanced-input,
+.enhanced-textarea,
+.enhanced-select :deep(.ant-select-selector) {
   border-radius: 12px !important;
   border: 1px solid #ffd1dc !important;
   background: rgba(255, 255, 255, 0.9) !important;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
   transition: all 0.3s;
 }
 
-.enhanced-input:hover, .enhanced-input:focus,
-.enhanced-textarea:hover, .enhanced-textarea:focus,
+.enhanced-input:hover,
+.enhanced-input:focus,
+.enhanced-textarea:hover,
+.enhanced-textarea:focus,
 .enhanced-select:hover :deep(.ant-select-selector) {
   border-color: #ff88bb !important;
   box-shadow: 0 0 0 3px rgba(255, 136, 187, 0.2) !important;
 }
 
-.input-icon { margin-right: 8px; font-size: 16px; }
+.input-icon {
+  margin-right: 8px;
+  font-size: 16px;
+}
 
 /* 帮助文本 */
 .help-text {
@@ -645,23 +703,27 @@ onMounted(() => {
   flex-direction: column;
   gap: 12px;
 }
+
 .list-item-wrapper {
   display: flex;
   gap: 10px;
   align-items: center;
 }
+
 .icon-btn {
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 .add-btn {
   border-radius: 12px;
   border-style: dashed;
   border-color: #ff99cc;
   color: #ff66aa;
 }
+
 .add-btn:hover {
   border-color: #ff3388;
   color: #ff3388;
@@ -674,13 +736,16 @@ onMounted(() => {
   transition: color 0.3s;
   padding: 8px 0;
 }
+
 .enhanced-checkbox:hover {
   color: #ff5599;
 }
+
 :deep(.ant-checkbox-inner) {
   border-radius: 6px;
   border-color: #ff99cc;
 }
+
 :deep(.ant-checkbox-checked .ant-checkbox-inner) {
   background-color: #ff66aa;
   border-color: #ff66aa;
@@ -709,6 +774,7 @@ onMounted(() => {
   margin-top: 40px;
   margin-bottom: 40px;
 }
+
 .submit-btn {
   background: linear-gradient(90deg, #ff88bb, #ff6699);
   border: none;
@@ -719,6 +785,7 @@ onMounted(() => {
   box-shadow: 0 10px 25px rgba(255, 102, 153, 0.4);
   transition: all 0.3s;
 }
+
 .submit-btn:hover {
   transform: translateY(-3px) scale(1.02);
   box-shadow: 0 15px 35px rgba(255, 102, 153, 0.5);
@@ -730,17 +797,39 @@ onMounted(() => {
   animation: fadeIn 0.4s ease-out;
   margin-top: 10px;
 }
+
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* 响应式调整 */
 @media (max-width: 768px) {
-  .config-container { padding: 20px 10px; }
-  .config-card { padding: 0; }
-  :deep(.ant-card-body) { padding: 16px; }
-  .page-title { font-size: 24px; }
-  .submit-btn { width: 100%; }
+  .config-container {
+    padding: 20px 10px;
+  }
+
+  .config-card {
+    padding: 0;
+  }
+
+  :deep(.ant-card-body) {
+    padding: 16px;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+
+  .submit-btn {
+    width: 100%;
+  }
 }
 </style>
