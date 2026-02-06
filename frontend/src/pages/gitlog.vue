@@ -1,20 +1,7 @@
 <template>
   <div class="js-names-page">
     <header class="page-header">
-      <div v-if="headerCarouselImages.length > 0" class="header-carousel">
-        <div class="carousel-container">
-          <div
-            v-for="(image, index) in headerCarouselImages"
-            :key="index"
-            class="carousel-slide"
-            :class="{ active: headerCurrentImageIndex === index }">
-            <img :src="image" :alt="`header-bg-${index}`" />
-          </div>
-        </div>
-        <div class="carousel-overlay" />
-      </div>
-
-      <button class="btn home-btn" @click="goHome">
+      <button class="btn home-btn" @click="router.push({ name: 'home' })">
         <span class="icon">🏠</span>
         <span class="text">返回首页</span>
       </button>
@@ -94,9 +81,9 @@
                     <td>
                       <button
                         class="btn-action"
-                        :disabled="isLoadingDetail[getRepoKey(item.FilePath)]"
+                        :disabled="isLoadingDetail[item.FilePath]"
                         @click="openDetailFromFile(item.FilePath)">
-                        {{ isLoadingDetail[getRepoKey(item.FilePath)] ? '⏳' : '📖' }} 详情
+                        {{ isLoadingDetail[item.FilePath] ? '⏳' : '📖' }} 详情
                       </button>
                     </td>
                   </tr>
@@ -131,9 +118,9 @@
               <div class="card-footer">
                 <button
                   class="btn-card-action"
-                  :disabled="isLoadingDetail[getRepoKey(item.FilePath)]"
+                  :disabled="isLoadingDetail[item.FilePath]"
                   @click="openDetailFromFile(item.FilePath)">
-                  {{ isLoadingDetail[getRepoKey(item.FilePath)] ? '加载中...' : '查看详情 README' }}
+                  {{ isLoadingDetail[item.FilePath] ? '加载中...' : '查看详情 README' }}
                 </button>
               </div>
             </div>
@@ -165,7 +152,7 @@ import { ref, computed, onMounted, reactive } from "vue"
 import { marked } from "marked"
 import DOMPurify from "dompurify"
 import { useRouter } from "vue-router"
-import { getLog } from "@/api"
+import { getLog, getMd } from "@/api"
 
 defineOptions({
   name: "JsNames",
@@ -185,47 +172,15 @@ const jsDetailContent = ref("")
 const jsDetailHtml = ref("")
 const isLoadingDetail = reactive({})
 
-const renderMarkdownToHtml = (markdownText) => {
+const renderMarkdownToHtml = (markdownText = "") => {
   try {
-    const rawHtml = marked.parse(markdownText || "")
+    const rawHtml = String(marked.parse(markdownText))
     return DOMPurify.sanitize(rawHtml)
   } catch (e) {
     return ""
   }
 }
 
-// Header轮播图相关
-const headerCarouselImages = ref([])
-const headerCurrentImageIndex = ref(0)
-let headerCarouselInterval = null
-
-const getHeaderImages = async () => {
-  headerCarouselImages.value = []
-  // try {
-  //   const response = await fetch('/api/images')
-  //   if (!response.ok) throw new Error('Failed')
-  //   const data = await response.json()
-  //   headerCarouselImages.value = data.images || []
-  //   if (headerCarouselImages.value.length > 0) startHeaderCarousel()
-  // } catch (error) {
-  //   // 默认图片回退
-  //   headerCarouselImages.value = ['/img/bd.jpg', '/img/ff.png']
-  //   startHeaderCarousel()
-  // }
-}
-
-const startHeaderCarousel = () => {
-  if (headerCarouselImages.value.length > 1) {
-    if (headerCarouselInterval) clearInterval(headerCarouselInterval)
-    headerCarouselInterval = setInterval(() => {
-      headerCurrentImageIndex.value = (headerCurrentImageIndex.value + 1) % headerCarouselImages.value.length
-    }, 7000)
-  }
-}
-
-const goHome = () => {
-  router.push({ name: "home" })
-}
 
 const sortTable = (key) => {
   if (currentSort.value.key === key) {
@@ -322,7 +277,7 @@ const loadGitLog = async () => {
   try {
     gitLogLoading.value = true
     const response = await getLog()
-    gitLogs.value = response.gitLog || []
+    gitLogs.value = response.data?.gitLog || []
   } catch (error) {
     console.error("加载提交记录失败：", error)
     gitLogs.value = []
@@ -331,15 +286,6 @@ const loadGitLog = async () => {
   }
 }
 
-const isRepoTriplePath = (filePath) => true // 简化判断
-
-const getRepoSegments = (filePath) => {
-  const match = filePath.match(/^repo\/(\/+)\/(\/+)\//)
-  if (!match) return { group: "", name: "" }
-  return { group: match[1], name: match[2] }
-}
-
-const getRepoKey = (filePath) => filePath
 
 const openDetailFromFile = async (filePath) => {
   // 提取文件名作为标题
@@ -353,10 +299,9 @@ const openDetailFromFile = async (filePath) => {
   jsDetailContent.value = ""
 
   try {
-    // 注意：这里需要根据实际后端API路径调整
-    const result = await api.get(`/api/md?filePath=${encodeURIComponent(filePath)}`)
-    if (result && (result.data || result.content)) {
-      jsDetailContent.value = result.data || result.content
+    const result = await getMd(filePath)
+    if (result.data?.data) {
+      jsDetailContent.value = result.data.data
       jsDetailHtml.value = renderMarkdownToHtml(jsDetailContent.value)
     } else {
       jsDetailContent.value = "# 暂无详情\n无法读取该文件的说明文档。"
@@ -376,7 +321,6 @@ const closeDetailModal = () => {
 
 onMounted(() => {
   loadGitLog()
-  getHeaderImages()
 })
 </script>
 

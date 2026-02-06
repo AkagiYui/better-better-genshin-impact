@@ -80,7 +80,7 @@ api.interceptors.response.use(
       if (token == null) {
         localStorage.removeItem("bbgi-token")
         // 只有当前不在登录页时才跳转，防止重复跳转报错
-        if (router.currentRoute._rawValue.name !== "login") {
+        if (router.currentRoute.value.name !== "login") {
           router.push({ name: "login" })
           return
         }
@@ -287,6 +287,7 @@ export const getBgiDownloadStatus = () => api.get("/api/UpdateBgi/DownloadStatus
 
 // 其他未在上方定义的 API 方法
 export const getLogInfo = (fileName) => api.get(`/api/logInfo?fileName=${encodeURIComponent(fileName)}`)
+export const getMd = (file) => api.get(`/api/md?filePath=${encodeURIComponent(file)}`)
 export const getMorale = (params) => api.get("/api/BagStatistics/Morale", { params })
 export const updateMorale = () => api.post("/api/BagStatistics/updateMorale")
 export const checkBag = () => api.get("/api/checkBag")
