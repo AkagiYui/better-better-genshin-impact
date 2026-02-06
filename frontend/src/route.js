@@ -17,7 +17,6 @@ const routes = [
   { path: "/config", name: "config", component: () => import("@/pages/config.vue"), meta: { requires: true } },
   { path: "/get-auto-artifacts-pro", name: "get-auto-artifacts-pro", component: () => import("@/pages/get-auto-artifacts-pro.vue"), meta: { requires: true } },
   { path: "/get-auto-artifacts-pro2", name: "get-auto-artifacts-pro2", component: () => import("@/pages/get-auto-artifacts-pro2.vue"), meta: { requires: true } },
-  { path: "/gitlog", name: "gitlog", component: () => import("@/pages/gitlog.vue"), meta: { requires: true } },
   { path: "/harvest", name: "harvest", component: () => import("@/pages/harvest.vue"), meta: { requires: true } },
   { path: "/js-names", name: "js-names", component: () => import("@/pages/js-names.vue"), meta: { requires: true } },
   { path: "/list-groups", name: "list-groups", component: () => import("@/pages/list-groups.vue"), meta: { requires: true } },
@@ -32,6 +31,7 @@ const routes = [
   { path: "/other", name: "other", component: () => import("@/pages/other.vue"), meta: { requires: true } },
   { path: "/pathing", name: "pathing", component: () => import("@/pages/pathing.vue"), meta: { requires: true } },
   { path: "/screen", name: "screen", component: () => import("@/pages/screen.vue"), meta: { requires: true } },
+  { path: "/script-repo", name: "script-repo", component: () => import("@/pages/script-repo.vue"), meta: { requires: true } },
   { path: "/task-cron", name: "task-cron", component: () => import("@/pages/task-cron.vue"), meta: { requires: true } },
   { path: "/update", name: "update", component: () => import("@/pages/update.vue"), meta: { requires: true } },
 ]

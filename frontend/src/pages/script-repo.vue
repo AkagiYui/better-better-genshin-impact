@@ -8,7 +8,7 @@
 
       <div class="header-content">
         <div class="title-section">
-          <h1 class="main-title">✨ 仓库提交记录 ✨</h1>
+          <h1 class="main-title">✨ 脚本仓库 ✨</h1>
           <p class="sub-title">追踪最新的脚本与策略更新</p>
         </div>
       </div>

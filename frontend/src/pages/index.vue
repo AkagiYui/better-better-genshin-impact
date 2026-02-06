@@ -165,13 +165,13 @@ const buttonGroups = ref([
     "title": "🧭 提瓦特指挥所",
     "buttons": [
       { text: "OBS录屏管理", route: { name: "obs-video" } },
-      { text: "脚本仓库管理", route: { name: "gitlog" } },
+      { text: "脚本仓库", route: { name: "script-repo" } },
       { text: "手动更新BGI", action: () => uploadBgiModalVisible.value = true },
       {
         text: "米游社签到", action: () => {
           confirm({
             content: "是否要米游社签到？",
-            onOk: async () => { try { const res = await mysSignInApi(); Modal.info({ title: "结果", content: res.message || "发送成功" }) } catch (e) { message.error("失败") } },
+            onOk: async () => { try { const res = await mysSignInApi(); Modal.info({ title: "结果", content: res.data.message || "发送成功" }) } catch (e) { message.error("失败") } },
           })
         },
       },
