@@ -135,7 +135,7 @@ const buttonGroups = ref([
   {
     "title": "🚀 自动化控制",
     "buttons": [
-      { text: "一条龙启动", action: () => { oneLongModalVisible.value = true } },
+      { text: "一条龙启动", action: () => { oneDragonFlowStartModalVisible.value = true } },
       {
         text: "关闭BGI和原神", action: () => {
           confirm({
