@@ -6,6 +6,7 @@
     ok-text="开始上传"
     cancel-text="取消"
     class="anime-modal"
+    centered
     @ok="handleUploadBgiOk"
     @update:open="handleVisibleChange">
     <div class="upload-area">
