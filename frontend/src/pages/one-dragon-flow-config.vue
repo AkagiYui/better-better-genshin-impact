@@ -2,15 +2,7 @@
   <div class="bgi-config-page">
     <div class="bg-pattern" />
 
-    <div class="floating-elements">
-      <div class="float-item flower">🌸</div>
-      <div class="float-item sparkle">✨</div>
-      <div class="float-item cat">😺</div>
-      <div class="float-item ribbon">🎀</div>
-      <div class="float-item star">⭐</div>
-    </div>
-
-    <div class="mascot" role="img" aria-label="mascot" @click="goHome">
+    <div class="mascot" role="img" aria-label="mascot" @click="router.push({ name: 'home' })">
       <span class="mascot-emoji">👧</span>
       <span class="mascot-tip">Back</span>
     </div>
@@ -95,8 +87,8 @@
 
             <div class="detail-actions">
               <div class="batch-btns">
-                <a-button class="cute-btn" @click="enableAll">✅ 全部开启</a-button>
-                <a-button class="cute-btn" @click="disableAll">⛔ 全部关闭</a-button>
+                <a-button class="cute-btn" @click="visibleEnabled.value = visibleEnabled.value.map(() => true)">✅ 全部开启</a-button>
+                <a-button class="cute-btn" @click="visibleEnabled.value = visibleEnabled.value.map(() => false)">⛔ 全部关闭</a-button>
               </div>
               <a-button type="primary" :loading="saving" class="save-btn" size="large" block @click="saveConfig">
                 {{ saving ? '保存中...' : '💾 保存当前配置' }}
@@ -110,8 +102,6 @@
 </template>
 
 <script setup>
-/** * 逻辑代码完全保持原样，未做任何功能性修改
- */
 import { ref, reactive, onMounted } from "vue"
 import { message } from "ant-design-vue"
 import { useRouter } from "vue-router"
@@ -214,21 +204,9 @@ const moveDown = (index) => {
   ve[index] = tmpE
 }
 
-const enableAll = () => {
-  visibleEnabled.value = visibleEnabled.value.map(() => true)
-}
-
-const disableAll = () => {
-  visibleEnabled.value = visibleEnabled.value.map(() => false)
-}
-
 onMounted(() => {
   loadConfigList()
 })
-
-const goHome = () => {
-  router.push({ name: "home" })
-}
 </script>
 
 <style scoped>
@@ -272,58 +250,6 @@ const goHome = () => {
   /* 留出底部空间 */
 }
 
-/* ================= 漂浮装饰动画 ================= */
-.floating-elements {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1;
-  overflow: hidden;
-}
-
-.float-item {
-  position: absolute;
-  font-size: 24px;
-  filter: drop-shadow(0 2px 4px rgba(255, 105, 180, 0.2));
-}
-
-.float-item.flower {
-  left: 5%;
-  top: 10%;
-  animation: floatY 6s ease-in-out infinite;
-  font-size: 32px;
-}
-
-.float-item.sparkle {
-  right: 8%;
-  top: 5%;
-  animation: floatRotate 5s linear infinite;
-  font-size: 24px;
-}
-
-.float-item.cat {
-  left: 88%;
-  top: 60%;
-  animation: floatY 7s ease-in-out infinite;
-  font-size: 40px;
-}
-
-.float-item.ribbon {
-  left: 2%;
-  bottom: 15%;
-  animation: floatX 8s ease-in-out infinite;
-  font-size: 28px;
-}
-
-.float-item.star {
-  right: 15%;
-  bottom: 10%;
-  animation: floatRotate 8s linear infinite;
-  font-size: 22px;
-}
 
 @keyframes floatY {
 
