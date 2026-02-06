@@ -3,8 +3,8 @@
     <div class="main-content">
       <header class="page-header">
         <div class="header-content">
-          <h1 class="header-title">✨ Better-BGI 控制台 ✨</h1>
-          <p class="header-subtitle">Better-BGI Dashboard</p>
+          <h1 class="header-title">✨ BetterBGI 控制台 ✨</h1>
+          <p class="header-subtitle">BetterBGI Dashboard</p>
         </div>
       </header>
 
@@ -164,8 +164,8 @@ const buttonGroups = ref([
   {
     "title": "🧭 提瓦特指挥所",
     "buttons": [
-      { text: "录屏管理", route: { name: "obs-video" } },
-      { text: "仓库管理", route: { name: "gitlog" } },
+      { text: "OBS录屏管理", route: { name: "obs-video" } },
+      { text: "脚本仓库管理", route: { name: "gitlog" } },
       { text: "手动更新BGI", action: () => uploadBgiModalVisible.value = true },
       {
         text: "米游社签到", action: () => {
@@ -175,8 +175,8 @@ const buttonGroups = ref([
           })
         },
       },
-      { text: "ABGI设置", route: { name: "config" } },
-      { text: "BGI一条龙配置", route: { name: "bgi-config" } },
+      { text: "BetterBGI设置", route: { name: "config" } },
+      { text: "一条龙配置", route: { name: "one-dragon-flow-config" } },
       { text: "检查更新", route: { name: "update" } },
       { text: "退出", action: () => { localStorage.removeItem("bbgi-token"); router.push({ name: "login" }) } },
     ],
