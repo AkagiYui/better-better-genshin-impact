@@ -10,7 +10,9 @@
 
       <div class="status-card glass-panel">
         <div class="card-header">
-          <h2>🖥️ 运行状态监控</h2>
+          <h2>
+            <LaptopOutlined /> 运行状态监控
+          </h2>
           <button class="refresh-btn" @click="onRestartBbgiButtonClicked">
             <SyncOutlined /> 重启Better-BGI
           </button>
@@ -53,7 +55,8 @@
 import { ref, reactive, onMounted, onUnmounted, computed, watch, h } from "vue"
 import { message, Modal } from "ant-design-vue"
 import { useRouter } from "vue-router"
-import { SyncOutlined } from "@ant-design/icons-vue"
+import { LaptopOutlined, SyncOutlined } from "@ant-design/icons-vue"
+import { confirm } from "@/util"
 import { mysSignIn as mysSignInApi, getBaseURL, closeBgi, backup, sendImage as sendImageApi, restartBetterBgi, getStatus, GetAppInfo } from "@/api"
 import DesktopMonitor from "@/components/DesktopMonitor.vue"
 import OneLongModal from "@/components/OneLongModal.vue"
@@ -107,11 +110,8 @@ const buttonGroups = ref([
       { text: "桌面监控", action: () => desktopMonitorVisible.value = true },
       {
         text: "发送截图", action: () => {
-          Modal.confirm({
-            title: "发送截图", content: "确认发送当前截图？",
-            centered: true,
-            cancelText: "取消",
-            maskClosable: true,
+          confirm({
+            content: "确认发送当前截图？",
             onOk: async () => { try { const res = await sendImageApi(); Modal.info({ content: res.data || "成功" }) } catch (e) { message.error("失败") } },
           })
         },
@@ -138,11 +138,8 @@ const buttonGroups = ref([
       { text: "一条龙启动", action: () => { oneLongModalVisible.value = true } },
       {
         text: "关闭BGI和原神", action: () => {
-          Modal.confirm({
-            title: "确认关闭？", content: "是否关闭【BGI】和【原神】？",
-            centered: true,
-            cancelText: "取消",
-            maskClosable: true,
+          confirm({
+            content: "是否关闭【BGI】和【原神】？",
             onOk: async () => {
               try { await closeBgi(); message.success("已发送关闭指令") } catch (e) { message.error("失败") }
             },
@@ -152,12 +149,8 @@ const buttonGroups = ref([
       { text: "调度圣坛", route: { name: "list-groups" } },
       {
         text: "备份 USER 文件", action: () => {
-          Modal.confirm({
-            title: "确认备份？",
+          confirm({
             content: "是否确认备份当前的 USER 文件？",
-            okText: "确定",
-            cancelText: "取消",
-            centered: true,
             onOk: async () => { try { await backup(); message.success("备份成功") } catch (e) { message.error("备份失败") } },
           })
         },
@@ -176,11 +169,8 @@ const buttonGroups = ref([
       { text: "手动更新BGI", action: () => uploadBgiModalVisible.value = true },
       {
         text: "米游社签到", action: () => {
-          Modal.confirm({
-            title: "确认签到？",
+          confirm({
             content: "是否要米游社签到？",
-            cancelText: "取消",
-            centered: true,
             onOk: async () => { try { const res = await mysSignInApi(); Modal.info({ title: "结果", content: res.message || "发送成功" }) } catch (e) { message.error("失败") } },
           })
         },
@@ -188,12 +178,7 @@ const buttonGroups = ref([
       { text: "ABGI设置", route: { name: "config" } },
       { text: "BGI一条龙配置", route: { name: "bgi-config" } },
       { text: "检查更新", route: { name: "update" } },
-      {
-        text: "退出", action: () => {
-          localStorage.removeItem("bbgi-token")
-          router.push({ name: "login" })
-        },
-      },
+      { text: "退出", action: () => { localStorage.removeItem("bbgi-token"); router.push({ name: "login" }) } },
     ],
   },
 ])
