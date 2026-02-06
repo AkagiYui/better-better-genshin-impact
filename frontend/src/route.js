@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from "vue-router"
 const routes = [
   { path: "/login", name: "login", component: () => import("@/pages/login.vue"), meta: { requires: false } },
   { path: "/", name: "home", component: () => import("@/pages/index.vue"), meta: { requires: true } },
+  { path: "/:path(.*)", component: () => import("@/pages/[...path].vue") },
 
   { path: "/archive", name: "archive", component: () => import("@/pages/archive.vue"), meta: { requires: true } },
   { path: "/auto-log", name: "auto-log", component: () => import("@/pages/auto-log.vue"), meta: { requires: true } },
@@ -14,7 +15,6 @@ const routes = [
   { path: "/cd-aware-auto-gather", name: "cd-aware-auto-gather", component: () => import("@/pages/cd-aware-auto-gather.vue"), meta: { requires: true } },
   { path: "/collection-management", name: "collection-management", component: () => import("@/pages/collection-management.vue"), meta: { requires: true } },
   { path: "/config", name: "config", component: () => import("@/pages/config.vue"), meta: { requires: true } },
-  { path: "/error", name: "error", component: () => import("@/pages/error.vue"), meta: { requires: true } },
   { path: "/get-auto-artifacts-pro", name: "get-auto-artifacts-pro", component: () => import("@/pages/get-auto-artifacts-pro.vue"), meta: { requires: true } },
   { path: "/get-auto-artifacts-pro2", name: "get-auto-artifacts-pro2", component: () => import("@/pages/get-auto-artifacts-pro2.vue"), meta: { requires: true } },
   { path: "/gitlog", name: "gitlog", component: () => import("@/pages/gitlog.vue"), meta: { requires: true } },
