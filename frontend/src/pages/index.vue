@@ -45,7 +45,7 @@
       </div>
     </div>
 
-    <OneLongModal v-model:visible="oneLongModalVisible" />
+    <OneDragonFlowStartModal v-model:visible="oneDragonFlowStartModalVisible" />
     <DesktopMonitor v-model:visible="desktopMonitorVisible" />
     <UploadBgiModal v-model:visible="uploadBgiModalVisible" />
   </div>
@@ -59,13 +59,13 @@ import { LaptopOutlined, SyncOutlined } from "@ant-design/icons-vue"
 import { confirm } from "@/util"
 import { mysSignIn as mysSignInApi, getBaseURL, closeBgi, backup, sendImage as sendImageApi, restartBetterBgi, getStatus, GetAppInfo } from "@/api"
 import DesktopMonitor from "@/components/DesktopMonitor.vue"
-import OneLongModal from "@/components/OneLongModal.vue"
+import OneDragonFlowStartModal from "@/components/OneDragonFlowStartModal.vue"
 import UploadBgiModal from "@/components/UploadBgiModal.vue"
 import { useInterval } from "@/hooks"
 
 const router = useRouter()
 const desktopMonitorVisible = ref(false)
-const oneLongModalVisible = ref(false)
+const oneDragonFlowStartModalVisible = ref(false)
 const uploadBgiModalVisible = ref(false)
 
 // 状态数据
