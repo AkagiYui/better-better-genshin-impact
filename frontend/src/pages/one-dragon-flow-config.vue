@@ -73,7 +73,7 @@
                         <a-button
                           type="text"
                           class="action-btn up-btn"
-                          :disabled="index===0"
+                          :disabled="index === 0"
                           title="上移"
                           @click="moveUp(index)">
                           ⬆
@@ -81,7 +81,7 @@
                         <a-button
                           type="text"
                           class="action-btn down-btn"
-                          :disabled="index===visibleTasks.length-1"
+                          :disabled="index === visibleTasks.length - 1"
                           title="下移"
                           @click="moveDown(index)">
                           ⬇
@@ -98,13 +98,7 @@
                 <a-button class="cute-btn" @click="enableAll">✅ 全部开启</a-button>
                 <a-button class="cute-btn" @click="disableAll">⛔ 全部关闭</a-button>
               </div>
-              <a-button
-                type="primary"
-                :loading="saving"
-                class="save-btn"
-                size="large"
-                block
-                @click="saveConfig">
+              <a-button type="primary" :loading="saving" class="save-btn" size="large" block @click="saveConfig">
                 {{ saving ? '保存中...' : '💾 保存当前配置' }}
               </a-button>
             </div>
@@ -136,7 +130,7 @@ const router = useRouter()
 const loadConfigList = async () => {
   try {
     const res = await getBgiConfigAll()
-    configList.value = Array.isArray(res.msg) ? res.msg : []
+    configList.value = Array.isArray(res.data?.msg) ? res.data?.msg : []
   } catch (err) {
     console.error(err)
     message.error("获取配置目录失败")
@@ -147,7 +141,7 @@ const selectConfig = async (name) => {
   currentName.value = name
   try {
     const res = await findBgiConfig(name)
-    const data = res.msg || {}
+    const data = res.data?.msg || {}
     // 原始数据保留到 taskList
     taskList.value = Array.isArray(data.TaskEnabledList) ? data.TaskEnabledList.map(t => ({ ...t })) : []
     // visibleTasks 作为展示副本，初始顺序与 taskList 相同
@@ -274,7 +268,8 @@ const goHome = () => {
   z-index: 2;
   max-width: 800px;
   margin: 0 auto;
-  padding-bottom: 60px; /* 留出底部空间 */
+  padding-bottom: 60px;
+  /* 留出底部空间 */
 }
 
 /* ================= 漂浮装饰动画 ================= */
@@ -295,24 +290,77 @@ const goHome = () => {
   filter: drop-shadow(0 2px 4px rgba(255, 105, 180, 0.2));
 }
 
-.float-item.flower { left: 5%; top: 10%; animation: floatY 6s ease-in-out infinite; font-size: 32px; }
-.float-item.sparkle { right: 8%; top: 5%; animation: floatRotate 5s linear infinite; font-size: 24px; }
-.float-item.cat { left: 88%; top: 60%; animation: floatY 7s ease-in-out infinite; font-size: 40px; }
-.float-item.ribbon { left: 2%; bottom: 15%; animation: floatX 8s ease-in-out infinite; font-size: 28px; }
-.float-item.star { right: 15%; bottom: 10%; animation: floatRotate 8s linear infinite; font-size: 22px; }
+.float-item.flower {
+  left: 5%;
+  top: 10%;
+  animation: floatY 6s ease-in-out infinite;
+  font-size: 32px;
+}
+
+.float-item.sparkle {
+  right: 8%;
+  top: 5%;
+  animation: floatRotate 5s linear infinite;
+  font-size: 24px;
+}
+
+.float-item.cat {
+  left: 88%;
+  top: 60%;
+  animation: floatY 7s ease-in-out infinite;
+  font-size: 40px;
+}
+
+.float-item.ribbon {
+  left: 2%;
+  bottom: 15%;
+  animation: floatX 8s ease-in-out infinite;
+  font-size: 28px;
+}
+
+.float-item.star {
+  right: 15%;
+  bottom: 10%;
+  animation: floatRotate 8s linear infinite;
+  font-size: 22px;
+}
 
 @keyframes floatY {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-20px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
 }
+
 @keyframes floatX {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(20px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(20px);
+  }
 }
+
 @keyframes floatRotate {
-  0% { transform: rotate(0deg) scale(1); }
-  50% { transform: rotate(180deg) scale(1.1); }
-  100% { transform: rotate(360deg) scale(1); }
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+
+  50% {
+    transform: rotate(180deg) scale(1.1);
+  }
+
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
 }
 
 /* ================= 头部标题 ================= */
@@ -363,10 +411,12 @@ const goHome = () => {
   background-color: #fff !important;
   box-shadow: none !important;
 }
+
 :deep(.ant-select-focused .ant-select-selector) {
   border-color: var(--deep-pink) !important;
   box-shadow: 0 0 0 2px rgba(255, 105, 180, 0.2) !important;
 }
+
 :deep(.cute-select) {
   width: 100%;
 }
@@ -392,6 +442,7 @@ const goHome = () => {
   color: #555;
   font-weight: 600;
 }
+
 .header-icon {
   margin-right: 8px;
   font-size: 20px;
@@ -408,14 +459,17 @@ const goHome = () => {
 .custom-scrollbar::-webkit-scrollbar {
   width: 8px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-track {
   background: #fff0f5;
   border-radius: 4px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #ffb6c1;
   border-radius: 4px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #ff69b4;
 }
@@ -450,7 +504,8 @@ const goHome = () => {
   display: flex;
   align-items: center;
   flex: 1;
-  overflow: hidden; /* 防止文字过长 */
+  overflow: hidden;
+  /* 防止文字过长 */
 }
 
 .item-index-badge {
@@ -486,8 +541,10 @@ const goHome = () => {
 :deep(.ant-switch-checked) {
   background-color: var(--deep-pink) !important;
 }
+
 :deep(.ant-switch-checked:hover) {
-  background-color: #ff1493 !important; /* hotpink darken */
+  background-color: #ff1493 !important;
+  /* hotpink darken */
 }
 
 /* 右侧按钮组 */
@@ -509,11 +566,13 @@ const goHome = () => {
   transition: all 0.2s;
   border: none;
 }
+
 .action-btn:not(:disabled):hover {
   background: var(--soft-pink);
   color: var(--deep-pink);
   transform: scale(1.1);
 }
+
 .action-btn:disabled {
   background: transparent;
   opacity: 0.3;
@@ -558,9 +617,11 @@ const goHome = () => {
   box-shadow: 0 4px 15px rgba(255, 154, 158, 0.4);
   transition: transform 0.2s;
 }
+
 .save-btn:active {
   transform: scale(0.98);
 }
+
 .save-btn:hover {
   filter: brightness(1.05);
   box-shadow: 0 6px 20px rgba(255, 154, 158, 0.6);
@@ -573,10 +634,12 @@ const goHome = () => {
   align-items: center;
   justify-content: center;
 }
+
 .empty-state {
   text-align: center;
   color: #999;
 }
+
 .empty-icon {
   font-size: 48px;
   margin-bottom: 10px;
@@ -603,19 +666,23 @@ const goHome = () => {
   border: 2px solid #fff0f5;
   user-select: none;
 }
+
 .mascot-emoji {
   font-size: 28px;
   line-height: 1;
 }
+
 .mascot-tip {
   font-size: 10px;
   color: var(--deep-pink);
   font-weight: bold;
 }
+
 .mascot:hover {
   transform: scale(1.1) rotate(-10deg);
   box-shadow: 0 8px 25px rgba(255, 105, 180, 0.5);
 }
+
 .mascot:active {
   transform: scale(0.95);
 }
@@ -661,7 +728,13 @@ const goHome = () => {
     width: 50px;
     height: 50px;
   }
-  .mascot-emoji { font-size: 24px; }
-  .mascot-tip { display: none; }
+
+  .mascot-emoji {
+    font-size: 24px;
+  }
+
+  .mascot-tip {
+    display: none;
+  }
 }
 </style>
