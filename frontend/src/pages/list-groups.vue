@@ -13,7 +13,8 @@
         </div>
       </div>
 
-      <div class="header-overlay" /> <div class="header-decoration">
+      <div class="header-overlay" />
+      <div class="header-decoration">
         <div class="sparkle">✨</div>
         <div class="sparkle">⭐</div>
         <div class="sparkle">💫</div>
@@ -187,7 +188,7 @@ import { message } from "ant-design-vue"
 import { getListGroups, startGroups } from "@/api"
 
 // 响应式数据
-const pageTitle = ref("配置组列表")
+const pageTitle = ref("配置组启动")
 const groups = ref([])
 const loading = ref(true)
 const isStarting = ref(false)
@@ -254,9 +255,9 @@ const loadGroups = async () => {
   loading.value = true
   try {
     const response = await getListGroups()
-    if (response && response.items) {
-      groups.value = response.items
-      pageTitle.value = response.title || "配置组列表"
+    if (response && response.data) {
+      groups.value = response.data
+      pageTitle.value = response.data.title || "配置组列表"
     } else if (Array.isArray(response)) {
       groups.value = response
     } else {
@@ -346,7 +347,10 @@ onUnmounted(() => {
   --shadow-hover: 0 10px 25px rgba(255, 110, 180, 0.25);
 }
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
 
 .list-groups-page {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -362,6 +366,7 @@ onUnmounted(() => {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -386,7 +391,7 @@ onUnmounted(() => {
   text-align: center;
   border-radius: 0 0 30px 30px;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(255,110,180,0.2);
+  box-shadow: 0 8px 32px rgba(255, 110, 180, 0.2);
   background: linear-gradient(135deg, #ff6eb4 0%, #ff8cc8 50%, #ffb3d9 100%);
   margin-bottom: 30px;
   position: relative;
@@ -400,14 +405,19 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   height: 100%;
-  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+  background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
   animation: shimmer 3s infinite linear;
   z-index: 1;
 }
 
 @keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 @media (max-width: 768px) {
@@ -426,9 +436,14 @@ onUnmounted(() => {
   }
 }
 
-.header-carousel, .carousel-slide img, .header-overlay {
+.header-carousel,
+.carousel-slide img,
+.header-overlay {
   position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .carousel-slide img {
@@ -436,7 +451,7 @@ onUnmounted(() => {
 }
 
 .header-overlay {
-  background: linear-gradient(to bottom, rgba(255,246,251,0.3), rgba(255,246,251,0.9));
+  background: linear-gradient(to bottom, rgba(255, 246, 251, 0.3), rgba(255, 246, 251, 0.9));
   z-index: 1;
 }
 
@@ -449,7 +464,7 @@ onUnmounted(() => {
   font-size: 2.2rem;
   color: white;
   margin: 0;
-  text-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   font-weight: 800;
   letter-spacing: -0.5px;
   position: relative;
@@ -460,8 +475,13 @@ onUnmounted(() => {
 }
 
 @keyframes titleGlow {
-  0% { text-shadow: 0 4px 12px rgba(0,0,0,0.2), 0 0 20px rgba(255,255,255,0.3); }
-  100% { text-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 30px rgba(255,255,255,0.5); }
+  0% {
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), 0 0 20px rgba(255, 255, 255, 0.3);
+  }
+
+  100% {
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 30px rgba(255, 255, 255, 0.5);
+  }
 }
 
 .title-decoration {
@@ -470,21 +490,33 @@ onUnmounted(() => {
   display: inline-block;
 }
 
-.title-decoration:nth-child(1) { animation-delay: 0s; }
-.title-decoration:nth-child(2) { animation-delay: 1.5s; }
+.title-decoration:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.title-decoration:nth-child(2) {
+  animation-delay: 1.5s;
+}
 
 @keyframes floatDecoration {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-8px) rotate(10deg); }
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-8px) rotate(10deg);
+  }
 }
 
 .subtitle {
-  color: rgba(255,255,255,0.9);
+  color: rgba(255, 255, 255, 0.9);
   margin-top: 8px;
   font-size: 1rem;
   font-weight: 500;
   letter-spacing: 0.5px;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 @media (max-width: 768px) {
@@ -568,6 +600,7 @@ onUnmounted(() => {
     margin-bottom: 12px;
     gap: 8px;
   }
+
   .groups-header h2 {
     font-size: 0.9rem;
   }
@@ -608,6 +641,7 @@ onUnmounted(() => {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -755,29 +789,35 @@ onUnmounted(() => {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: linear-gradient(
-    45deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.1) 50%,
-    transparent 70%
-  );
+  background: linear-gradient(45deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.1) 50%,
+      transparent 70%);
   animation: selectedShimmer 3s linear infinite;
   z-index: 1;
   pointer-events: none;
 }
 
 @keyframes selectedShimmer {
-  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-  100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
 }
 
 @keyframes selectedPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow:
       0 16px 48px rgba(255, 110, 180, 0.25),
       0 4px 16px rgba(0, 0, 0, 0.08),
       inset 0 1px 0 rgba(255, 255, 255, 0.9);
   }
+
   50% {
     box-shadow:
       0 20px 60px rgba(255, 110, 180, 0.35),
@@ -788,13 +828,15 @@ onUnmounted(() => {
 
 .select-checkbox-wrapper {
   position: absolute;
-  top: 6px; /* 调整位置 */
+  top: 6px;
+  /* 调整位置 */
   right: 6px;
   z-index: 5;
 }
 
 .checkbox-ui {
-  width: 18px; /* 进一步减小复选框 */
+  width: 18px;
+  /* 进一步减小复选框 */
   height: 18px;
   border-radius: 50%;
   border: 2px solid #ddd;
@@ -811,8 +853,12 @@ onUnmounted(() => {
 .checkbox-ui.checked::after {
   content: '';
   position: absolute;
-  top: 2px; left: 5px; /* 调整勾的位置 */
-  width: 3px; height: 7px; /* 进一步减小勾的大小 */
+  top: 2px;
+  left: 5px;
+  /* 调整勾的位置 */
+  width: 3px;
+  height: 7px;
+  /* 进一步减小勾的大小 */
   border: solid rgb(252, 5, 5);
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
@@ -864,14 +910,21 @@ onUnmounted(() => {
 .group-icon {
   font-size: 2.5rem;
   margin-bottom: 12px;
-  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
   animation: iconFloat 3s ease-in-out infinite;
   display: inline-block;
 }
 
 @keyframes iconFloat {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-5px) scale(1.05); }
+
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+
+  50% {
+    transform: translateY(-5px) scale(1.05);
+  }
 }
 
 .group-card.selected .group-icon {
@@ -879,8 +932,17 @@ onUnmounted(() => {
 }
 
 @keyframes selectedIcon {
-  0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 4px 8px rgba(255, 110, 180, 0.3)); }
-  50% { transform: translateY(-5px) scale(1.1); filter: drop-shadow(0 6px 12px rgba(255, 110, 180, 0.5)); }
+
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    filter: drop-shadow(0 4px 8px rgba(255, 110, 180, 0.3));
+  }
+
+  50% {
+    transform: translateY(-5px) scale(1.1);
+    filter: drop-shadow(0 6px 12px rgba(255, 110, 180, 0.5));
+  }
 }
 
 @media (max-width: 768px) {
@@ -947,9 +1009,11 @@ onUnmounted(() => {
 .selected-tag {
   display: block;
   text-align: center;
-  font-size: 0.65rem; /* 进一步减小字体 */
+  font-size: 0.65rem;
+  /* 进一步减小字体 */
   color: var(--primary-color);
-  margin-bottom: 2px; /* 进一步减小间距 */
+  margin-bottom: 2px;
+  /* 进一步减小间距 */
   font-weight: bold;
 }
 
@@ -993,6 +1057,7 @@ onUnmounted(() => {
     opacity: 0;
     transform: translate(-50%, 20px);
   }
+
   to {
     opacity: 1;
     transform: translate(-50%, 0);
@@ -1047,8 +1112,10 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 10px;
-  flex: 1; /* 占据剩余空间 */
-  min-width: 0; /* 关键：允许flex子元素收缩，防止文字撑开容器 */
+  flex: 1;
+  /* 占据剩余空间 */
+  min-width: 0;
+  /* 关键：允许flex子元素收缩，防止文字撑开容器 */
 }
 
 .count-badge {
@@ -1087,11 +1154,13 @@ onUnmounted(() => {
   flex-direction: column;
   justify-content: center;
   line-height: 1.2;
-  overflow: hidden; /* 隐藏溢出文字 */
+  overflow: hidden;
+  /* 隐藏溢出文字 */
 }
 
 .selection-text-col .label {
-  font-size: 0.65rem; /* 减小字体 */
+  font-size: 0.65rem;
+  /* 减小字体 */
   color: #999;
   margin-bottom: 1px;
 }
@@ -1099,24 +1168,29 @@ onUnmounted(() => {
 .selection-text {
   display: flex;
   flex-direction: column;
-  font-size: 0.8rem; /* 减小字体 */
+  font-size: 0.8rem;
+  /* 减小字体 */
   overflow: hidden;
 }
 
 .preview-text {
   color: #333;
   font-weight: 600;
-  font-size: 0.85rem; /* 减小字体 */
+  font-size: 0.85rem;
+  /* 减小字体 */
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis; /* 文字过长显示省略号 */
+  text-overflow: ellipsis;
+  /* 文字过长显示省略号 */
 }
 
 .selection-actions {
   display: flex;
   gap: 8px;
-  flex-shrink: 0; /* 防止按钮被压缩 */
+  flex-shrink: 0;
+  /* 防止按钮被压缩 */
 }
+
 /* 通用按钮样式优化 */
 .btn {
   border: none;
@@ -1165,10 +1239,12 @@ onUnmounted(() => {
     transform: scale(0, 0);
     opacity: 0.5;
   }
+
   20% {
     transform: scale(25, 25);
     opacity: 0.3;
   }
+
   100% {
     opacity: 0;
     transform: scale(40, 40);
@@ -1255,22 +1331,69 @@ onUnmounted(() => {
 }
 
 /* 动画 */
-.slide-up-enter-active, .slide-up-leave-active { transition: all 0.3s ease; }
-.slide-up-enter-from, .slide-up-leave-to { opacity: 0; transform: translate(-50%, 20px); }
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: all 0.3s ease;
+}
+
+.slide-up-enter-from,
+.slide-up-leave-to {
+  opacity: 0;
+  transform: translate(-50%, 20px);
+}
 
 /* 针对极小屏幕适配 */
 @media (max-width: 380px) {
-  .btn-text { display: none; }
-  .page-title { font-size: 1.2rem; }
-  .selection-footer { width: 98%; padding: 8px 10px; }
-  .container { padding: 0 10px; }
-  .groups-header h2 { font-size: 0.85rem; }
+  .btn-text {
+    display: none;
+  }
+
+  .page-title {
+    font-size: 1.2rem;
+  }
+
+  .selection-footer {
+    width: 98%;
+    padding: 8px 10px;
+  }
+
+  .container {
+    padding: 0 10px;
+  }
+
+  .groups-header h2 {
+    font-size: 0.85rem;
+  }
 }
 
 /* 装饰性元素保持不变 (Heart, Sparkle等) - 省略以节省篇幅，保持原样即可 */
-.floating-hearts, .heart { pointer-events: none; z-index: 0; }
-.heart { position: fixed; color: #ffb3d9; animation: float 6s infinite ease-in-out; }
-@keyframes float { 0% { transform: translateY(100vh); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(-100px); opacity: 0; } }
+.floating-hearts,
+.heart {
+  pointer-events: none;
+  z-index: 0;
+}
+
+.heart {
+  position: fixed;
+  color: #ffb3d9;
+  animation: float 6s infinite ease-in-out;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+}
 
 /* --- 数字气泡交互优化 --- */
 .count-badge.clickable {
@@ -1278,7 +1401,7 @@ onUnmounted(() => {
   position: relative;
   transition: transform 0.2s;
   /* 增加点击区域 */
-  border: 2px solid rgba(255,255,255,0.5);
+  border: 2px solid rgba(255, 255, 255, 0.5);
 }
 
 .count-badge.clickable:active {
@@ -1298,7 +1421,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 /* --- 弹窗样式 - 现代化设计 --- */
@@ -1319,8 +1442,13 @@ onUnmounted(() => {
 }
 
 @keyframes overlayFade {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .modal-content {
@@ -1356,6 +1484,7 @@ onUnmounted(() => {
     opacity: 0;
     transform: scale(0.9) translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -1416,7 +1545,8 @@ onUnmounted(() => {
 
 .modal-body {
   padding: 10px;
-  overflow-y: auto; /* 内容过多可滚动 */
+  overflow-y: auto;
+  /* 内容过多可滚动 */
   -webkit-overflow-scrolling: touch;
 }
 
@@ -1473,14 +1603,24 @@ onUnmounted(() => {
 
 /* 弹窗动画 */
 @keyframes popIn {
-  from { transform: scale(0.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
-.fade-modal-enter-active, .fade-modal-leave-active {
+.fade-modal-enter-active,
+.fade-modal-leave-active {
   transition: opacity 0.3s ease;
 }
-.fade-modal-enter-from, .fade-modal-leave-to {
+
+.fade-modal-enter-from,
+.fade-modal-leave-to {
   opacity: 0;
 }
 
@@ -1548,8 +1688,13 @@ onUnmounted(() => {
 }
 
 @keyframes orbitSpin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-core {
@@ -1577,13 +1722,25 @@ onUnmounted(() => {
 }
 
 @keyframes corePulse {
-  0%, 100% { transform: translate(-50%, -50%) scale(1); }
-  50% { transform: translate(-50%, -50%) scale(1.1); }
+
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
 }
 
 @keyframes innerSpin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-particles {
@@ -1613,12 +1770,15 @@ onUnmounted(() => {
     opacity: 0;
     transform: translate(-50%, -50%) rotate(calc(var(--i) * 30deg)) translateX(80px);
   }
+
   10% {
     opacity: 1;
   }
+
   90% {
     opacity: 1;
   }
+
   100% {
     opacity: 0;
     transform: translate(-50%, -50%) rotate(calc(var(--i) * 30deg + 360deg)) translateX(80px);
@@ -1651,15 +1811,27 @@ onUnmounted(() => {
   animation: dotBounce 1.4s ease-in-out infinite;
 }
 
-.dot:nth-child(1) { animation-delay: 0s; }
-.dot:nth-child(2) { animation-delay: 0.2s; }
-.dot:nth-child(3) { animation-delay: 0.4s; }
+.dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
 
 @keyframes dotBounce {
-  0%, 60%, 100% {
+
+  0%,
+  60%,
+  100% {
     transform: translateY(0);
     opacity: 0.6;
   }
+
   30% {
     transform: translateY(-10px);
     opacity: 1;
@@ -1842,10 +2014,12 @@ onUnmounted(() => {
     width: 160px;
     height: 160px;
   }
+
   .spinner-ring:nth-child(2) {
     width: 120px;
     height: 120px;
   }
+
   .spinner-ring:nth-child(3) {
     width: 80px;
     height: 80px;
@@ -1853,8 +2027,13 @@ onUnmounted(() => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* 加载消息 */
@@ -1881,19 +2060,20 @@ onUnmounted(() => {
   margin: 0 0 8px 0;
   font-size: 1.3rem;
   font-weight: 700;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .loading-message p {
   margin: 0 0 15px 0;
   font-size: 0.95rem;
-  color: rgba(255,255,255,0.9);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 @media (max-width: 768px) {
   .loading-message h3 {
     font-size: 1.1rem;
   }
+
   .loading-message p {
     font-size: 0.85rem;
   }
@@ -1913,15 +2093,27 @@ onUnmounted(() => {
   animation: dotPulse 1.4s ease-in-out infinite;
 }
 
-.progress-dots span:nth-child(1) { animation-delay: 0s; }
-.progress-dots span:nth-child(2) { animation-delay: 0.2s; }
-.progress-dots span:nth-child(3) { animation-delay: 0.4s; }
+.progress-dots span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.progress-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.progress-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
 
 @keyframes dotPulse {
-  0%, 60%, 100% {
+
+  0%,
+  60%,
+  100% {
     transform: scale(1);
     opacity: 0.7;
   }
+
   30% {
     transform: scale(1.5);
     opacity: 1;
@@ -1929,7 +2121,14 @@ onUnmounted(() => {
 }
 
 @keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-15px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-15px);
+  }
 }
 </style>
