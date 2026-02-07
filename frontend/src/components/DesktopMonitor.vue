@@ -25,7 +25,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted, watch } from "vue"
 import { message } from "ant-design-vue"
-import { getBaseURL } from "@/api"
+import { getScreenshot } from "@/api"
 import { useIsMobile, useWindowEvent, useInterval } from "@/hooks"
 
 const props = defineProps({
@@ -43,19 +43,18 @@ const handleVisibleChange = (val) => {
   emit("update:visible", val)
 }
 
-// --- 截图功能 ---
 const screenshotUrl = ref("")
 const isZoomed = ref(false)
 const zoomScale = ref(1)
-const token = typeof window !== "undefined" ? localStorage.getItem("bbgi-token") : ""
 
 // 自动刷新
 const userWantAutoRefresh = ref(true) // 用户是否希望自动刷新
 const autoRefreshButtonText = computed(() => userWantAutoRefresh.value ? "⏸️ 点击暂停刷新" : "▶️ 点击继续刷新")
 const isAutoRefresh = computed(() => userWantAutoRefresh.value && props.visible)
 const refreshScreenshot = () => {
-  const ts = Date.now()
-  screenshotUrl.value = `${getBaseURL()}/api/aBgiJt?t=${ts}&tk=${token}`
+  getScreenshot().then(url => {
+    screenshotUrl.value = url
+  })
 }
 useInterval(refreshScreenshot, 5000, isAutoRefresh)
 watch(() => props.visible, (val) => {
@@ -72,8 +71,7 @@ const imagePosition = ref({ x: 0, y: 0 })
 
 const onScreenshotLoad = () => {
   fitImage()
-  // 重置位置
-  imagePosition.value = { x: 0, y: 0 }
+  imagePosition.value = { x: 0, y: 0 } // 重置位置
 }
 
 const zoomIn = () => {

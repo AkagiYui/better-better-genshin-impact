@@ -105,6 +105,10 @@ export const updateABgi = () => api.post("/api/updateABgi")
 // 获取轮播图图片列表
 export const getImages = () => api.get("/api/images")
 
+export const getScreenshot = () => api.get(`/api/aBgiJt?t=${new Date().getTime()}`, { responseType: "blob" }).then(response => {
+  const url = URL.createObjectURL(response.data)
+  return url
+})
 // 发送桌面截图
 export const sendImage = () => api.post("/api/sendImage")
 
