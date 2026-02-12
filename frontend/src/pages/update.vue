@@ -4,7 +4,7 @@
       <div class="card-deco" />
 
       <div class="sponsor-badge">
-        <span class="heart">❤</span> 感谢 <span class="name">思姐</span> 赞助
+        <span class="heart">❤</span> 感谢 <span class="name"></span> 赞助
       </div>
 
       <h2 class="title">系统版本管理</h2>
@@ -478,7 +478,7 @@ onUnmounted(() => {
 /* Help button near section title */
 .help-btn {
   background: transparent;
-  border: 1px solid rgba(0,0,0,0.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -498,7 +498,7 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -512,7 +512,7 @@ onUnmounted(() => {
   background: #fff;
   border-radius: 12px;
   padding: 18px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
   animation: modalIn 200ms ease;
 }
 
@@ -550,7 +550,14 @@ onUnmounted(() => {
 }
 
 @keyframes modalIn {
-  from { transform: translateY(-6px); opacity: 0 }
-  to { transform: translateY(0); opacity: 1 }
+  from {
+    transform: translateY(-6px);
+    opacity: 0
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1
+  }
 }
 </style>
