@@ -15,7 +15,7 @@
           <div class="button-group glass-panel">
             <h2 class="group-title">{{ group.title }}</h2>
             <div class="btn-grid">
-              <button v-for="(btn, i) in group.buttons" :key="i" @click="btn.action ? btn.action() : btn.route ? router.push(btn.route) : undefined">
+              <button v-for="(btn, i) in group.buttons" :key="i" @click="handleButtonClick(btn)">
                 {{ btn.text }}
               </button>
             </div>
@@ -35,7 +35,7 @@ import { ref } from "vue"
 import { message, Modal } from "ant-design-vue"
 import { useRouter } from "vue-router"
 import { confirm } from "@/util"
-import { mysSignIn as mysSignInApi, getBaseURL, closeBgi, backup, sendImage as sendImageApi, GetAppInfo } from "@/api"
+import { mysSignIn as mysSignInApi, closeBgi, backup, sendImage as sendImageApi } from "@/api"
 import DesktopMonitor from "@/components/DesktopMonitor.vue"
 import OneDragonFlowStartModal from "@/components/OneDragonFlowStartModal.vue"
 import UploadBgiModal from "@/components/UploadBgiModal.vue"
@@ -46,6 +46,15 @@ const desktopMonitorVisible = ref(false)
 const oneDragonFlowStartModalVisible = ref(false)
 const uploadBgiModalVisible = ref(false)
 
+// 处理按钮点击事件
+const handleButtonClick = (btn) => {
+  if (btn.action) {
+    btn.action()
+  } else if (btn.route) {
+    router.push(btn.route)
+  }
+}
+
 // 按钮定义
 const buttonGroups = ref([
   {
@@ -53,7 +62,8 @@ const buttonGroups = ref([
     "buttons": [
       { text: "桌面监控", action: () => desktopMonitorVisible.value = true },
       {
-        text: "发送截图", action: () => {
+        text: "发送截图",
+        action: () => {
           confirm({
             content: "确认发送当前截图？",
             onOk: async () => { try { const res = await sendImageApi(); Modal.info({ content: res.data || "成功" }) } catch (e) { message.error("失败") } },
@@ -81,7 +91,8 @@ const buttonGroups = ref([
     "buttons": [
       { text: "一条龙启动", action: () => { oneDragonFlowStartModalVisible.value = true } },
       {
-        text: "关闭BGI和原神", action: () => {
+        text: "关闭BGI和原神",
+        action: () => {
           confirm({
             content: "是否关闭【BGI】和【原神】？",
             onOk: async () => {
@@ -92,7 +103,8 @@ const buttonGroups = ref([
       },
       { text: "⭕调度圣坛", route: { name: "list-groups" } },
       {
-        text: "⭕备份 USER 文件", action: () => {
+        text: "⭕备份 USER 文件",
+        action: () => {
           confirm({
             content: "是否确认备份当前的 USER 文件？",
             onOk: async () => { try { await backup(); message.success("备份成功") } catch (e) { message.error("备份失败") } },
@@ -112,7 +124,8 @@ const buttonGroups = ref([
       { text: "脚本仓库", route: { name: "script-repo" } },
       { text: "手动更新BGI", action: () => uploadBgiModalVisible.value = true },
       {
-        text: "米游社签到", action: () => {
+        text: "米游社签到",
+        action: () => {
           confirm({
             content: "是否要米游社签到？",
             onOk: async () => { try { const res = await mysSignInApi(); Modal.info({ title: "结果", content: res.data.message || "发送成功" }) } catch (e) { message.error("失败") } },
