@@ -12,10 +12,6 @@ import BaseUrlInput from "@/components/BaseUrlInput.vue"
 </script>
 
 <style>
-:root {
-  scrollbar-gutter: stable;
-}
-
 html,
 body {
   margin: 0;
