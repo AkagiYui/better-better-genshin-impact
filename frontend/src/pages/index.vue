@@ -116,20 +116,20 @@ const buttonGroups = ref([
           })
         },
       },
-      { text: "实时日志", route: { name: "log" } },
-      { text: "ABGI日志查询", route: { name: "auto-log" } },
+      { text: "⭕实时日志", route: { name: "log" } },
+      { text: "⭕ABGI日志查询", route: { name: "auto-log" } },
     ],
   },
   {
     "title": "📊 数据分析",
     "buttons": [
-      { text: "查看狗粮日志", route: { name: "get-auto-artifacts-pro" } },
-      { text: "屑荧进村", route: { name: "log-analysis" } },
-      { text: "归档查询", route: { name: "archive" } },
-      { text: "旅行者札记", route: { name: "bag-statistics" } },
-      { text: "配置组运行情况", route: { name: "other" } },
-      { text: "CD管理自动采集", route: { name: "cd-aware-auto-gather" } },
-      { text: "采集管理", route: { name: "collection-management" } },
+      { text: "⭕查看狗粮日志", route: { name: "get-auto-artifacts-pro" } },
+      { text: "⭕屑荧进村", route: { name: "log-analysis" } },
+      { text: "⭕归档查询", route: { name: "archive" } },
+      { text: "⭕旅行者札记", route: { name: "bag-statistics" } },
+      { text: "⭕配置组运行情况", route: { name: "other" } },
+      { text: "⭕CD管理自动采集", route: { name: "cd-aware-auto-gather" } },
+      { text: "⭕采集管理", route: { name: "collection-management" } },
     ],
   },
   {
@@ -146,25 +146,25 @@ const buttonGroups = ref([
           })
         },
       },
-      { text: "调度圣坛", route: { name: "list-groups" } },
+      { text: "⭕调度圣坛", route: { name: "list-groups" } },
       {
-        text: "备份 USER 文件", action: () => {
+        text: "⭕备份 USER 文件", action: () => {
           confirm({
             content: "是否确认备份当前的 USER 文件？",
             onOk: async () => { try { await backup(); message.success("备份成功") } catch (e) { message.error("备份失败") } },
           })
         },
       },
-      { text: "脚本屋", route: { name: "js-names" } },
-      { text: "地图追踪", route: { name: "pathing" } },
-      { text: "联机管理", route: { name: "online" } },
-      { text: "ABGI定时任务", route: { name: "task-cron" } },
+      { text: "⭕脚本屋", route: { name: "js-names" } },
+      { text: "⭕地图追踪", route: { name: "pathing" } },
+      { text: "⭕联机管理", route: { name: "online" } },
+      { text: "⭕ABGI定时任务", route: { name: "task-cron" } },
     ],
   },
   {
     "title": "🧭 提瓦特指挥所",
     "buttons": [
-      { text: "OBS录屏管理", route: { name: "obs-video" } },
+      { text: "⭕OBS录屏管理", route: { name: "obs-video" } },
       { text: "脚本仓库", route: { name: "script-repo" } },
       { text: "手动更新BGI", action: () => uploadBgiModalVisible.value = true },
       {
@@ -177,7 +177,7 @@ const buttonGroups = ref([
       },
       { text: "BetterBGI设置", route: { name: "config" } },
       { text: "一条龙配置", route: { name: "one-dragon-flow-config" } },
-      { text: "检查更新", route: { name: "update" } },
+      { text: "⭕检查更新", route: { name: "update" } },
       { text: "退出", action: () => { localStorage.removeItem("bbgi-token"); router.push({ name: "login" }) } },
     ],
   },

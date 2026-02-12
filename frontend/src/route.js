@@ -2,9 +2,9 @@ import { createRouter, createWebHistory } from "vue-router"
 
 // 路由配置
 const routes = [
-  { path: "/login", name: "login", component: () => import("@/pages/login.vue"), meta: { requires: false } },
-  { path: "/", name: "home", component: () => import("@/pages/index.vue"), meta: { requires: true } },
-  { path: "/:path(.*)", component: () => import("@/pages/[...path].vue") },
+  { path: "/login", name: "login", component: () => import("@/pages/login.vue"), meta: { requires: false } }, // ✅已验证
+  { path: "/", name: "home", component: () => import("@/pages/index.vue"), meta: { requires: true } }, // ✅已验证
+  { path: "/:path(.*)", component: () => import("@/pages/[...path].vue") }, // ✅已验证
 
   { path: "/archive", name: "archive", component: () => import("@/pages/archive.vue"), meta: { requires: true } },
   { path: "/auto-log", name: "auto-log", component: () => import("@/pages/auto-log.vue"), meta: { requires: true } },
@@ -14,7 +14,7 @@ const routes = [
   { path: "/calculate-task-enabled-list", name: "calculate-task-enabled-list", component: () => import("@/pages/calculate-task-enabled-list.vue"), meta: { requires: true } },
   { path: "/cd-aware-auto-gather", name: "cd-aware-auto-gather", component: () => import("@/pages/cd-aware-auto-gather.vue"), meta: { requires: true } },
   { path: "/collection-management", name: "collection-management", component: () => import("@/pages/collection-management.vue"), meta: { requires: true } },
-  { path: "/config", name: "config", component: () => import("@/pages/config.vue"), meta: { requires: true } },
+  { path: "/config", name: "config", component: () => import("@/pages/config.vue"), meta: { requires: true } }, // ✅已验证
   { path: "/get-auto-artifacts-pro", name: "get-auto-artifacts-pro", component: () => import("@/pages/get-auto-artifacts-pro.vue"), meta: { requires: true } },
   { path: "/get-auto-artifacts-pro2", name: "get-auto-artifacts-pro2", component: () => import("@/pages/get-auto-artifacts-pro2.vue"), meta: { requires: true } },
   { path: "/harvest", name: "harvest", component: () => import("@/pages/harvest.vue"), meta: { requires: true } },
@@ -26,12 +26,12 @@ const routes = [
   { path: "/material-trend", name: "material-trend", component: () => import("@/pages/material-trend.vue"), meta: { requires: true } },
   { path: "/morale", name: "morale", component: () => import("@/pages/morale.vue"), meta: { requires: true } },
   { path: "/obs-video", name: "obs-video", component: () => import("@/pages/obs-video.vue"), meta: { requires: true } },
-  { path: "/one-dragon-flow-config", name: "one-dragon-flow-config", component: () => import("@/pages/one-dragon-flow-config.vue"), meta: { requires: true } },
+  { path: "/one-dragon-flow-config", name: "one-dragon-flow-config", component: () => import("@/pages/one-dragon-flow-config.vue"), meta: { requires: true } }, // ✅已验证
   { path: "/online", name: "online", component: () => import("@/pages/online.vue"), meta: { requires: true } },
   { path: "/other", name: "other", component: () => import("@/pages/other.vue"), meta: { requires: true } },
   { path: "/pathing", name: "pathing", component: () => import("@/pages/pathing.vue"), meta: { requires: true } },
   { path: "/screen", name: "screen", component: () => import("@/pages/screen.vue"), meta: { requires: true } },
-  { path: "/script-repo", name: "script-repo", component: () => import("@/pages/script-repo.vue"), meta: { requires: true } },
+  { path: "/script-repo", name: "script-repo", component: () => import("@/pages/script-repo.vue"), meta: { requires: true } }, // ✅已验证
   { path: "/task-cron", name: "task-cron", component: () => import("@/pages/task-cron.vue"), meta: { requires: true } },
   { path: "/update", name: "update", component: () => import("@/pages/update.vue"), meta: { requires: true } },
 ]
