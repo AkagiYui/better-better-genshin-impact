@@ -24,44 +24,40 @@
 </template>
 
 <script setup>
-import { reactive, computed, onMounted } from "vue"
+import { computed } from "vue"
 import { message } from "ant-design-vue"
 import { LaptopOutlined, SyncOutlined } from "@ant-design/icons-vue"
+import { useQuery } from "@pinia/colada"
 import { restartBetterBgi, getStatus } from "@/api"
-import { useInterval } from "@/hooks"
 
-// 状态数据
-const statusData = reactive({
-  group: "加载中...",
-  ExpectedToEnd: "...",
-  line: "...",
-  progress: "...",
-  running: "...",
-  jsProgress: "...",
-  scriptName: "...",
+const { data: statusData } = useQuery({
+  key: ["status"],
+  query: async () => {
+    const res = await getStatus()
+    return res.data
+  },
+  staleTime: 5000,
+  placeholderData: {
+    group: "加载中...",
+    ExpectedToEnd: "...",
+    line: "...",
+    progress: "...",
+    running: "...",
+    jsProgress: "...",
+    scriptName: "...",
+  },
 })
+
 
 const overviewData = computed(() => [
-  { label: "🧩 执行配置组:", value: statusData.group, hover: statusData.ExpectedToEnd },
-  { label: "📜 运行路线:", value: statusData.line },
-  { label: "📜 运行脚本:", value: statusData.scriptName },
-  { label: "🗺️ 进度:", value: statusData.progress },
-  { label: "⚙️ 状态:", value: statusData.running },
-  { label: "✨ JS进度:", value: statusData.jsProgress },
+  { label: "🧩 执行配置组:", value: statusData.value.group, hover: statusData.value.ExpectedToEnd },
+  { label: "📜 运行路线:", value: statusData.value.line },
+  { label: "📜 运行脚本:", value: statusData.value.scriptName },
+  { label: "🗺️ 进度:", value: statusData.value.progress },
+  { label: "⚙️ 状态:", value: statusData.value.running },
+  { label: "✨ JS进度:", value: statusData.value.jsProgress },
 ])
 
-const refreshStatus = async () => {
-  try {
-    const res = await getStatus()
-    Object.assign(statusData, res.data)
-  } catch (e) { console.error(e) }
-}
-
-useInterval(refreshStatus, 3000)
-
-onMounted(() => {
-  refreshStatus()
-})
 
 const onRestartBbgiButtonClicked = () => {
   restartBetterBgi()

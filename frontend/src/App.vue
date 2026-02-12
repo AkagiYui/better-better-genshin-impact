@@ -2,10 +2,12 @@
   <div id="app">
     <BaseUrlInput />
     <router-view />
+    <PiniaColadaDevtools />
   </div>
 </template>
 
 <script setup>
+import { PiniaColadaDevtools } from "@pinia/colada-devtools"
 import BaseUrlInput from "@/components/BaseUrlInput.vue"
 </script>
 
