@@ -8,35 +8,14 @@
         </div>
       </header>
 
-      <div class="status-card glass-panel">
-        <div class="card-header">
-          <h2>
-            <LaptopOutlined /> 运行状态监控
-          </h2>
-          <button class="refresh-btn" @click="onRestartBbgiButtonClicked">
-            <SyncOutlined /> 重启Better-BGI
-          </button>
-        </div>
-
-        <div class="status-grid">
-          <template v-for="(item, index) in overviewData" :key="index">
-            <div :class="['status-item', item.hover ? 'group-name' : '']">
-              <span class="label">{{ item.label }}</span>
-              <span class="value">{{ item.value }}</span>
-              <div v-if="item.hover" class="ExpectedToEnd">
-                <pre>{{ item.hover }}</pre>
-              </div>
-            </div>
-          </template>
-        </div>
-      </div>
+      <StatusMonitor />
 
       <div class="action-zone">
         <template v-for="(group, index) in buttonGroups" :key="index">
           <div class="button-group glass-panel">
             <h2 class="group-title">{{ group.title }}</h2>
             <div class="btn-grid">
-              <button v-for="(btn, i) in group.buttons" :key="i" @click="btn.action ? btn.action() : btn.route ? router.push(btn.route) : () => { }">
+              <button v-for="(btn, i) in group.buttons" :key="i" @click="btn.action ? btn.action() : btn.route ? router.push(btn.route) : undefined">
                 {{ btn.text }}
               </button>
             </div>
@@ -52,55 +31,20 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onUnmounted, computed, watch, h } from "vue"
+import { ref } from "vue"
 import { message, Modal } from "ant-design-vue"
 import { useRouter } from "vue-router"
-import { LaptopOutlined, SyncOutlined } from "@ant-design/icons-vue"
 import { confirm } from "@/util"
-import { mysSignIn as mysSignInApi, getBaseURL, closeBgi, backup, sendImage as sendImageApi, restartBetterBgi, getStatus, GetAppInfo } from "@/api"
+import { mysSignIn as mysSignInApi, getBaseURL, closeBgi, backup, sendImage as sendImageApi, GetAppInfo } from "@/api"
 import DesktopMonitor from "@/components/DesktopMonitor.vue"
 import OneDragonFlowStartModal from "@/components/OneDragonFlowStartModal.vue"
 import UploadBgiModal from "@/components/UploadBgiModal.vue"
-import { useInterval } from "@/hooks"
+import StatusMonitor from "@/components/StatusMonitor.vue"
 
 const router = useRouter()
 const desktopMonitorVisible = ref(false)
 const oneDragonFlowStartModalVisible = ref(false)
 const uploadBgiModalVisible = ref(false)
-
-// 状态数据
-const statusData = reactive({
-  group: "加载中...",
-  ExpectedToEnd: "...",
-  line: "...",
-  progress: "...",
-  running: "...",
-  jsProgress: "...",
-  scriptName: "...",
-})
-const overviewData = computed(() => [
-  { label: "🧩 执行配置组:", value: statusData.group, hover: statusData.ExpectedToEnd },
-  { label: "📜 运行路线:", value: statusData.line },
-  { label: "📜 运行脚本:", value: statusData.scriptName },
-  { label: "🗺️ 进度:", value: statusData.progress },
-  { label: "⚙️ 状态:", value: statusData.running },
-  { label: "✨ JS进度:", value: statusData.jsProgress },
-])
-const refreshStatus = async () => {
-  try {
-    const res = await getStatus()
-    Object.assign(statusData, res.data)
-  } catch (e) { console.error(e) }
-}
-useInterval(refreshStatus, 3000)
-onMounted(() => {
-  refreshStatus()
-})
-
-const onRestartBbgiButtonClicked = () => {
-  restartBetterBgi()
-  message.success("正在重启中····")
-}
 
 // 按钮定义
 const buttonGroups = ref([
@@ -197,23 +141,6 @@ const buttonGroups = ref([
   background-size: 20px 20px;
 }
 
-
-.ExpectedToEnd {
-  background: rgb(252, 207, 230);
-  position: absolute;
-  opacity: 0;
-  display: none;
-  transition: all .2s ease;
-  border-radius: 5px;
-}
-
-.group-name:hover .ExpectedToEnd {
-  opacity: 1;
-  display: block;
-  visibility: visible;
-}
-
-
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 1s;
@@ -257,7 +184,6 @@ const buttonGroups = ref([
   box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3);
 }
 
-
 .header-content {
   position: relative;
   z-index: 2;
@@ -280,66 +206,6 @@ const buttonGroups = ref([
   display: inline-block;
   padding: 4px 12px;
   border-radius: 12px;
-}
-
-/* 状态卡片 */
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-  border-bottom: 2px dashed #ffb6c1;
-  padding-bottom: 10px;
-}
-
-.card-header h2 {
-  margin: 0;
-  color: #ff3385;
-  font-size: 1.2rem;
-}
-
-.refresh-btn {
-  background: #ffecf5;
-  color: #ff3385;
-  border: 1px solid #ff99cc;
-  padding: 4px 12px;
-  border-radius: 15px;
-  cursor: pointer;
-  width: auto;
-}
-
-.status-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.status-item {
-  background: rgba(255, 255, 255, 0.5);
-  padding: 8px;
-  border-radius: 12px;
-  font-size: 14px;
-}
-
-.full-width {
-  grid-column: span 2;
-}
-
-.label {
-  color: #ff80ab;
-  font-weight: bold;
-  margin-right: 5px;
-}
-
-.value {
-  color: #d81b60;
-  font-weight: bold;
-  word-break: break-all;
-}
-
-.value.highlight {
-  font-size: 1.1em;
-  color: #c2185b;
 }
 
 /* 按钮组样式 */
@@ -474,10 +340,6 @@ button:hover::after {
 @media (max-width: 576px) {
   .main-content {
     width: 95%;
-  }
-
-  .status-grid {
-    font-size: 12px;
   }
 
   .modal-tools button {
