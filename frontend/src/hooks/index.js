@@ -1,4 +1,4 @@
-import { ref, onUnmounted, onMounted, watch } from "vue"
+import { ref, onUnmounted, onMounted, watch, unref } from "vue"
 
 export const useIsMobile = () => {
   const isMobile = ref(window.innerWidth <= 768)
@@ -26,11 +26,19 @@ export const useWindowEvent = (event, handler) => {
   })
 }
 
+/**
+ * Starts/stops a setInterval based on a reactive flag.
+ *
+ * @param {() => void} callback
+ * @param {number} interval
+ * @param {boolean | import('vue').Ref<boolean> | import('vue').ComputedRef<boolean>} [isActive=true]
+ */
 export const useInterval = (callback, interval, isActive = true) => {
   let timerId = null
 
-  watch(isActive, (active) => {
+  watch(() => unref(isActive), (active) => {
     if (active) {
+      if (timerId) clearInterval(timerId)
       timerId = setInterval(callback, interval)
     } else {
       if (timerId) clearInterval(timerId)
