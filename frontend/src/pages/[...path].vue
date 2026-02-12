@@ -47,7 +47,11 @@ const refreshPage = () => {
 onMounted(() => {
   // 从路由参数获取错误详情
   if (route.query.error) {
-    errorDetails.value = decodeURIComponent(route.query.error)
+    // route.query.error 可能是 string 或 string[]，需要统一处理为 string
+    const errorValue = Array.isArray(route.query.error)
+      ? route.query.error[0]
+      : route.query.error
+    errorDetails.value = decodeURIComponent(errorValue)
   }
 })
 </script>
