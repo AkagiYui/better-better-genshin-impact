@@ -41,7 +41,7 @@ export default defineConfig({
             }
             name = name.replace(".", "_")
             let chunkName = name.split("@")[0]
-            if (["vue", "vue+devtools-api"].includes(chunkName)) {
+            if (["vue", "vue+devtools-api", "vue+devtools-kit", "vue+devtools-shared"].includes(chunkName)) {
               chunkName = "vue+runtime-core"
             }
             return `vendor-${chunkName}`
