@@ -23,10 +23,11 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, onUnmounted, watch } from "vue"
+import { ref, computed, watch } from "vue"
 import { message } from "ant-design-vue"
+import { useQuery } from "@pinia/colada"
 import { getScreenshot } from "@/api"
-import { useIsMobile, useWindowEvent, useInterval } from "@/hooks"
+import { useIsMobile, useWindowEvent } from "@/hooks"
 
 const props = defineProps({
   visible: {
@@ -43,7 +44,6 @@ const handleVisibleChange = (val) => {
   emit("update:visible", val)
 }
 
-const screenshotUrl = ref("")
 const isZoomed = ref(false)
 const zoomScale = ref(1)
 
@@ -51,16 +51,20 @@ const zoomScale = ref(1)
 const userWantAutoRefresh = ref(true) // 用户是否希望自动刷新
 const autoRefreshButtonText = computed(() => userWantAutoRefresh.value ? "⏸️ 点击暂停刷新" : "▶️ 点击继续刷新")
 const isAutoRefresh = computed(() => userWantAutoRefresh.value && props.visible)
-const refreshScreenshot = () => {
-  getScreenshot().then(url => {
-    screenshotUrl.value = url
-  })
-}
-useInterval(refreshScreenshot, 5000, isAutoRefresh)
+
+const { data: screenshotUrl, refetch } = useQuery({
+  key: ["screenshot"],
+  query: async () => {
+    const res = await getScreenshot()
+    return res
+  },
+  staleTime: 5000,
+  placeholderData: "",
+  enabled: () => isAutoRefresh.value,
+})
+
 watch(() => props.visible, (val) => {
-  if (val) {
-    refreshScreenshot()
-  }
+  if (val) refetch()
 })
 
 // 拖动查看相关状态
@@ -172,7 +176,7 @@ useWindowEvent("keydown", (event) => {
   if (!props.visible) return // 只在截图模态框打开时处理
   if (event.key === "r" || event.key === "R") {
     event.preventDefault()
-    refreshScreenshot()
+    refetch()
     message.info("已手动刷新截图")
   }
 })
