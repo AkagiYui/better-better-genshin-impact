@@ -24,12 +24,15 @@
 </template>
 
 <script setup>
-import { computed } from "vue"
 import { message } from "ant-design-vue"
 import { LaptopOutlined, SyncOutlined } from "@ant-design/icons-vue"
 import { useQuery } from "@pinia/colada"
+import { computed } from "vue"
+import { useDocumentVisibility } from "@vueuse/core"
 import { restartBetterBgi, getStatus } from "@/api"
 
+const isDocumentVisible = useDocumentVisibility()
+const isVisible = computed(() => isDocumentVisible.value === "visible")
 const { data: statusData } = useQuery({
   key: ["status"],
   query: async () => {
@@ -46,6 +49,7 @@ const { data: statusData } = useQuery({
     jsProgress: "...",
     scriptName: "...",
   },
+  enabled: () => isVisible.value,
 })
 
 

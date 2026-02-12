@@ -13,6 +13,7 @@
     "@ant-design/icons-vue": "^7.0.1",
     "@pinia/colada": "^0.21.4",
     "@pinia/colada-plugin-auto-refetch": "^0.2.4",
+    "@vueuse/core": "^14.2.1",
     "ant-design-vue": "^4.2.6",
     "axios": "^1.13.4",
     "dayjs": "^1.11.19",
