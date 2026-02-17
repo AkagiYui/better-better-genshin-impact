@@ -1,29 +1,10 @@
 <template>
   <div class="list-groups-page">
-    <div class="floating-hearts">
-      <div v-for="i in 15" :key="i" class="heart" :style="{ animationDelay: (i * 0.5) + 's' }">♡</div>
-    </div>
-
     <header class="page-header">
-      <div v-if="carouselImages.length > 0" class="header-carousel">
-        <div class="carousel-container">
-          <div v-for="(image, index) in carouselImages" :key="index" class="carousel-slide" :class="{ active: currentImageIndex === index }">
-            <img :src="image" :alt="`carousel-${index}`" />
-          </div>
-        </div>
-      </div>
-
-      <div class="header-overlay" />
-      <div class="header-decoration">
-        <div class="sparkle">✨</div>
-        <div class="sparkle">⭐</div>
-        <div class="sparkle">💫</div>
-      </div>
-
       <div class="container header-content">
         <h1 class="page-title">
           <span class="title-decoration">🎀</span>
-          {{ pageTitle }}
+          配置组
           <span class="title-decoration">🎀</span>
         </h1>
         <p class="subtitle">管理并启动您的配置实例</p>
@@ -188,15 +169,11 @@ import { message } from "ant-design-vue"
 import { getListGroups, startGroups } from "@/api"
 
 // 响应式数据
-const pageTitle = ref("配置组启动")
 const groups = ref([])
 const loading = ref(true)
 const isStarting = ref(false)
 const showLoadingOverlay = ref(false)
 const selectedGroups = ref([])
-const carouselImages = ref([])
-const currentImageIndex = ref(0)
-let carouselInterval = null
 const showDetailModal = ref(false)
 
 // 计算属性
@@ -204,11 +181,6 @@ const isAllSelected = computed(() => {
   return groups.value.length > 0 && selectedGroups.value.length === groups.value.length
 })
 
-// 显示选中的文本预览（如：GroupA, GroupB...）
-const selectedGroupsText = computed(() => {
-  const text = selectedGroups.value.join(", ")
-  return text.length > 20 ? `${text.substring(0, 20)}...` : text
-})
 
 //智能生成预览文字
 const selectionPreview = computed(() => {
@@ -227,28 +199,6 @@ const selectionPreview = computed(() => {
   }
 })
 
-// 获取轮播图图片
-const getImages = async () => {
-  // try {
-  //   const response = await fetch('/api/images')
-  //   if (!response.ok) throw new Error('Failed')
-  //   const data = await response.json()
-  //   carouselImages.value = data.images || []
-  //   if (carouselImages.value.length > 0) startCarousel()
-  // } catch (error) {
-  //   // 默认图片
-  //   carouselImages.value = ['/img/bd.jpg', '/img/ff.png']
-  //   startCarousel()
-  // }
-}
-
-const startCarousel = () => {
-  if (carouselImages.value.length > 1) {
-    carouselInterval = setInterval(() => {
-      currentImageIndex.value = (currentImageIndex.value + 1) % carouselImages.value.length
-    }, 5000)
-  }
-}
 
 // 加载配置组数据
 const loadGroups = async () => {
@@ -257,7 +207,6 @@ const loadGroups = async () => {
     const response = await getListGroups()
     if (response && response.data) {
       groups.value = response.data
-      pageTitle.value = response.data.title || "配置组列表"
     } else if (Array.isArray(response)) {
       groups.value = response
     } else {
@@ -265,26 +214,11 @@ const loadGroups = async () => {
     }
   } catch (error) {
     console.error("API Error:", error)
-    // 模拟数据用于展示效果 (实际使用请删除)
-    groups.value = ["LoginServer", "GameServer", "ChatService", "Database", "Gateway"]
   } finally {
     loading.value = false
   }
 }
 
-// 启动单个
-const startGroup = async (groupName) => {
-  if (isStarting.value) return
-  isStarting.value = true
-  try {
-    await startGroups([groupName])
-    message.success(`已启动: ${groupName}`)
-  } catch (error) {
-    message.error("启动失败")
-  } finally {
-    isStarting.value = false
-  }
-}
 
 // 多选逻辑优化
 const isSelected = (groupName) => selectedGroups.value.includes(groupName)
@@ -328,12 +262,9 @@ const startSelected = async () => {
 
 onMounted(() => {
   loadGroups()
-  getImages()
 })
 
-onUnmounted(() => {
-  if (carouselInterval) clearInterval(carouselInterval)
-})
+
 </script>
 
 <style scoped>
