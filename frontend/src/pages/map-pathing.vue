@@ -119,7 +119,7 @@
 <script setup>
 import { ref, onMounted } from "vue"
 import { Cascader as ACascader, message, Modal } from "ant-design-vue"
-import { getListGroups, listPathingUpdatePaths } from "@/api"
+import { getListGroups, listPathingUpdatePaths, getMapPathingList } from "@/api"
 
 
 const pathingList = ref([])
@@ -135,8 +135,8 @@ const cascaderOptions = ref([]) // 级联选择用数据
 const fetchPathing = async () => {
   loading.value = true
   try {
-    const res = await fetch("/api/scriptGroup/ConfigPathing")
-    const json = await res.json()
+    const res = await getMapPathingList()
+    const json = res.data
     // folderName字符串转数组
     pathingList.value = (json.data || []).map(item => ({
       ...item,
@@ -356,17 +356,20 @@ onMounted(() => {
   box-shadow: 0 8px 32px #ffb6c1;
   padding: 40px;
 }
+
 h2 {
   color: #ff6eb4;
   margin-bottom: 32px;
   font-size: 2.2rem;
   text-align: center;
 }
+
 .loading {
   color: #e91e63;
   font-size: 1.2em;
   text-align: center;
 }
+
 .pathing-table {
   width: 100%;
   border-collapse: collapse;
@@ -374,17 +377,22 @@ h2 {
   margin-bottom: 18px;
   font-size: 1.15rem;
 }
-.pathing-table th, .pathing-table td {
+
+.pathing-table th,
+.pathing-table td {
   border: 2px solid #ffc0da;
   padding: 16px;
   text-align: left;
 }
+
 .pathing-table th {
   background: #ffe4ee;
   color: #e91e63;
   font-size: 1.1rem;
 }
-input, select {
+
+input,
+select {
   width: 95%;
   padding: 10px 14px;
   border: 1px solid #ffc0da;
@@ -392,6 +400,7 @@ input, select {
   font-size: 1rem;
   background: #fff;
 }
+
 button {
   background: linear-gradient(90deg, #ff6eb4, #ff8cc8);
   color: #fff;
@@ -403,31 +412,38 @@ button {
   transition: background 0.2s;
   font-size: 1rem;
 }
+
 button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
+
 button[type="button"] {
   background: #fff;
   color: #ff6eb4;
   border: 2px solid #ff6eb4;
   margin-top: 10px;
 }
+
 .desktop-table {
   display: table;
 }
+
 .mobile-list {
   display: none;
 }
+
 .path-cell {
   max-width: 380px;
   min-width: 180px;
   padding: 0;
 }
+
 .path-scroll {
   overflow-x: auto;
   width: 100%;
 }
+
 .path-scroll input {
   min-width: 320px;
   width: 100%;
@@ -447,16 +463,20 @@ button[type="button"] {
     padding: 10px;
     border-radius: 10px;
   }
+
   h2 {
     font-size: 1.3rem;
     margin-bottom: 18px;
   }
+
   .desktop-table {
     display: none;
   }
+
   .mobile-list {
     display: block;
   }
+
   .mobile-card {
     background: #fff;
     border-radius: 12px;
@@ -465,24 +485,29 @@ button[type="button"] {
     margin-bottom: 16px;
     font-size: 1rem;
   }
+
   .mobile-row {
     display: flex;
     align-items: center;
     margin-bottom: 10px;
     gap: 8px;
   }
+
   .mobile-label {
     min-width: 70px;
     color: #e91e63;
     font-size: 0.98em;
   }
+
   .mobile-btn {
     width: 100%;
     padding: 10px 0;
     font-size: 1rem;
     border-radius: 8px;
   }
-  input, select {
+
+  input,
+  select {
     width: 100%;
     padding: 8px 10px;
     font-size: 1rem;

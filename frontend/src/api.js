@@ -301,3 +301,5 @@ export const deleteBagStatistics = (name) => api.delete(`/api/BagStatistics/DELE
 export const clearBagStatistics = () => api.post("/api/BagStatistics/CLEAR")
 export const logAnalysis2Page = (file) => api.get(`/api/LogAnalysis2Page?file=${encodeURIComponent(file)}`)
 export const archive = (archiveItem) => api.post("/api/archive", archiveItem)
+
+export const getMapPathingList = () => api.get("/api/scriptGroup/ConfigPathin")
