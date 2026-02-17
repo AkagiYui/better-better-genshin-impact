@@ -112,7 +112,7 @@ const buttonGroups = ref([
         },
       },
       { text: "⭕脚本屋", route: { name: "js-names" } },
-      { text: "⭕地图追踪", route: { name: "pathing" } },
+      { text: "⭕地图追踪", route: { name: "map-pathing" } },
       { text: "⭕联机管理", route: { name: "online" } },
       { text: "⭕ABGI定时任务", route: { name: "task-cron" } },
     ],
