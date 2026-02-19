@@ -17,14 +17,6 @@ export const useIsMobile = () => {
   return { isMobile }
 }
 
-export const useWindowEvent = (event, handler) => {
-  onMounted(() => {
-    window.addEventListener(event, handler)
-  })
-  onUnmounted(() => {
-    window.removeEventListener(event, handler)
-  })
-}
 
 /**
  * Starts/stops a setInterval based on a reactive flag.

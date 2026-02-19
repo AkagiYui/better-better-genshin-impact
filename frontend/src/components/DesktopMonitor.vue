@@ -26,8 +26,9 @@
 import { ref, computed, watch } from "vue"
 import { message } from "ant-design-vue"
 import { useQuery } from "@pinia/colada"
+import { useEventListener } from "@vueuse/core"
 import { getScreenshot } from "@/api"
-import { useIsMobile, useWindowEvent } from "@/hooks"
+import { useIsMobile } from "@/hooks"
 
 const props = defineProps({
   visible: {
@@ -172,7 +173,7 @@ const handleTouchEnd = () => {
 }
 
 // 监听键盘事件，支持按R键手动刷新
-useWindowEvent("keydown", (event) => {
+useEventListener("keydown", (event) => {
   if (!props.visible) return // 只在截图模态框打开时处理
   if (event.key === "r" || event.key === "R") {
     event.preventDefault()
