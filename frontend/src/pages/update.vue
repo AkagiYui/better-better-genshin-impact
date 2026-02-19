@@ -148,10 +148,10 @@ const refresh = async () => {
   checking.value = true
   note.value = ""
   try {
-    const cur = await aBgiGetCurrentVersion()
+    const cur = (await aBgiGetCurrentVersion()).data
     currentVersion.value = cur?.version ?? cur?.data?.version ?? (typeof cur === "string" ? cur : JSON.stringify(cur))
 
-    const last = await aBgiGetLastVersion()
+    const last = (await aBgiGetLastVersion()).data
     latestVersion.value = last?.version ?? last?.data?.version ?? (typeof last === "string" ? last : JSON.stringify(last))
   } catch (err) {
     message.error("获取版本信息失败")
@@ -186,7 +186,7 @@ const refreshBgiVersions = async () => {
   bgiLatestVersion.value = "加载中..."
   bgiCanUpdate.value = false
   try {
-    const res = await aBgiGetVersions()
+    const res = (await aBgiGetVersions()).data
     if (res) {
       bgiCurrentVersion.value = res.currentVersion ?? res.current ?? bgiCurrentVersion.value
       bgiLatestVersion.value = res.lastVersion ?? res.latest ?? bgiLatestVersion.value
@@ -210,7 +210,7 @@ const startBgiPolling = () => {
   }
   bgiTimerId = setInterval(async () => {
     try {
-      const status = await getBgiDownloadStatus()
+      const status = (await getBgiDownloadStatus()).data
       if (!status) return
 
       if (typeof status.percent !== "undefined") {
@@ -256,7 +256,7 @@ const downloadByUrl = () => {
 
 const resumeBgiDownloadIfNeeded = async () => {
   try {
-    const status = await getBgiDownloadStatus()
+    const status = (await getBgiDownloadStatus()).data
     if (!status) return
     if (status.status === "downloading") {
       downloading.value = true
