@@ -101,7 +101,7 @@ const buttonGroups = ref([
           })
         },
       },
-      { text: "配置组", route: { name: "script-groups" } },
+      { text: "配置组启动", route: { name: "script-groups" } },
       {
         text: "⭕备份 USER 文件",
         action: () => {
