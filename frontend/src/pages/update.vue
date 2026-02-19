@@ -4,7 +4,7 @@
       <div class="card-deco" />
 
       <div class="sponsor-badge">
-        <span class="heart">❤</span> 感谢 <span class="name"></span> 赞助
+        <span class="heart">❤</span> 感谢 <span class="name" /> 赞助
       </div>
 
       <h2 class="title">系统版本管理</h2>
@@ -110,6 +110,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue"
 import { message } from "ant-design-vue"
+import { useEventListener } from "@vueuse/core"
 import {
   aBgiGetCurrentVersion,
   aBgiGetLastVersion,
@@ -293,18 +294,11 @@ const closeDisclaimer = () => {
   showDisclaimer.value = false
 }
 
-const _onKeydown = (e) => {
+
+useEventListener("keydown", (e) => {
   if (e && e.key === "Escape") {
     showDisclaimer.value = false
   }
-}
-
-onMounted(() => {
-  window.addEventListener("keydown", _onKeydown)
-})
-
-onUnmounted(() => {
-  window.removeEventListener("keydown", _onKeydown)
 })
 </script>
 
